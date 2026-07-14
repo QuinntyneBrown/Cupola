@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Typography — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<style>
+  .type-row { display: grid; grid-template-columns: 200px 1fr 220px; gap: 24px; align-items: baseline; padding: 16px 0; border-bottom: 1px solid var(--cp-color-hairline); }
+  .type-row .meta { font: var(--cp-type-data-s); color: var(--cp-color-ink-3); }
+  .type-row .meta code { display:block; color: var(--cp-color-primary); margin-bottom: 2px; }
+  .type-row .map { font: var(--cp-type-caption); color: var(--cp-color-ink-3); }
+  @media (max-width: 800px) { .type-row { grid-template-columns: 1fr; gap: 4px; } }
+</style>
+</head>
+<body data-page="foundations/typography" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Foundations</p>
+  <h1>Typography</h1>
+  <p class="ds-lead">
+    One superfamily, three cuts. IBM&nbsp;Plex&nbsp;Sans carries the interface, IBM&nbsp;Plex&nbsp;Mono
+    carries every number the spacecraft produces, and IBM&nbsp;Plex&nbsp;Sans&nbsp;Condensed labels
+    panels the way placards label switches. Roboto is deliberately replaced in the Material
+    typography config.
+  </p>
+
+  <h2 id="faces">Typefaces<a class="ds-anchor" href="#faces">#</a></h2>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Token</th><th>Stack</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td><code>--cp-font-ui</code></td><td>IBM Plex Sans, Segoe UI, system-ui</td><td>All interface text: labels, body, buttons, headings</td></tr>
+      <tr><td><code>--cp-font-mono</code></td><td>IBM Plex Mono, Cascadia Mono, Consolas</td><td>Telemetry values, timestamps, axis ticks, code — always with <code>font-variant-numeric: tabular-nums</code> in columns</td></tr>
+      <tr><td><code>--cp-font-cond</code></td><td>IBM Plex Sans Condensed, Arial Narrow</td><td>Pane headers and eyebrows only — uppercase, letterspaced</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="scale">Type scale<a class="ds-anchor" href="#scale">#</a></h2>
+  <p>Each level is a single <code class="ds-code-inline">font</code> shorthand token. Base UI size is 14px; the scale is compact because the working surfaces are dense.</p>
+
+  <div class="ds-demo"><div class="ds-demo-stage ds-demo-stage--block" style="padding:8px 32px">
+    <div class="type-row">
+      <div class="meta"><code>--cp-type-display</code>600 &middot; 28/34 &middot; Sans</div>
+      <div style="font:var(--cp-type-display)">Mission operations</div>
+      <div class="map">Material: headline-4 &middot; page titles, About dialog</div>
+    </div>
+    <div class="type-row">
+      <div class="meta"><code>--cp-type-title</code>600 &middot; 20/28 &middot; Sans</div>
+      <div style="font:var(--cp-type-title)">Dialog and view titles</div>
+      <div class="map">headline-6 &middot; dialog heads, large-overlay titles</div>
+    </div>
+    <div class="type-row">
+      <div class="meta"><code>--cp-type-title-s</code>600 &middot; 16/24 &middot; Sans</div>
+      <div style="font:var(--cp-type-title-s)">Section and card titles</div>
+      <div class="map">subtitle-1 &middot; card heads, object view header</div>
+    </div>
+    <div class="type-row">
+      <div class="meta"><code>--cp-type-body</code>400 &middot; 14/20 &middot; Sans</div>
+      <div style="font:var(--cp-type-body)">Default interface text: menu items, form values, table of contents, dialog body copy.</div>
+      <div class="map">body-1 &middot; the base size</div>
+    </div>
+    <div class="type-row">
+      <div class="meta"><code>--cp-type-body-s</code>400 &middot; 12/16 &middot; Sans</div>
+      <div style="font:var(--cp-type-body-s)">Secondary text: breadcrumbs, indicator labels, result paths.</div>
+      <div class="map">body-2</div>
+    </div>
+    <div class="type-row">
+      <div class="meta"><code>--cp-type-label</code>500 &middot; 13/16 &middot; Sans</div>
+      <div style="font:var(--cp-type-label)">Buttons, tabs, field labels, column headers</div>
+      <div class="map">button / subtitle-2</div>
+    </div>
+    <div class="type-row">
+      <div class="meta"><code>--cp-type-caption</code>400 &middot; 11/14 &middot; Sans</div>
+      <div style="font:var(--cp-type-caption)">Helper text, timestamps under entries, demo captions</div>
+      <div class="map">caption</div>
+    </div>
+    <div class="type-row">
+      <div class="meta"><code>--cp-type-overline</code>600 &middot; 11/16 &middot; Cond &middot; +0.06em</div>
+      <div style="font:var(--cp-type-overline);text-transform:uppercase;letter-spacing:.08em">Group label &middot; nav section &middot; eyebrow</div>
+      <div class="map">overline &middot; always uppercase</div>
+    </div>
+    <div class="type-row">
+      <div class="meta"><code>--cp-type-pane-head</code>600 &middot; 12/16 &middot; Cond &middot; +0.06em</div>
+      <div style="font:var(--cp-type-pane-head);text-transform:uppercase;letter-spacing:.06em">Browse &middot; Inspector &middot; Elements</div>
+      <div class="map">pane headers, expansion panel heads</div>
+    </div>
+    <div class="type-row">
+      <div class="meta"><code>--cp-type-data-l</code>500 &middot; 24/28 &middot; Mono</div>
+      <div style="font:var(--cp-type-data-l)">84.2 <span style="font:var(--cp-type-data);color:var(--cp-color-ink-3)">kW</span></div>
+      <div class="map">gauge values, hero readouts — unit one level down, muted</div>
+    </div>
+    <div class="type-row">
+      <div class="meta"><code>--cp-type-data</code>400 &middot; 13/18 &middot; Mono</div>
+      <div style="font:var(--cp-type-data);font-variant-numeric:tabular-nums">2026-07-13 18:22:04.000&nbsp;&nbsp;120.14 V</div>
+      <div class="map">table cells, conductor bounds, property values</div>
+    </div>
+    <div class="type-row" style="border-bottom:none">
+      <div class="meta"><code>--cp-type-data-s</code>400 &middot; 11/14 &middot; Mono</div>
+      <div style="font:var(--cp-type-data-s)">18:22:04&nbsp;&nbsp;+00:00:30&nbsp;&nbsp;60 fps</div>
+      <div class="map">axis ticks, offsets, badges, requirement chips</div>
+    </div>
+  </div></div>
+
+  <h2 id="rules">Usage rules<a class="ds-anchor" href="#rules">#</a></h2>
+  <ul>
+    <li><strong>If a human didn't write it, set it in mono.</strong> Values, timestamps, identifiers, units, coordinates. Names and descriptions stay in sans.</li>
+    <li><strong>Tabular figures in columns.</strong> Any vertically aligned numbers (tables, ticks, conductor) get <code class="ds-code-inline">tabular-nums</code> so updates don't jitter.</li>
+    <li><strong>Units are muted, values are not.</strong> The unit renders in <code class="ds-code-inline">ink-3</code> one step smaller, separated by a thin space.</li>
+    <li><strong>Condensed caps never exceed 12px</strong> and never set running text — headers and eyebrows only.</li>
+    <li><strong>Stale values go italic</strong> in the same mono face, with the history glyph (<a href="color.html#status">Color &rsaquo; status</a>).</li>
+    <li><strong>Weights:</strong> 400 body, 500 labels/mono emphasis, 600 headings. Nothing bolder; hierarchy comes from size, color, and case.</li>
+  </ul>
+
+  <div class="ds-dodont">
+    <div class="ds-do"><div class="head"><svg class="cp-icon cp-icon--s"><use href="#i-check"/></svg>Do</div>
+      <div class="body"><span style="font:var(--cp-type-data);font-variant-numeric:tabular-nums">101.32 <span style="color:var(--cp-color-ink-3);font-size:11px">kPa</span></span></div>
+      <div class="note">Mono value, muted smaller unit.</div>
+    </div>
+    <div class="ds-dont"><div class="head"><svg class="cp-icon cp-icon--s"><use href="#i-close"/></svg>Don't</div>
+      <div class="body"><span style="font:600 14px/18px var(--cp-font-ui)">101.32 KPA</span></div>
+      <div class="note">Proportional bold figures jitter as they update; the unit shouts.</div>
+    </div>
+  </div>
+
+  <h2 id="angular">Angular mapping<a class="ds-anchor" href="#angular">#</a></h2>
+  <pre class="ds-code"><span class="cmt">// styles/_typography.scss — replaces Roboto across Material</span>
+$cupola-typography: mat.define-typography-config(
+  $font-family: <span class="str">'IBM Plex Sans'</span>,
+  $headline-4: mat.define-typography-level(28px, 34px, 600),
+  $headline-6: mat.define-typography-level(20px, 28px, 600),
+  $subtitle-1: mat.define-typography-level(16px, 24px, 600),
+  $body-1:     mat.define-typography-level(14px, 20px, 400),
+  $body-2:     mat.define-typography-level(12px, 16px, 400),
+  $button:     mat.define-typography-level(13px, 16px, 500),
+  $caption:    mat.define-typography-level(11px, 14px, 400),
+);
+<span class="cmt">// Load via index.html &lt;link&gt; to Google Fonts, or self-host the woff2 files.</span></pre>
+
+  <div class="ds-pagenav">
+    <a href="color.html"><span class="dir">Previous</span>&larr; Color</a>
+    <a href="spacing.html"><span class="dir">Next</span>Spacing &amp; density &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

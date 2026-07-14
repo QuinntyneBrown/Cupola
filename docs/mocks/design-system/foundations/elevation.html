@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elevation &amp; shape — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body data-page="foundations/elevation" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Foundations</p>
+  <h1>Elevation &amp; shape</h1>
+  <p class="ds-lead">
+    Attached layers elevate by getting <em>lighter</em> and gaining a hairline. Shadows exist only
+    under <em>detached</em> layers &mdash; things that float over the workspace and will leave:
+    menus, dialogs, tooltips, drag ghosts. Shape stays tight and instrument-like.
+  </p>
+
+  <h2 id="ladder">Elevation ladder<a class="ds-anchor" href="#ladder">#</a></h2>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Level</th><th>Surface</th><th>Border</th><th>Shadow</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td>0 &middot; canvas</td><td><code>void</code></td><td>&mdash;</td><td>&mdash;</td><td>App background, status bar, plot/canvas wells</td></tr>
+      <tr><td>1 &middot; pane</td><td><code>surface-1</code></td><td><code>hairline</code></td><td>&mdash;</td><td>Tree pane, main view, inspector</td></tr>
+      <tr><td>2 &middot; raised</td><td><code>surface-2</code></td><td><code>hairline</code></td><td>optional <code>--cp-shadow-1</code></td><td>Toolbars, pane heads, cards, table headers</td></tr>
+      <tr><td>3 &middot; detached</td><td><code>surface-3</code></td><td><code>line</code></td><td><code>--cp-shadow-2</code></td><td>Menus, popups, tooltips, snackbars</td></tr>
+      <tr><td>4 &middot; modal</td><td><code>surface-3</code> + scrim</td><td><code>line</code></td><td><code>--cp-shadow-3</code></td><td>Dialogs, large-view overlay</td></tr>
+      <tr><td>drag</td><td><code>surface-3</code></td><td>accent ring</td><td><code>--cp-shadow-drag</code></td><td>Drag ghosts (tree nodes, layout frames)</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="gap:24px;padding:40px">
+      <div class="cp-card" style="width:150px"><div style="font:var(--cp-type-caption);color:var(--cp-color-ink-3)">Level 2</div><div style="font:var(--cp-type-body)">Card</div></div>
+      <div class="cp-menu" style="min-width:150px;position:static"><div style="padding:6px 8px;font:var(--cp-type-caption);color:var(--cp-color-ink-3)">Level 3</div><button class="cp-menu-item">Menu item</button></div>
+      <div class="cp-dialog cp-dialog--fit" style="position:static;max-height:none">
+        <div class="cp-dialog-head"><h2>Level 4</h2></div>
+        <div class="cp-dialog-body" style="padding-bottom:16px">Dialog on a scrim.</div>
+      </div>
+      <div class="cp-drag-ghost"><svg class="cp-icon cp-icon--s"><use href="#i-telemetry"/></svg>Drag ghost</div>
+    </div>
+    <div class="ds-demo-caption">The four visible elevation treatments, side by side on the void canvas.</div>
+  </div>
+
+  <h2 id="shape">Shape<a class="ds-anchor" href="#shape">#</a></h2>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Token</th><th>Radius</th><th>Applies to</th></tr></thead>
+    <tbody>
+      <tr><td><code>--cp-radius-s</code></td><td>3px</td><td>Buttons, inputs, menu items, tree rows, tab bodies, kbd</td></tr>
+      <tr><td><code>--cp-radius-m</code></td><td>6px</td><td>Cards, panes, menus, banners, popups</td></tr>
+      <tr><td><code>--cp-radius-l</code></td><td>10px</td><td>Dialogs and large overlays only</td></tr>
+      <tr><td><code>--cp-radius-pill</code></td><td>999px</td><td>Chips, count badges, switch track, status dots</td></tr>
+    </tbody>
+  </table></div>
+  <p>
+    Nothing else is rounded. Plot canvases, gauges, imagery, and layout frames keep 3px or square
+    corners &mdash; data surfaces should read as instruments, not bubbles.
+  </p>
+
+  <h2 id="focus">Focus &amp; selection treatment<a class="ds-anchor" href="#focus">#</a></h2>
+  <p>
+    One focus ring everywhere: <code class="ds-code-inline">2px solid --cp-color-focus-ring</code> with
+    2px offset (inset &minus;2px inside clipped containers). Selection is a fill
+    (<code class="ds-code-inline">primary-dim</code>), never a ring, so keyboard focus and selection
+    remain distinguishable when they coincide (OMCT-C16-L2-03.01).
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage">
+      <button class="cp-btn cp-btn--outlined" style="outline:2px solid var(--cp-color-focus-ring);outline-offset:2px">Focused</button>
+      <div class="cp-tree" style="width:200px;background:var(--cp-color-surface-1)">
+        <div class="cp-tree-row is-selected"><svg class="cp-icon cp-tree-chevron" style="visibility:hidden"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-plot"/></svg><span class="cp-tree-label">Selected</span></div>
+        <div class="cp-tree-row is-selected" style="outline:2px solid var(--cp-color-focus-ring);outline-offset:-2px"><svg class="cp-icon cp-tree-chevron" style="visibility:hidden"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-plot"/></svg><span class="cp-tree-label">Selected + focused</span></div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Focus ring vs selection fill — both can apply at once and stay legible.</div>
+  </div>
+
+  <h2 id="angular">Angular mapping<a class="ds-anchor" href="#angular">#</a></h2>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Disable Material's elevation shadows on attached components (<code class="ds-code-inline">mat-elevation-z0</code>) and let CDK overlays carry <code class="ds-code-inline">--cp-shadow-2/3</code> via the overlay pane class.</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="spacing.html"><span class="dir">Previous</span>&larr; Spacing &amp; density</a>
+    <a href="iconography.html"><span class="dir">Next</span>Iconography &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notebook — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<style>
+/* ---- page-scoped: notebook scaffolding (token-driven) ---- */
+.nb-shell {
+  display: flex; height: 480px; width: 100%;
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-m);
+  background: var(--cp-color-surface-1);
+  overflow: hidden;
+}
+.nb-col { display: flex; flex-direction: column; min-width: 0; }
+.nb-col--sections { width: 190px; flex: none; border-right: 1px solid var(--cp-color-hairline); }
+.nb-col--pages { width: 214px; flex: none; border-right: 1px solid var(--cp-color-hairline); }
+.nb-col--entries { flex: 1; }
+.nb-list { padding: var(--cp-space-2); overflow-y: auto; }
+.nb-item {
+  display: flex; align-items: center; gap: 8px;
+  height: var(--cp-size-row);
+  padding: 0 var(--cp-space-3);
+  border-radius: var(--cp-radius-s);
+  font: var(--cp-type-body); color: var(--cp-color-ink-2);
+  cursor: pointer; white-space: nowrap; overflow: hidden;
+}
+.nb-item:hover { background: var(--cp-color-surface-hover); color: var(--cp-color-ink); }
+.nb-item.is-selected { background: var(--cp-color-primary-dim); color: var(--cp-color-primary); }
+.nb-item .cp-icon { width: 14px; height: 14px; flex: none; }
+.nb-item-label { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.nb-item-actions { display: flex; gap: 2px; margin-left: auto; }
+.nb-act {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; padding: 0;
+  border: none; border-radius: var(--cp-radius-s);
+  background: transparent; color: var(--cp-color-ink-3); cursor: pointer;
+}
+.nb-act:hover { background: var(--cp-color-surface-hover); color: var(--cp-color-ink); }
+.nb-act .cp-icon { width: 13px; height: 13px; }
+
+/* Entries column */
+.nb-editor {
+  flex: none; padding: var(--cp-space-4);
+  border-bottom: 1px solid var(--cp-color-hairline);
+  display: flex; flex-direction: column; gap: var(--cp-space-3);
+  background: var(--cp-color-surface-1);
+}
+.nb-drop {
+  display: flex; align-items: center; gap: 8px; flex: 1;
+  border: 1px dashed var(--cp-color-line);
+  border-radius: var(--cp-radius-s);
+  padding: 5px var(--cp-space-3);
+  font: var(--cp-type-caption); color: var(--cp-color-ink-3);
+}
+.nb-drop .cp-icon { width: 14px; height: 14px; }
+.nb-entries {
+  flex: 1; overflow-y: auto; padding: var(--cp-space-4);
+  display: flex; flex-direction: column; gap: var(--cp-space-4);
+  background: var(--cp-color-void);
+}
+
+/* Entry */
+.nb-entry {
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-m);
+  background: var(--cp-color-surface-2);
+  padding: var(--cp-space-4) 14px;
+  display: flex; flex-direction: column; gap: var(--cp-space-3);
+}
+.nb-entry-head { display: flex; align-items: center; gap: 10px; min-height: 22px; }
+.nb-ts { font: var(--cp-type-data-s); color: var(--cp-color-ink-2); }
+.nb-author { display: inline-flex; align-items: center; gap: 5px; font: var(--cp-type-body-s); color: var(--cp-color-ink-3); }
+.nb-author .cp-icon { width: 12px; height: 12px; }
+.nb-entry-head .nb-item-actions { margin-left: auto; }
+.nb-entry-body { font: var(--cp-type-body); color: var(--cp-color-ink); }
+.nb-entry-body p { margin: 0; max-width: none; color: inherit; }
+.nb-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.nb-entry .cp-chip { height: 20px; }
+
+/* Committed / restricted */
+.nb-committed {
+  display: inline-flex; align-items: center; gap: 5px;
+  font: var(--cp-type-overline); text-transform: uppercase; letter-spacing: var(--cp-tracking-caps);
+  color: var(--cp-color-ink-3);
+  border: 1px solid var(--cp-color-line);
+  border-radius: var(--cp-radius-pill);
+  padding: 0 8px; line-height: 16px;
+}
+.nb-committed .cp-icon { width: 11px; height: 11px; }
+.nb-blocked {
+  display: inline-flex; align-items: center; gap: 4px;
+  color: var(--cp-color-ink-3); text-decoration: line-through;
+}
+.nb-blocked .cp-icon { width: 12px; height: 12px; color: var(--cp-color-critical); }
+.nb-blocked-badge {
+  font: var(--cp-type-data-s); text-decoration: none;
+  color: var(--cp-color-critical);
+  background: var(--cp-color-critical-dim);
+  border: 1px solid var(--cp-color-critical-border);
+  border-radius: var(--cp-radius-s);
+  padding: 0 4px; line-height: 15px; margin-left: 2px;
+}
+
+/* Snapshot embed */
+.nb-snap {
+  display: inline-flex; align-items: center; gap: 10px;
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-s);
+  background: var(--cp-color-void);
+  padding: 6px 10px 6px 6px;
+  max-width: 100%;
+}
+.nb-snap-img {
+  width: 64px; height: 40px; flex: none; border-radius: 2px;
+  border: 1px solid var(--cp-color-line);
+  background: linear-gradient(135deg, #1D3A5C 0%, #0C1826 80%);
+}
+.nb-snap-meta { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.nb-snap-name { display: inline-flex; align-items: center; gap: 5px; font: var(--cp-type-body-s); color: var(--cp-color-ink); white-space: nowrap; }
+.nb-snap-name .cp-icon { width: 12px; height: 12px; color: var(--cp-color-ink-3); }
+.nb-snap-ts { font: var(--cp-type-data-s); color: var(--cp-color-ink-3); }
+
+/* Annotation inspector target row */
+.nb-target {
+  display: flex; align-items: center; gap: 8px;
+  font: var(--cp-type-body-s); color: var(--cp-color-ink);
+  background: var(--cp-color-void);
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-s);
+  padding: 6px 10px;
+}
+.nb-target .cp-icon { width: 14px; height: 14px; color: var(--cp-color-ink-2); }
+.nb-target .range { margin-left: auto; font: var(--cp-type-data-s); color: var(--cp-color-ink-3); }
+
+/* Search results: stack name over path so the path can ellipsize */
+.nb-search .cp-result-name, .nb-search .cp-result-path { display: block; }
+</style>
+</head>
+<body data-page="patterns/notebook" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Patterns</p>
+  <h1>Notebook</h1>
+  <p class="ds-lead">
+    Notebooks are the mission log: sections contain pages, pages contain timestamped entries with
+    sanitized rich text, embedded snapshots, and tags. Restricted notebooks add committed (locked)
+    entries and a URL whitelist. Annotations attach the same tag vocabulary to points, regions, and
+    objects anywhere in the workspace.
+  </p>
+
+  <h2 id="layout">Notebook layout<a class="ds-anchor" href="#layout">#</a></h2>
+  <p>
+    Three columns: sections, pages, entries. Sections and pages support inline add / rename / delete;
+    the pin marks the default entry destination — “new entry” actions anywhere in Cupola land on the
+    pinned notebook + section + page.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:var(--cp-space-5)">
+      <div class="nb-shell">
+        <div class="nb-col nb-col--sections">
+          <div class="cp-pane-head">Sections<button class="cp-icon-btn cp-icon-btn--s" style="margin-left:auto" aria-label="Add section"><svg class="cp-icon cp-icon--s"><use href="#i-plus"/></svg></button></div>
+          <div class="nb-list cp-scroll">
+            <div class="nb-item"><span class="nb-item-label">Increment 72 ops</span></div>
+            <div class="nb-item is-selected"><span class="nb-item-label">EVA operations</span>
+              <span class="nb-item-actions">
+                <button class="nb-act" aria-label="Rename section"><svg class="cp-icon"><use href="#i-pencil"/></svg></button>
+                <button class="nb-act" aria-label="Delete section"><svg class="cp-icon"><use href="#i-trash"/></svg></button>
+              </span>
+            </div>
+            <div class="nb-item"><span class="nb-item-label">Payload science</span></div>
+            <div class="nb-item"><span class="nb-item-label">Anomalies</span></div>
+          </div>
+        </div>
+        <div class="nb-col nb-col--pages">
+          <div class="cp-pane-head">Pages<button class="cp-icon-btn cp-icon-btn--s" style="margin-left:auto" aria-label="Add page"><svg class="cp-icon cp-icon--s"><use href="#i-plus"/></svg></button></div>
+          <div class="nb-list cp-scroll">
+            <div class="nb-item"><span class="nb-item-label">EVA 70 debrief</span></div>
+            <div class="nb-item is-selected"><span class="nb-item-label">EVA 71 — P6 battery swap</span></div>
+            <div class="nb-item"><span class="nb-item-label">EVA 72 prep</span><svg class="cp-icon" style="color:var(--cp-color-primary)" role="img" aria-label="Default destination"><use href="#i-pin"/></svg></div>
+          </div>
+        </div>
+        <div class="nb-col nb-col--entries">
+          <div class="nb-editor">
+            <textarea class="cp-textarea" placeholder="Add a notebook entry…" style="min-height:52px"></textarea>
+            <div style="display:flex;gap:10px;align-items:stretch">
+              <span class="nb-drop"><svg class="cp-icon"><use href="#i-image"/></svg>Drop an object here to embed a snapshot</span>
+              <button class="cp-btn cp-btn--filled cp-btn--small" style="align-self:center">Save entry</button>
+            </div>
+          </div>
+          <div class="nb-entries cp-scroll">
+            <div class="nb-entry">
+              <div class="nb-entry-head">
+                <span class="nb-ts">2026-07-13 14:52:07</span>
+                <span class="nb-author"><svg class="cp-icon"><use href="#i-user"/></svg>j.reyes</span>
+                <span class="nb-item-actions">
+                  <button class="nb-act" aria-label="Edit entry"><svg class="cp-icon"><use href="#i-pencil"/></svg></button>
+                  <button class="nb-act" aria-label="Delete entry"><svg class="cp-icon"><use href="#i-trash"/></svg></button>
+                </span>
+              </div>
+              <div class="nb-entry-body"><p>Torqued bolts 1–4 on <strong>battery 2B</strong>; drive readings <em>nominal</em>. Cross-checked against the <a class="cp-link" href="#layout">P6 channel 2B procedure</a>.</p></div>
+              <div>
+                <span class="nb-snap">
+                  <span class="nb-snap-img"></span>
+                  <span class="nb-snap-meta">
+                    <span class="nb-snap-name"><svg class="cp-icon"><use href="#i-camera"/></svg>SciCam 02 — snapshot</span>
+                    <span class="nb-snap-ts">2026-07-13 14:51:40 UTC</span>
+                  </span>
+                </span>
+              </div>
+              <div class="nb-tags">
+                <span class="cp-chip"><span class="cp-chip-dot" style="background:var(--cp-chart-1)"></span>EVA</span>
+                <span class="cp-chip"><span class="cp-chip-dot" style="background:var(--cp-chart-3)"></span>Power</span>
+              </div>
+            </div>
+            <div class="nb-entry">
+              <div class="nb-entry-head">
+                <span class="nb-ts">2026-07-13 13:38:19</span>
+              </div>
+              <div class="nb-entry-body"><p>Suit 2 CO₂ scrubber swap complete before egress; ppCO₂ back under 2.0 mmHg.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Sections → pages → entries. Add buttons in each pane head; rename/delete affordances appear on hover (shown on the selected section). The pin on “EVA 72 prep” marks the default destination.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">cupola-notebook</code> — three CDK-scrollable columns; section/page lists are the same list-row primitive as the object tree. The second entry omits the author line: entries created with no identity configured render timestamp-only.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C13-L2-01.01 · notebook object</span>
+    <span class="ds-req">OMCT-C13-L2-01.02 · sections &amp; pages</span>
+    <span class="ds-req">OMCT-C13-L2-01.03 · entry creation</span>
+    <span class="ds-req">OMCT-C13-L2-01.05 · default destination</span>
+  </div>
+
+  <h2 id="entries">Entry anatomy &amp; states<a class="ds-anchor" href="#entries">#</a></h2>
+  <p>
+    An entry is a mono timestamp, an optional author, sanitized rich-text body, embedded snapshots,
+    and tag chips. Markdown renders through the sanitizer — script, style, and event-handler content
+    is stripped before display. In a <strong>restricted</strong> notebook, committed entries lock
+    permanently and only whitelisted URLs render as links.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--col" style="align-items:stretch">
+      <div style="max-width:640px;display:flex;flex-direction:column;gap:var(--cp-space-5)">
+      <div class="nb-entry">
+        <div class="nb-entry-head">
+          <span class="nb-ts">2026-07-13 15:06:33</span>
+          <span class="nb-author"><svg class="cp-icon"><use href="#i-user"/></svg>j.reyes</span>
+          <span class="nb-item-actions">
+            <button class="nb-act" aria-label="Edit entry"><svg class="cp-icon"><use href="#i-pencil"/></svg></button>
+            <button class="nb-act" aria-label="Delete entry"><svg class="cp-icon"><use href="#i-trash"/></svg></button>
+          </span>
+        </div>
+        <div class="nb-entry-body"><p><strong>Battery 2B installed.</strong> Load test at 105 A held for 5 min — <em>no thermal excursion</em>. Full trace linked from the <a class="cp-link" href="#entries">EVA 71 plot workspace</a>.</p></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <span class="nb-snap">
+            <span class="nb-snap-img"></span>
+            <span class="nb-snap-meta">
+              <span class="nb-snap-name"><svg class="cp-icon"><use href="#i-camera"/></svg>Bus voltage — snapshot</span>
+              <span class="nb-snap-ts">2026-07-13 15:05:58 UTC</span>
+            </span>
+          </span>
+          <span class="nb-snap">
+            <span class="nb-snap-img" style="background:linear-gradient(135deg,#24476B 0%,#0C1826 80%)"></span>
+            <span class="nb-snap-meta">
+              <span class="nb-snap-name"><svg class="cp-icon"><use href="#i-camera"/></svg>Helmet cam 1 — snapshot</span>
+              <span class="nb-snap-ts">2026-07-13 15:04:12 UTC</span>
+            </span>
+          </span>
+        </div>
+        <div class="nb-tags">
+          <span class="cp-chip"><span class="cp-chip-dot" style="background:var(--cp-chart-1)"></span>EVA</span>
+          <span class="cp-chip"><span class="cp-chip-dot" style="background:var(--cp-chart-3)"></span>Power</span>
+          <span class="cp-chip"><span class="cp-chip-dot" style="background:var(--cp-chart-2)"></span>Science</span>
+        </div>
+      </div>
+      <div class="nb-entry" style="border-color:var(--cp-color-line)">
+        <div class="nb-entry-head">
+          <svg class="cp-icon cp-icon--s" style="color:var(--cp-color-ink-3)"><use href="#i-lock"/></svg>
+          <span class="nb-ts">2026-07-13 12:04:51</span>
+          <span class="nb-author"><svg class="cp-icon"><use href="#i-user"/></svg>e.thorne</span>
+          <span class="nb-committed" style="margin-left:auto"><svg class="cp-icon"><use href="#i-lock"/></svg>Committed</span>
+        </div>
+        <div class="nb-entry-body"><p>Pre-EVA go/no-go poll complete — all stations GO. External reference:
+          <span class="nb-blocked"><svg class="cp-icon"><use href="#i-x-circle"/></svg>mission-wiki.example.org/eva-71<span class="nb-blocked-badge">Blocked URL</span></span>
+        </p></div>
+      </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Top: editable entry — pencil/trash appear on hover; snapshots are mini cards (camera + object name + mono timestamp) that expand to a full-size annotatable preview on click. Bottom: committed entry in a restricted notebook — locked, no edit controls, and a non-whitelisted URL renders inert with the Blocked URL badge.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Entry markdown pipes through <code class="ds-code-inline">DomSanitizer</code> plus a markdown whitelist (OMCT-C16-L2-04.02); restricted notebooks additionally check hrefs against the configured URL whitelist before rendering an anchor.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C13-L2-01.03 · entry anatomy</span>
+    <span class="ds-req">OMCT-C13-L2-02.02/.03 · snapshots &amp; expanded view</span>
+    <span class="ds-req">OMCT-C13-L2-02.06 · restricted notebooks</span>
+    <span class="ds-req">OMCT-C13-L2-04.04 · tag chips</span>
+    <span class="ds-req">OMCT-C16-L2-04.02 · sanitized markdown</span>
+  </div>
+
+  <h2 id="editor">Entry editor &amp; deletion<a class="ds-anchor" href="#editor">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="align-items:flex-start;gap:40px">
+      <div style="width:360px;display:flex;flex-direction:column;gap:10px">
+        <textarea class="cp-textarea" placeholder="Add a notebook entry…"></textarea>
+        <span class="nb-drop"><svg class="cp-icon"><use href="#i-image"/></svg>Drop an object here to embed a snapshot</span>
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+          <button class="cp-btn cp-btn--text cp-btn--small">Cancel</button>
+          <button class="cp-btn cp-btn--filled cp-btn--small">Save entry</button>
+        </div>
+      </div>
+      <div class="cp-dialog cp-dialog--s" style="position:static">
+        <div class="cp-dialog-head">
+          <svg class="cp-icon" style="color:var(--cp-color-critical)"><use href="#i-alert-triangle"/></svg>
+          <h2>Delete this entry?</h2>
+        </div>
+        <div class="cp-dialog-body">The entry from <span style="font:var(--cp-type-data-s);color:var(--cp-color-ink)">2026-07-13 14:52:07</span> and its embedded snapshots will be removed from this page. This can’t be undone.</div>
+        <div class="cp-dialog-foot">
+          <button class="cp-btn cp-btn--text">Cancel</button>
+          <button class="cp-btn cp-btn--danger">Delete entry</button>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">The editor accepts typed text and dragged objects (dropped objects embed as snapshots). Deletion always confirms with a danger dialog.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Editor is a plain <code class="ds-code-inline">cp-textarea</code> with a CDK drop list overlay; confirmation via <code class="ds-code-inline">MatDialog</code> (small variant, danger action right-aligned).</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C13-L2-01.03 · text entries</span>
+    <span class="ds-req">OMCT-C13-L2-01.04 · entry deletion</span>
+  </div>
+
+  <h2 id="sync">Live synchronization<a class="ds-anchor" href="#sync">#</a></h2>
+  <p>
+    Notebooks are shared documents: entries added, edited, or deleted by other operators appear,
+    update, or disappear in place — no reload, no “refresh” action. Remote changes never steal focus
+    from an entry being written locally.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block">
+      <div class="cp-banner cp-banner--info" style="max-width:640px">
+        <svg class="cp-icon"><use href="#i-refresh"/></svg>
+        <span class="cp-banner-msg"><strong>Synced live.</strong> e.thorne added an entry to EVA operations · “EVA 71 — P6 battery swap” 12 s ago; it appeared in place without a reload.</span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Remote adds (OMCT-C13-L2-03.01), edits (03.02), and deletions (03.03) reconcile through the persistence store’s change feed.</div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C13-L2-03.01–.03 · live add / update / remove</span>
+  </div>
+
+  <h2 id="search">Notebook search<a class="ds-anchor" href="#search">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start;gap:40px">
+      <div class="nb-search" style="width:380px;display:flex;flex-direction:column;gap:8px">
+        <span class="cp-input-wrap">
+          <svg class="cp-icon cp-icon--s cp-icon--lead"><use href="#i-search"/></svg>
+          <input class="cp-input" value="battery">
+        </span>
+        <div class="cp-search-results">
+          <div class="cp-result is-focus">
+            <svg class="cp-icon"><use href="#i-notebook"/></svg>
+            <span class="cp-result-text">
+              <span class="cp-result-name">Torqued bolts 1–4 on <mark>battery</mark> 2B; drive readings nominal…</span>
+              <span class="cp-result-path">EVA operations / EVA 71 · 14:52:07 UTC</span>
+            </span>
+          </div>
+          <div class="cp-result">
+            <svg class="cp-icon"><use href="#i-notebook"/></svg>
+            <span class="cp-result-text">
+              <span class="cp-result-name"><mark>Battery</mark> 2B installed. Load test at 105 A held…</span>
+              <span class="cp-result-path">EVA operations / EVA 71 · 15:06:33 UTC</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div style="width:320px">
+        <div class="cp-empty" style="border:1px solid var(--cp-color-hairline);border-radius:var(--cp-radius-m)">
+          <svg class="cp-icon"><use href="#i-search"/></svg>
+          <h4>No matching entries</h4>
+          <p>Nothing in this notebook matches “ammonia clamp”. Try a tag, author, or object name.</p>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Search spans all sections and pages of the open notebook; matches highlight in accent with the section/page path and entry time. Empty results state on the right.</div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C13-L2-02.04 · notebook search</span>
+  </div>
+
+  <h2 id="actions">Default destination, copy &amp; export<a class="ds-anchor" href="#actions">#</a></h2>
+  <p>
+    Any object’s action menu can copy it into a notebook as a snapshot; captured snapshots wait in the
+    snapshot container until they are placed into an entry or discarded.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start;gap:40px">
+      <div class="cp-menu" style="width:250px">
+        <div class="cp-menu-head">Notebook</div>
+        <button class="cp-menu-item"><svg class="cp-icon"><use href="#i-pin"/></svg>Set as default notebook</button>
+        <button class="cp-menu-item"><svg class="cp-icon"><use href="#i-copy"/></svg>Copy to notebook</button>
+        <div class="cp-menu-sep"></div>
+        <button class="cp-menu-item"><svg class="cp-icon"><use href="#i-download"/></svg>Export as text</button>
+      </div>
+      <div class="cp-pane" style="width:300px">
+        <div class="cp-pane-head"><svg class="cp-icon"><use href="#i-camera"/></svg>Snapshots<span class="cp-count cp-count--info" style="margin-left:auto">3</span></div>
+        <div class="cp-pane-body" style="display:flex;gap:10px">
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:center">
+            <span class="nb-snap-img"></span><span class="nb-snap-ts">14:51:40</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:center">
+            <span class="nb-snap-img" style="background:linear-gradient(135deg,#24476B 0%,#0C1826 80%)"></span><span class="nb-snap-ts">15:04:12</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;align-items:center">
+            <span class="nb-snap-img" style="background:linear-gradient(135deg,#173250 0%,#0A141F 80%)"></span><span class="nb-snap-ts">15:05:58</span>
+          </div>
+          <button class="cp-icon-btn cp-icon-btn--s" style="margin-left:auto" aria-label="Snapshot actions"><svg class="cp-icon"><use href="#i-kebab"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">“Set as default notebook” pins the destination shown in the layout above; “Copy to notebook” snapshots the selected object into the default page; “Export as text” downloads the notebook as plain text.</div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C13-L2-01.05 · default notebook</span>
+    <span class="ds-req">OMCT-C13-L2-02.01 · copy to notebook</span>
+    <span class="ds-req">OMCT-C13-L2-02.05 · export as text</span>
+  </div>
+
+  <h2 id="annotations">Annotations &amp; tags<a class="ds-anchor" href="#annotations">#</a></h2>
+  <p>
+    Annotations attach tags and comments to targets anywhere — plot points, image regions, map
+    features, or whole objects. Tag colors come from the chart palette slots, shared with notebook
+    entry tags. Creation fails loudly when the target lives in a read-only namespace.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <div class="cp-pane" style="width:340px">
+        <div class="cp-pane-head"><svg class="cp-icon"><use href="#i-eye"/></svg>Inspector — Annotations</div>
+        <div class="cp-pane-body" style="display:flex;flex-direction:column;gap:12px">
+          <div class="nb-target">
+            <svg class="cp-icon"><use href="#i-plot"/></svg>3 plot points on Bus voltage
+            <span class="range">14:31:02–14:31:40</span>
+          </div>
+          <div class="cp-field" style="max-width:none">
+            <label class="cp-field-label">Tags</label>
+            <div class="nb-tags">
+              <span class="cp-chip"><span class="cp-chip-dot" style="background:var(--cp-chart-6)"></span>Anomaly<button class="cp-chip-x" aria-label="Remove tag Anomaly"><svg class="cp-icon" style="width:10px;height:10px"><use href="#i-close"/></svg></button></span>
+              <span class="cp-chip"><span class="cp-chip-dot" style="background:var(--cp-chart-5)"></span>Eclipse ops<button class="cp-chip-x" aria-label="Remove tag Eclipse ops"><svg class="cp-icon" style="width:10px;height:10px"><use href="#i-close"/></svg></button></span>
+            </div>
+            <span class="cp-field-help"></span>
+          </div>
+          <div class="cp-field" style="max-width:none">
+            <label class="cp-field-label">Add tag</label>
+            <span class="cp-input-wrap">
+              <svg class="cp-icon cp-icon--s cp-icon--lead"><use href="#i-search"/></svg>
+              <input class="cp-input" value="sc">
+            </span>
+            <span class="cp-field-help">Empty search term shows no suggestions</span>
+          </div>
+          <div class="cp-menu" style="min-width:0">
+            <button class="cp-menu-item"><span class="cp-chip-dot" style="width:8px;height:8px;border-radius:50%;background:var(--cp-chart-2)"></span><span><b style="color:var(--cp-color-primary)">Sc</b>ience</span></button>
+            <button class="cp-menu-item"><span class="cp-chip-dot" style="width:8px;height:8px;border-radius:50%;background:var(--cp-chart-8)"></span><span><b style="color:var(--cp-color-primary)">Sc</b>rubber swap</span></button>
+          </div>
+          <div class="cp-banner cp-banner--critical" role="alert">
+            <svg class="cp-icon"><use href="#i-alert-circle"/></svg>
+            <span class="cp-banner-msg"><strong>Can’t create annotation:</strong> read-only namespace. The target object’s provider does not accept writes.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Target summary (what is annotated + mono time range), removable tag chips, and a tag combobox — suggestions appear only once a term is typed. Rejected creation keeps the selection and explains why.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Tag picker is <code class="ds-code-inline">mat-autocomplete</code> over the shared tag vocabulary; annotations load with the target’s view and render as chips/markers in place. Writes go through the annotation provider — read-only namespaces reject with the banner above.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C13-L2-04.01 · create annotations</span>
+    <span class="ds-req">OMCT-C13-L2-04.02 · annotation targets</span>
+    <span class="ds-req">OMCT-C13-L2-04.03 · rejected creation</span>
+    <span class="ds-req">OMCT-C13-L2-04.04 · tag chips &amp; colors</span>
+    <span class="ds-req">OMCT-C13-L2-04.05 · tag suggestions</span>
+    <span class="ds-req">OMCT-C13-L2-04.06 · annotations load with view</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="timeline.html"><span class="dir">Previous</span>&larr; Plans &amp; timelines</a>
+    <a href="../index.html"><span class="dir">Next</span>Back to overview &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

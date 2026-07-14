@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panes &amp; panels — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<style>
+  /* page-scoped demo helpers — all token-driven */
+  .demo-el {
+    display: flex; align-items: center; gap: 6px;
+    height: 28px; padding: 0 var(--cp-space-2);
+    border-radius: var(--cp-radius-s);
+    font: var(--cp-type-body-s); color: var(--cp-color-ink);
+  }
+  .demo-el:hover { background: var(--cp-color-surface-hover); }
+  .demo-el .demo-grip { color: var(--cp-color-ink-3); cursor: grab; }
+  .demo-el .cp-icon { width: 14px; height: 14px; color: var(--cp-color-ink-2); }
+
+  .demo-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: var(--cp-space-3);
+  }
+  .demo-tile {
+    display: flex; flex-direction: column; align-items: center;
+    gap: var(--cp-space-3);
+    padding: var(--cp-space-4) var(--cp-space-3);
+    border: 1px solid transparent;
+    border-radius: var(--cp-radius-m);
+    cursor: pointer; text-align: center;
+    color: var(--cp-color-ink);
+  }
+  .demo-tile:hover { background: var(--cp-color-surface-hover); }
+  .demo-tile.is-selected {
+    background: var(--cp-color-primary-dim);
+    border-color: var(--cp-color-primary-border);
+    color: var(--cp-color-primary);
+  }
+  .demo-tile .cp-icon { width: 28px; height: 28px; color: var(--cp-color-ink-2); }
+  .demo-tile.is-selected .cp-icon { color: var(--cp-color-primary); }
+  .demo-tile-name { font: var(--cp-type-body-s); overflow-wrap: anywhere; }
+
+  .demo-listrow {
+    display: flex; align-items: center; gap: var(--cp-space-3);
+    height: var(--cp-size-row); padding: 0 var(--cp-space-4);
+    border-bottom: 1px solid var(--cp-color-hairline);
+    font: var(--cp-type-body); cursor: pointer;
+  }
+  .demo-listrow:last-child { border-bottom: none; }
+  .demo-listrow:hover { background: var(--cp-color-surface-hover); }
+  .demo-listrow.is-selected { background: var(--cp-color-primary-dim); color: var(--cp-color-primary); }
+  .demo-listrow .cp-icon { width: var(--cp-size-icon-s); height: var(--cp-size-icon-s); color: var(--cp-color-ink-2); }
+  .demo-listrow.is-selected .cp-icon { color: var(--cp-color-primary); }
+  .demo-listrow .type { font: var(--cp-type-body-s); color: var(--cp-color-ink-3); width: 100px; }
+  .demo-listrow .when { font: var(--cp-type-data-s); color: var(--cp-color-ink-3); margin-left: auto; }
+
+  /* remote-update flash — primary-dim pulse, never alarm colors */
+  .demo-flash { position: relative; }
+  .demo-flash::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: var(--cp-color-primary-dim);
+    opacity: 0;
+    animation: demo-flash 2.4s var(--cp-ease-standard) infinite;
+  }
+  @keyframes demo-flash { 8% { opacity: 1; } 40% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .demo-flash::after { animation: none; opacity: 1; }
+  }
+
+  .demo-split {
+    display: flex; width: 260px; height: 110px;
+    border: 1px solid var(--cp-color-hairline);
+    border-radius: var(--cp-radius-m);
+    overflow: hidden; background: var(--cp-color-void);
+  }
+  .demo-split .p { flex: 1; background: var(--cp-color-surface-1); }
+  .demo-split--h { flex-direction: column; }
+
+  .demo-rail {
+    width: 28px; height: 140px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: var(--cp-space-2); padding-top: var(--cp-space-1);
+    background: var(--cp-color-surface-2);
+    border: 1px solid var(--cp-color-hairline);
+    border-radius: var(--cp-radius-m);
+  }
+  .demo-rail-label {
+    writing-mode: vertical-rl;
+    font: var(--cp-type-pane-head);
+    text-transform: uppercase;
+    letter-spacing: var(--cp-tracking-caps);
+    color: var(--cp-color-ink-3);
+  }
+</style>
+</head>
+<body data-page="components/cards-panels" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Components</p>
+  <h1>Panes &amp; panels</h1>
+  <p class="ds-lead">
+    Every region of the shell is a pane: a condensed-caps header over a body, separated from its
+    neighbors by draggable splitters. The inspector stacks expansion panels inside one pane; folders
+    render their children as tiles or rows; and when a pane has nothing to show, it says so with a
+    proper empty state instead of a blank rectangle.
+  </p>
+
+  <h2 id="anatomy">Pane anatomy<a class="ds-anchor" href="#anatomy">#</a></h2>
+  <p>
+    <code class="ds-code-inline">.cp-pane</code> &mdash; surface-1 body under a 32px surface-2 head.
+    The head holds a 14px icon, a condensed-caps label (12/16, +0.06em), a spacer, then icon
+    buttons; last is the collapse control. Body padding is 12px
+    (<code class="ds-code-inline">--cp-space-4</code>); when the body is a tree, table, or canvas
+    that manages its own gutters, the body goes flush (padding 0).
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void">
+      <div class="cp-pane" style="width:320px">
+        <div class="cp-pane-head">
+          <svg class="cp-icon"><use href="#i-layers"/></svg>
+          Browse
+          <span class="cp-toolbar-spacer"></span>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Pane options"><svg class="cp-icon cp-icon--s"><use href="#i-kebab"/></svg></button>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Collapse pane"><svg class="cp-icon cp-icon--s"><use href="#i-chevron-left"/></svg></button>
+        </div>
+        <div class="cp-pane-body" style="color:var(--cp-color-ink-2);font:var(--cp-type-body-s)">
+          Body content &mdash; 12px padding on all sides.
+        </div>
+      </div>
+      <div style="font:var(--cp-type-data-s);color:var(--cp-color-caution);display:flex;flex-direction:column;gap:6px">
+        <span>head 32 &middot; icon 14 &middot; label 12/16 caps +0.06em</span>
+        <span>body padding 12 &middot; radius 6 &middot; hairline border</span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Head: icon + condensed-caps label + spacer + icon buttons; the collapse chevron always sits last.</div>
+  </div>
+
+  <h2 id="inspector">The inspector as panes<a class="ds-anchor" href="#inspector">#</a></h2>
+  <p>
+    The inspector is one pane holding a glyph tab strip and a stack of expansion panels. Tabs appear
+    only when they apply to the current selection and keep a fixed priority order &mdash; Properties
+    first, view-specific tabs next, Annotations last. Within a tab, sections are
+    <code class="ds-code-inline">.cp-expand</code> panels the operator opens and closes independently.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="align-items:flex-start">
+      <div class="cp-pane" style="width:344px">
+        <div class="cp-pane-head">
+          <svg class="cp-icon"><use href="#i-crosshair"/></svg>
+          Inspect
+          <span class="cp-toolbar-spacer"></span>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Collapse pane"><svg class="cp-icon cp-icon--s"><use href="#i-chevron-right"/></svg></button>
+        </div>
+        <div class="cp-tabs" style="padding:0 4px">
+          <button class="cp-tab" aria-selected="true" aria-label="Properties" title="Properties"><svg class="cp-icon"><use href="#i-info"/></svg></button>
+          <button class="cp-tab" aria-selected="false" aria-label="Elements" title="Elements"><svg class="cp-icon"><use href="#i-layers"/></svg></button>
+          <button class="cp-tab" aria-selected="false" aria-label="Styles" title="Styles"><svg class="cp-icon"><use href="#i-eye"/></svg></button>
+          <button class="cp-tab" aria-selected="false" aria-label="Annotations" title="Annotations"><svg class="cp-icon"><use href="#i-notebook"/></svg></button>
+        </div>
+        <div class="cp-expand is-open">
+          <button class="cp-expand-head">Properties<svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg></button>
+          <div class="cp-expand-body">
+            <dl class="cp-props" style="grid-template-columns:88px 1fr">
+              <dt>Title</dt><dd>Array output vs. bus voltage</dd>
+              <dt>Type</dt><dd>Overlay Plot</dd>
+              <dt>Created</dt><dd>2026-07-11 09:14:02 UTC</dd>
+              <dt>Created by</dt><dd>j.reyes</dd>
+              <dt>Modified</dt><dd>2026-07-13 17:22:41 UTC</dd>
+              <dt>Modified by</dt><dd>k.tanaka</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="cp-expand is-open">
+          <button class="cp-expand-head">Elements<svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg></button>
+          <div class="cp-expand-body" style="display:flex;flex-direction:column;gap:2px">
+            <div class="demo-el"><svg class="cp-icon demo-grip"><use href="#i-grip"/></svg><svg class="cp-icon"><use href="#i-telemetry"/></svg>pwr.array_out</div>
+            <div class="demo-el"><svg class="cp-icon demo-grip"><use href="#i-grip"/></svg><svg class="cp-icon"><use href="#i-telemetry"/></svg>pwr.bus_v</div>
+            <div class="demo-el"><svg class="cp-icon demo-grip"><use href="#i-grip"/></svg><svg class="cp-icon"><use href="#i-telemetry"/></svg>pwr.pdu2_current</div>
+          </div>
+        </div>
+        <div class="cp-expand">
+          <button class="cp-expand-head">Styles<svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg></button>
+        </div>
+        <div class="cp-expand" style="border-bottom:none">
+          <button class="cp-expand-head">Annotations<svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Glyph tab strip (Properties selected) over expansion panels. Elements rows carry grip handles — drag to reorder; row order is series order.</div>
+  </div>
+  <p>
+    Properties always shows the persistence metadata &mdash; created and modified timestamps in mono
+    UTC plus <code class="ds-code-inline">createdBy</code> / <code class="ds-code-inline">modifiedBy</code>
+    attribution &mdash; so any operator can see who touched an object last without leaving the view.
+  </p>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">mat-tab-group</code> (icon tabs with tooltips) + <code class="ds-code-inline">mat-expansion-panel</code> restyled to 32px condensed-caps headers; Elements reorders via <code class="ds-code-inline">cdkDropList</code>.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C15-L2-02.03 &middot; tab applicability &amp; order</span>
+    <span class="ds-req">OMCT-C15-L2-02.04 &middot; inspector panels</span>
+    <span class="ds-req">OMCT-C02-L2-02.02 &middot; object metadata</span>
+    <span class="ds-req">OMCT-C02-L2-02.03 &middot; created/modified by</span>
+  </div>
+
+  <h2 id="header">Object view header<a class="ds-anchor" href="#header">#</a></h2>
+  <p>The main view's toolbar variant: type glyph, object name, then the breadcrumb path. Actions sit right of the spacer.</p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:24px;display:flex;flex-direction:column;align-items:stretch;gap:16px">
+      <div class="cp-toolbar" style="border:1px solid var(--cp-color-hairline);border-radius:var(--cp-radius-m)">
+        <svg class="cp-icon" style="color:var(--cp-color-ink-2)"><use href="#i-plot"/></svg>
+        <span style="font:var(--cp-type-title-s)">Array output vs. bus voltage</span>
+        <nav class="cp-breadcrumb" aria-label="Object path"><a href="#header">My Items</a><span class="sep">/</span><a href="#header">Station displays</a></nav>
+        <span class="cp-toolbar-spacer"></span>
+        <button class="cp-icon-btn" aria-label="Edit object"><svg class="cp-icon"><use href="#i-pencil"/></svg></button>
+        <button class="cp-icon-btn" aria-label="More actions"><svg class="cp-icon"><use href="#i-kebab"/></svg></button>
+      </div>
+      <div class="cp-toolbar demo-flash" style="border:1px solid var(--cp-color-primary-border);border-radius:var(--cp-radius-m)">
+        <svg class="cp-icon" style="color:var(--cp-color-ink-2)"><use href="#i-plot"/></svg>
+        <span style="font:var(--cp-type-title-s)">Array output vs. bus voltage</span>
+        <nav class="cp-breadcrumb" aria-label="Object path"><a href="#header">My Items</a><span class="sep">/</span><a href="#header">Station displays</a></nav>
+        <span class="cp-toolbar-spacer"></span>
+        <span style="font:var(--cp-type-caption);color:var(--cp-color-primary)">updated by k.tanaka</span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Default header · remote-change state: another session saved this object, the view updates in place and the header pulses primary-dim — a mode color, never an alarm color (OMCT-C04-L2-02.05).</div>
+  </div>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:24px;display:flex;flex-direction:column;align-items:stretch;gap:16px">
+      <div class="cp-banner">
+        <svg class="cp-icon" style="color:var(--cp-color-ink-2)"><use href="#i-lock"/></svg>
+        <span class="cp-banner-msg"><strong>This object is locked.</strong> Properties, composition, and layout can't change until an owner unlocks it. Views stay live.</span>
+      </div>
+      <div class="cp-pane" style="min-height:220px">
+        <div class="cp-pane-head"><svg class="cp-icon"><use href="#i-help"/></svg>Unknown object</div>
+        <div class="cp-empty" style="flex:1">
+          <svg class="cp-icon"><use href="#i-help"/></svg>
+          <h4>This object is missing or unavailable</h4>
+          <p>The identifier couldn't be resolved. It may have been removed, or its source isn't reachable. Links to it stay in place and recover if it returns.</p>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Locked banner (neutral — locked is a state, not a fault) · missing object gets the full-pane empty treatment, never a broken partial view.</div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C04-L2-02.05 &middot; remote update flash</span>
+    <span class="ds-req">OMCT-C03-L2-02.06 &middot; locked objects</span>
+    <span class="ds-req">OMCT-C02-L2-01.06 &middot; missing objects</span>
+  </div>
+
+  <h2 id="cards">Cards &amp; folder views<a class="ds-anchor" href="#cards">#</a></h2>
+  <p>
+    <code class="ds-code-inline">.cp-card</code> is the surface-2 block for grouped content inside a
+    pane. Folders use it at scale: children render as a tile grid or a detail list, switched by a
+    toggle group in the pane head. Selection looks the same in both &mdash; primary-dim fill.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:24px">
+      <div class="cp-pane">
+        <div class="cp-pane-head">
+          <svg class="cp-icon"><use href="#i-folder"/></svg>
+          Station displays
+          <span class="cp-toolbar-spacer"></span>
+          <div class="cp-toggle-group" role="group" aria-label="Folder view">
+            <button class="cp-btn cp-btn--small" aria-pressed="true" data-demo-toggle aria-label="Grid view"><svg class="cp-icon"><use href="#i-grid"/></svg></button>
+            <button class="cp-btn cp-btn--small" aria-pressed="false" data-demo-toggle aria-label="List view"><svg class="cp-icon"><use href="#i-list"/></svg></button>
+          </div>
+        </div>
+        <div class="cp-pane-body">
+          <div class="demo-tiles">
+            <div class="demo-tile"><svg class="cp-icon"><use href="#i-folder"/></svg><span class="demo-tile-name">Eclipse ops</span></div>
+            <div class="demo-tile"><svg class="cp-icon"><use href="#i-plot"/></svg><span class="demo-tile-name">Bus voltage</span></div>
+            <div class="demo-tile is-selected"><svg class="cp-icon"><use href="#i-layout"/></svg><span class="demo-tile-name">Power dashboard</span></div>
+            <div class="demo-tile"><svg class="cp-icon"><use href="#i-table"/></svg><span class="demo-tile-name">PDU currents</span></div>
+            <div class="demo-tile"><svg class="cp-icon"><use href="#i-image"/></svg><span class="demo-tile-name">Cupola cam</span></div>
+            <div class="demo-tile"><svg class="cp-icon"><use href="#i-gauge"/></svg><span class="demo-tile-name">Cabin pressure</span></div>
+            <div class="demo-tile"><svg class="cp-icon"><use href="#i-notebook"/></svg><span class="demo-tile-name">Shift log</span></div>
+            <div class="demo-tile"><svg class="cp-icon"><use href="#i-timer"/></svg><span class="demo-tile-name">Eclipse timer</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Grid view: glyph + name tiles; selected tile takes the primary-dim fill. Toggle is interactive.</div>
+  </div>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:24px">
+      <div class="cp-pane">
+        <div class="cp-pane-head">
+          <svg class="cp-icon"><use href="#i-folder"/></svg>
+          Station displays
+          <span class="cp-toolbar-spacer"></span>
+          <div class="cp-toggle-group" role="group" aria-label="Folder view">
+            <button class="cp-btn cp-btn--small" aria-pressed="false" data-demo-toggle aria-label="Grid view"><svg class="cp-icon"><use href="#i-grid"/></svg></button>
+            <button class="cp-btn cp-btn--small" aria-pressed="true" data-demo-toggle aria-label="List view"><svg class="cp-icon"><use href="#i-list"/></svg></button>
+          </div>
+        </div>
+        <div>
+          <div class="demo-listrow"><svg class="cp-icon"><use href="#i-folder"/></svg>Eclipse ops<span class="type">Folder</span><span class="when">2026-07-12 21:03 UTC</span></div>
+          <div class="demo-listrow"><svg class="cp-icon"><use href="#i-plot"/></svg>Bus voltage<span class="type">Overlay Plot</span><span class="when">2026-07-13 16:48 UTC</span></div>
+          <div class="demo-listrow is-selected"><svg class="cp-icon"><use href="#i-layout"/></svg>Power dashboard<span class="type">Display Layout</span><span class="when">2026-07-13 17:22 UTC</span></div>
+          <div class="demo-listrow"><svg class="cp-icon"><use href="#i-table"/></svg>PDU currents<span class="type">Telemetry Table</span><span class="when">2026-07-10 08:15 UTC</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">List view: the same children as rows with type and modified time (mono). Body goes flush — the rows own their padding.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Folder view is a registered object view; the grid/list choice persists per folder. Toggle: <code class="ds-code-inline">mat-button-toggle-group</code>.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C09-L2-03.04 &middot; folder grid/list views</span>
+  </div>
+
+  <h2 id="splitters">Splitters &amp; collapse<a class="ds-anchor" href="#splitters">#</a></h2>
+  <p>
+    A 5px invisible hit area between panes; it tints primary on hover and while dragging. Double-click
+    resets the split. Collapsing a pane leaves a 28px rail with its label rotated and a restore
+    chevron &mdash; the pane is parked, not gone.
+  </p>
+  <div class="ds-variants">
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="demo-split"><div class="p"></div><div class="cp-splitter cp-splitter--v"></div><div class="p"></div></div></div><div class="ds-variant-label">Vertical splitter — default (invisible)</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="demo-split"><div class="p"></div><div class="cp-splitter cp-splitter--v" style="background:var(--cp-color-primary-border)"></div><div class="p"></div></div></div><div class="ds-variant-label">Hover</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="demo-split"><div class="p" style="flex:2"></div><div class="cp-splitter cp-splitter--v is-dragging"></div><div class="p"></div></div></div><div class="ds-variant-label">Dragging — panes resize live</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="demo-split demo-split--h"><div class="p"></div><div class="cp-splitter cp-splitter--h" style="background:var(--cp-color-primary-border)"></div><div class="p"></div></div></div><div class="ds-variant-label">Horizontal splitter — hover</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="demo-rail"><button class="cp-icon-btn cp-icon-btn--s" aria-label="Expand inspector"><svg class="cp-icon cp-icon--s"><use href="#i-chevron-left"/></svg></button><span class="demo-rail-label">Inspect</span></div></div><div class="ds-variant-label">Collapsed pane rail — click to restore</div></div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Custom <code class="ds-code-inline">cp-splitter</code> directive on CDK drag; announces size changes to assistive tech and persists ratios per layout.</span>
+  </div>
+
+  <h2 id="empty">Empty states<a class="ds-anchor" href="#empty">#</a></h2>
+  <p>Every pane that can be empty has words for it: a muted 32px icon, a one-line title, and at most one sentence pointing at the way forward. No illustration, no humor &mdash; this is a console.</p>
+  <div class="ds-variants" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="cp-empty" style="padding:16px"><svg class="cp-icon"><use href="#i-folder"/></svg><h4>This folder is empty</h4><p>Create an object here, or drag one in from the tree.</p></div></div><div class="ds-variant-label">Empty folder</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="cp-empty" style="padding:16px"><svg class="cp-icon"><use href="#i-crosshair"/></svg><h4>Nothing selected</h4><p>Select an object to inspect.</p></div></div><div class="ds-variant-label">Inspector — no selection</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="cp-empty" style="padding:16px"><svg class="cp-icon"><use href="#i-search"/></svg><h4>No matching objects</h4><p>Try a shorter term, or clear the type filters.</p></div></div><div class="ds-variant-label">Empty search</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="cp-empty" style="padding:16px"><svg class="cp-icon"><use href="#i-telemetry"/></svg><h4>No telemetry</h4><p>No data in the selected time range. Widen the conductor bounds.</p></div></div><div class="ds-variant-label">No telemetry in range</div></div>
+  </div>
+
+  <h2 id="dividers">Dividers &amp; property lists<a class="ds-anchor" href="#dividers">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="align-items:flex-start">
+      <div class="cp-pane" style="width:344px">
+        <div class="cp-pane-head"><svg class="cp-icon"><use href="#i-info"/></svg>Details</div>
+        <div class="cp-pane-body">
+          <dl class="cp-props" style="grid-template-columns:88px 1fr">
+            <dt>Type</dt><dd>Telemetry Table</dd>
+            <dt>Rows</dt><dd>1,248</dd>
+          </dl>
+          <hr class="cp-divider">
+          <dl class="cp-props" style="grid-template-columns:88px 1fr">
+            <dt>Created</dt><dd>2026-07-09 11:02:44 UTC</dd>
+            <dt>Created by</dt><dd>j.reyes</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">A hairline divider separates prop groups inside one body; labels are muted 12px, values are mono ink.</div>
+  </div>
+  <ul>
+    <li><strong>Dividers separate, headers name:</strong> use <code class="ds-code-inline">.cp-divider</code> between groups within one section; if a group deserves a name, promote it to an expansion panel instead.</li>
+    <li><strong>Property lists are two columns, always:</strong> <code class="ds-code-inline">dt</code> muted at up to 40% width, <code class="ds-code-inline">dd</code> in mono. Long values wrap; they never truncate silently.</li>
+    <li><strong>Timestamps are mono UTC</strong> in the active time-system format, same as the indicator bar clock.</li>
+  </ul>
+
+  <div class="ds-pagenav">
+    <a href="indicators.html"><span class="dir">Previous</span>&larr; Indicators &amp; chips</a>
+    <a href="../patterns/shell.html"><span class="dir">Next</span>Application shell &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

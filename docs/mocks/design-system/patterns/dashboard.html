@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Layouts &amp; dashboards — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<style>
+  /* ---- display-layout canvas ------------------------------------------ */
+  .dl-canvas { position: relative; height: 500px; overflow: hidden; }
+  .dl-canvas--browse { background: var(--cp-color-void); }
+
+  .dl-frame-head {
+    display: flex; align-items: center; gap: 6px;
+    height: 22px; padding: 0 8px;
+    font: var(--cp-type-overline); text-transform: uppercase; letter-spacing: var(--cp-tracking-caps);
+    color: var(--cp-color-ink-3);
+    background: var(--cp-color-surface-2);
+    border-bottom: 1px solid var(--cp-color-hairline);
+    border-radius: var(--cp-radius-s) var(--cp-radius-s) 0 0;
+    white-space: nowrap; overflow: hidden;
+  }
+  .dl-frame-head .cp-icon { width: 12px; height: 12px; flex: none; }
+  .dl-frame-body { padding: var(--cp-space-3) 10px; }
+
+  /* frame-less text item floating on the canvas */
+  .dl-text {
+    position: absolute;
+    font: var(--cp-type-overline); text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--cp-color-ink-2);
+  }
+  .dl-text .sub { display: block; font: var(--cp-type-data-s); color: var(--cp-color-ink-3); text-transform: none; letter-spacing: 0; margin-top: 2px; }
+
+  /* image element */
+  .dl-img {
+    height: 88px; border-radius: 2px;
+    background:
+      radial-gradient(ellipse 70% 60% at 55% 40%, rgba(148, 178, 214, 0.20), rgba(148, 178, 214, 0.05) 60%, transparent 80%),
+      linear-gradient(rgba(139, 168, 204, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139, 168, 204, 0.05) 1px, transparent 1px),
+      #05070C;
+    background-size: auto, 24px 24px, 24px 24px, auto;
+    border: 1px solid var(--cp-color-hairline);
+  }
+  .dl-img-cap { display: flex; justify-content: space-between; font: var(--cp-type-data-s); color: var(--cp-color-ink-3); margin-top: 4px; }
+
+  /* rotation affordance on the selected frame — violet, like the handles */
+  .dl-rotate {
+    position: absolute; top: -26px; left: 50%;
+    width: 10px; height: 10px; margin-left: -5px;
+    border-radius: 50%;
+    background: var(--cp-color-edit);
+    border: 1px solid var(--cp-color-void);
+    cursor: grab; z-index: 2;
+  }
+  .dl-rotate::after {
+    content: ""; position: absolute; left: 3.5px; top: 9px;
+    width: 1px; height: 13px; background: var(--cp-color-edit);
+  }
+
+  /* geometry readout in the edit toolbar */
+  .dl-geom { font: var(--cp-type-data-s); color: var(--cp-color-ink-2); white-space: nowrap; }
+  .dl-geom b { color: var(--cp-color-edit); font-weight: 400; }
+
+  /* ---- flexible layout ------------------------------------------------- */
+  .fl-canvas { display: flex; flex-direction: column; background: var(--cp-color-void); padding: 6px; }
+  .fl-container { position: relative; display: flex; min-height: 0; }
+  .fl-canvas--edit .fl-container { outline: 1px dashed var(--cp-color-edit-border); outline-offset: -1px; }
+  .fl-chip {
+    position: absolute; top: 4px; left: 4px; z-index: 3;
+    font: var(--cp-type-data-s); color: var(--cp-color-edit);
+    background: var(--cp-color-edit-dim);
+    border: 1px solid var(--cp-color-edit-border);
+    border-radius: 2px; padding: 0 5px; line-height: 15px;
+    pointer-events: none;
+  }
+  .fl-pane {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    background: var(--cp-color-surface-1);
+    border: 1px solid var(--cp-color-hairline);
+    border-radius: var(--cp-radius-s);
+    padding: var(--cp-space-3);
+    text-align: center;
+  }
+  .fl-pane .name { font: var(--cp-type-body-s); color: var(--cp-color-ink-2); }
+  .fl-pane .name .cp-icon { width: 14px; height: 14px; vertical-align: -3px; margin-right: 4px; color: var(--cp-color-ink-3); }
+  .fl-pane .size { font: var(--cp-type-data-s); color: var(--cp-color-ink-3); }
+  .fl-pane--styled {
+    background: linear-gradient(rgba(57, 135, 229, 0.08), rgba(57, 135, 229, 0.08)) var(--cp-color-surface-1);
+    border-color: rgba(57, 135, 229, 0.45);
+  }
+
+  /* ---- web-page embed --------------------------------------------------- */
+  .web-embed-frame {
+    height: 150px;
+    display: flex; align-items: center; justify-content: center;
+    background: repeating-linear-gradient(-45deg, var(--cp-color-void), var(--cp-color-void) 12px, #0A0E15 12px, #0A0E15 24px);
+    border: 1px solid var(--cp-color-hairline);
+    border-radius: var(--cp-radius-s);
+    font: var(--cp-type-caption); color: var(--cp-color-ink-3);
+  }
+</style>
+</head>
+<body data-page="patterns/dashboard" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Patterns</p>
+  <h1>Layouts &amp; dashboards</h1>
+  <p class="ds-lead">
+    Display layouts compose child objects and drawing elements on a fixed 10px-snap canvas
+    (OMCT-C09-L2-01.01); flexible layouts split space into proportional containers and panes.
+    Both browse clean and edit violet — edit-mode affordances never borrow status colors.
+  </p>
+
+  <h2 id="browse">Display layout — browse mode<a class="ds-anchor" href="#browse">#</a></h2>
+  <p>
+    In browse mode the canvas is just the composed view: each sub-object frame embeds that object's
+    default view, live against the current time bounds (OMCT-C09-L2-01.04). No grid, no handles,
+    no outlines beyond each frame's own chrome.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:0">
+      <div class="dl-canvas dl-canvas--browse">
+        <!-- frame-less text element -->
+        <div class="dl-text" style="left:20px;top:16px">Station power — shift A
+          <span class="sub">Console 2 &middot; display layout</span>
+        </div>
+        <!-- readout frame -->
+        <div class="cp-frame" style="left:20px;top:60px;width:240px;height:130px">
+          <div class="dl-frame-head"><svg class="cp-icon"><use href="#i-telemetry"/></svg>Bus voltage</div>
+          <div class="dl-frame-body">
+            <div class="cp-gauge-value">28.4 <span class="unit">V</span></div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:6px;font:var(--cp-type-body-s);color:var(--cp-color-ink-2)"><span class="cp-dot cp-dot--ok"></span>Nominal</div>
+            <div style="font:var(--cp-type-data-s);color:var(--cp-color-ink-3);margin-top:6px">2026-07-13 18:20:11</div>
+          </div>
+        </div>
+        <!-- image frame -->
+        <div class="cp-frame" style="left:20px;top:200px;width:240px;height:130px">
+          <div class="dl-frame-head"><svg class="cp-icon"><use href="#i-camera"/></svg>Hatch camera</div>
+          <div class="dl-frame-body" style="padding:6px 8px">
+            <div class="dl-img" style="height:74px"></div>
+            <div class="dl-img-cap"><span>CAM-2 &middot; nadir</span><span>18:20:08</span></div>
+          </div>
+        </div>
+        <!-- small table frame -->
+        <div class="cp-frame" style="left:20px;top:340px;width:240px;height:140px">
+          <div class="dl-frame-head"><svg class="cp-icon"><use href="#i-table"/></svg>EPS summary</div>
+          <table class="cp-table">
+            <thead><tr><th>Channel</th><th class="num">Value</th></tr></thead>
+            <tbody>
+              <tr><td>Array out</td><td class="num">4.82<span class="unit">kW</span></td></tr>
+              <tr><td>Battery SoC</td><td class="num">87<span class="unit">%</span></td></tr>
+              <tr><td>Load bus B</td><td class="num">1.13<span class="unit">kW</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- mini plot frame -->
+        <div class="cp-frame" style="left:280px;top:60px;width:620px;height:420px">
+          <div class="dl-frame-head"><svg class="cp-icon"><use href="#i-plot"/></svg>Array output — overlay plot</div>
+          <div style="position:absolute;inset:22px 0 0 0;padding:10px 12px 8px">
+            <svg width="100%" height="100%" viewBox="0 0 600 370" preserveAspectRatio="none" role="img" aria-label="Plot placeholder">
+              <path d="M0 74 H600 M0 148 H600 M0 222 H600 M0 296 H600 M120 0 V370 M240 0 V370 M360 0 V370 M480 0 V370" stroke="var(--cp-chart-grid)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+              <path d="M0 369 H600" stroke="var(--cp-chart-axis)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+              <polyline points="0,280 60,262 120,240 180,258 240,180 300,148 360,158 420,96 480,120 540,88 600,102" fill="none" stroke="var(--cp-chart-1)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+              <polyline points="0,320 60,312 120,318 180,300 240,296 300,270 360,282 420,246 480,258 540,236 600,244" fill="none" stroke="var(--cp-chart-2)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Browse mode: readout, image, table, plot frames plus a frame-less text element — each frame renders the child object's own view (OMCT-C09-L2-01.04).</div>
+  </div>
+
+  <h2 id="edit">Display layout — edit mode<a class="ds-anchor" href="#edit">#</a></h2>
+  <p>
+    Entering edit mode reveals the 10px snap lattice and the edit toolbar. Selection outlines,
+    handles, and the rotation affordance are <strong>violet</strong> (<code class="ds-code-inline">--cp-color-edit</code>) —
+    edit is a mode, not an alarm. Position, size, rotation, and stacking order persist with the
+    layout (OMCT-C09-L2-01.03); selected items copy and paste with their geometry (OMCT-C09-L2-01.05).
+  </p>
+  <div class="ds-demo">
+    <div class="cp-toolbar cp-toolbar--editing">
+      <span class="cp-editing-badge"><svg class="cp-icon cp-icon--s"><use href="#i-pencil"/></svg>Editing</span>
+      <span class="cp-toolbar-sep"></span>
+      <button class="cp-btn cp-btn--text cp-btn--small">Align<svg class="cp-icon"><use href="#i-chevron-down"/></svg></button>
+      <button class="cp-btn cp-btn--text cp-btn--small">Distribute<svg class="cp-icon"><use href="#i-chevron-down"/></svg></button>
+      <span class="cp-toolbar-sep"></span>
+      <button class="cp-icon-btn cp-icon-btn--s" aria-label="Bring forward" title="Bring forward"><svg class="cp-icon"><use href="#i-arrow-up"/></svg></button>
+      <button class="cp-icon-btn cp-icon-btn--s" aria-label="Send backward" title="Send backward"><svg class="cp-icon"><use href="#i-arrow-down"/></svg></button>
+      <span class="cp-toolbar-sep"></span>
+      <button class="cp-btn cp-btn--text cp-btn--small"><svg class="cp-icon"><use href="#i-copy"/></svg>Copy</button>
+      <button class="cp-btn cp-btn--text cp-btn--small">Paste</button>
+      <span class="cp-toolbar-sep"></span>
+      <button class="cp-icon-btn cp-icon-btn--s is-active" aria-pressed="true" aria-label="Snap to grid" title="Snap to grid"><svg class="cp-icon"><use href="#i-grid"/></svg></button>
+      <span class="cp-toolbar-spacer"></span>
+      <span class="dl-geom"><b>x</b> 20 &middot; <b>y</b> 200 &middot; <b>w</b> 240 &middot; <b>h</b> 130 &middot; <b>r</b> 0&deg; &middot; <b>z</b> 4</span>
+      <span class="cp-toolbar-sep"></span>
+      <button class="cp-btn cp-btn--text cp-btn--small">Cancel</button>
+      <button class="cp-btn cp-btn--filled cp-btn--small"><svg class="cp-icon"><use href="#i-check"/></svg>Save</button>
+    </div>
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:0">
+      <div class="dl-canvas cp-editable-canvas">
+        <div class="dl-text" style="left:20px;top:16px">Station power — shift A
+          <span class="sub">Console 2 &middot; display layout</span>
+        </div>
+        <!-- second frame in the multi-selection: violet outline, no handles -->
+        <div class="cp-frame is-selected" style="left:20px;top:60px;width:240px;height:130px">
+          <div class="dl-frame-head"><svg class="cp-icon"><use href="#i-telemetry"/></svg>Bus voltage</div>
+          <div class="dl-frame-body">
+            <div class="cp-gauge-value">28.4 <span class="unit">V</span></div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:6px;font:var(--cp-type-body-s);color:var(--cp-color-ink-2)"><span class="cp-dot cp-dot--ok"></span>Nominal</div>
+            <div style="font:var(--cp-type-data-s);color:var(--cp-color-ink-3);margin-top:6px">2026-07-13 18:20:11</div>
+          </div>
+        </div>
+        <!-- primary selection: all 8 handles + rotation affordance -->
+        <div class="cp-frame is-selected" style="left:20px;top:200px;width:240px;height:130px">
+          <span class="dl-rotate" title="Rotate"></span>
+          <span class="cp-handle cp-handle--nw"></span><span class="cp-handle cp-handle--n"></span><span class="cp-handle cp-handle--ne"></span>
+          <span class="cp-handle cp-handle--e"></span><span class="cp-handle cp-handle--se"></span><span class="cp-handle cp-handle--s"></span>
+          <span class="cp-handle cp-handle--sw"></span><span class="cp-handle cp-handle--w"></span>
+          <div class="dl-frame-head"><svg class="cp-icon"><use href="#i-camera"/></svg>Hatch camera</div>
+          <div class="dl-frame-body" style="padding:6px 8px">
+            <div class="dl-img" style="height:74px"></div>
+            <div class="dl-img-cap"><span>CAM-2 &middot; nadir</span><span>18:20:08</span></div>
+          </div>
+        </div>
+        <div class="cp-frame" style="left:20px;top:340px;width:240px;height:140px">
+          <div class="dl-frame-head"><svg class="cp-icon"><use href="#i-table"/></svg>EPS summary</div>
+          <table class="cp-table">
+            <thead><tr><th>Channel</th><th class="num">Value</th></tr></thead>
+            <tbody>
+              <tr><td>Array out</td><td class="num">4.82<span class="unit">kW</span></td></tr>
+              <tr><td>Battery SoC</td><td class="num">87<span class="unit">%</span></td></tr>
+              <tr><td>Load bus B</td><td class="num">1.13<span class="unit">kW</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="cp-frame" style="left:280px;top:60px;width:620px;height:420px">
+          <div class="dl-frame-head"><svg class="cp-icon"><use href="#i-plot"/></svg>Array output — overlay plot</div>
+          <div style="position:absolute;inset:22px 0 0 0;padding:10px 12px 8px">
+            <svg width="100%" height="100%" viewBox="0 0 600 370" preserveAspectRatio="none" role="img" aria-label="Plot placeholder">
+              <path d="M0 74 H600 M0 148 H600 M0 222 H600 M0 296 H600 M120 0 V370 M240 0 V370 M360 0 V370 M480 0 V370" stroke="var(--cp-chart-grid)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+              <path d="M0 369 H600" stroke="var(--cp-chart-axis)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+              <polyline points="0,280 60,262 120,240 180,258 240,180 300,148 360,158 420,96 480,120 540,88 600,102" fill="none" stroke="var(--cp-chart-1)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+              <polyline points="0,320 60,312 120,318 180,300 240,296 300,270 360,282 420,246 480,258 540,236 600,244" fill="none" stroke="var(--cp-chart-2)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Edit mode: 10px lattice visible; the primary selection carries all eight resize handles plus the rotation stem; further shift-clicked frames outline violet without handles. The toolbar reads back the primary selection's geometry in mono.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Canvas is a custom component; frames use <code class="ds-code-inline">cdkDrag</code> with a 10px
+    <code class="ds-code-inline">dragConstrainPosition</code> snap. Rotation applies a CSS
+    <code class="ds-code-inline">transform: rotate()</code> and is persisted per item alongside x/y/w/h/z.</span>
+  </div>
+
+  <h2 id="composition">Composition stays in sync<a class="ds-anchor" href="#composition">#</a></h2>
+  <div class="cp-banner cp-banner--info" role="note" style="max-width:720px">
+    <svg class="cp-icon"><use href="#i-info"/></svg>
+    <span class="cp-banner-msg"><strong>One source of truth.</strong> Dropping a child into the layout's
+    composition auto-creates a sub-object frame at the drop point; removing the child removes its
+    layout item — geometry never outlives membership (OMCT-C09-L2-01.02).</span>
+  </div>
+  <ul>
+    <li>Drag from the tree onto the canvas &rarr; child is added to composition <em>and</em> a frame appears at the pointer, snapped to the grid.</li>
+    <li>"Remove" on a frame &rarr; removes the child from composition; the layout item and its geometry are deleted together.</li>
+    <li>Drawing elements (text, image, box, line) are layout-only items — they never appear in composition.</li>
+  </ul>
+
+  <h2 id="items">Layout item types<a class="ds-anchor" href="#items">#</a></h2>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Item</th><th>Content</th><th>Geometry properties</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><svg class="cp-icon cp-icon--s" style="color:var(--cp-color-ink-2);margin-right:6px"><use href="#i-layout"/></svg>Sub-object frame</td><td>A child object's embedded view</td><td><code>x, y, w, h, rotation, z</code></td><td>Frame chrome (header, border) can be hidden per item</td></tr>
+      <tr><td><svg class="cp-icon cp-icon--s" style="color:var(--cp-color-ink-2);margin-right:6px"><use href="#i-list"/></svg>Text</td><td>Static label or annotation</td><td><code>x, y, w, h, rotation, z</code></td><td>Font size steps from the type scale; color from styling panel</td></tr>
+      <tr><td><svg class="cp-icon cp-icon--s" style="color:var(--cp-color-ink-2);margin-right:6px"><use href="#i-image"/></svg>Image</td><td>Static image by URL</td><td><code>x, y, w, h, rotation, z</code></td><td>URL subject to the content allow-list</td></tr>
+      <tr><td><svg class="cp-icon cp-icon--s" style="color:var(--cp-color-ink-2);margin-right:6px"><use href="#i-widget"/></svg>Box / shape</td><td>Filled rectangle or ellipse</td><td><code>x, y, w, h, rotation, z</code></td><td>Background + border from styling panel; sits behind or above via z</td></tr>
+      <tr><td><svg class="cp-icon cp-icon--s" style="color:var(--cp-color-ink-2);margin-right:6px"><use href="#i-minus"/></svg>Line</td><td>Straight connector / divider</td><td><code>x, y, x2, y2, z</code></td><td>Endpoints snap independently; no rotation property — the endpoints are the rotation</td></tr>
+    </tbody>
+  </table></div>
+  <p>All coordinates are stored in layout-grid units (10px) so a layout re-renders identically at any DPI.</p>
+
+  <h2 id="styling">Frame styling panel<a class="ds-anchor" href="#styling">#</a></h2>
+  <p>Selecting an item in edit mode surfaces its style properties in the inspector. Hiding the frame removes header and border so the embedded view floats directly on the canvas.</p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <div class="cp-pane" style="width:280px">
+        <div class="cp-pane-head"><svg class="cp-icon"><use href="#i-pencil"/></svg>Element style</div>
+        <div class="cp-pane-body" style="display:flex;flex-direction:column;gap:14px">
+          <div class="cp-field">
+            <label class="cp-field-label">Background</label>
+            <div class="cp-swatches">
+              <button class="cp-swatch is-selected" style="background:var(--cp-color-surface-1)" aria-label="Surface 1"></button>
+              <button class="cp-swatch" style="background:var(--cp-color-surface-2)" aria-label="Surface 2"></button>
+              <button class="cp-swatch" style="background:var(--cp-color-void)" aria-label="Void"></button>
+              <button class="cp-swatch" style="background:linear-gradient(135deg, transparent 45%, var(--cp-color-ink-3) 45%, var(--cp-color-ink-3) 55%, transparent 55%)" aria-label="None"></button>
+            </div>
+          </div>
+          <div class="cp-field">
+            <label class="cp-field-label">Border</label>
+            <div class="cp-swatches">
+              <button class="cp-swatch is-selected" style="background:var(--cp-color-hairline)" aria-label="Hairline"></button>
+              <button class="cp-swatch" style="background:var(--cp-color-line)" aria-label="Line"></button>
+              <button class="cp-swatch" style="background:var(--cp-chart-1)" aria-label="Blue"></button>
+              <button class="cp-swatch" style="background:linear-gradient(135deg, transparent 45%, var(--cp-color-ink-3) 45%, var(--cp-color-ink-3) 55%, transparent 55%)" aria-label="None"></button>
+            </div>
+          </div>
+          <div class="cp-field">
+            <label class="cp-field-label">Text</label>
+            <div class="cp-swatches">
+              <button class="cp-swatch is-selected" style="background:var(--cp-color-ink)" aria-label="Ink"></button>
+              <button class="cp-swatch" style="background:var(--cp-color-ink-2)" aria-label="Ink 2"></button>
+              <button class="cp-swatch" style="background:var(--cp-chart-3)" aria-label="Yellow"></button>
+            </div>
+          </div>
+          <hr class="cp-divider" style="margin:0">
+          <label class="cp-switch"><span class="cp-switch-track"></span>Hide frame</label>
+          <span class="cp-field-help">Hidden frames drop the header and border — the view floats on the canvas.</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="dl-canvas cp-editable-canvas" style="height:120px;width:300px;border-radius:var(--cp-radius-s)">
+          <div class="cp-frame is-selected" style="left:30px;top:20px;width:240px;height:80px;background:transparent;border-color:transparent;box-shadow:0 0 0 1px var(--cp-color-edit)">
+            <div class="dl-frame-body">
+              <div class="cp-gauge-value">28.4 <span class="unit">V</span></div>
+              <div style="font:var(--cp-type-data-s);color:var(--cp-color-ink-3);margin-top:4px">frame hidden — value floats</div>
+            </div>
+          </div>
+        </div>
+        <span style="font:var(--cp-type-caption);color:var(--cp-color-ink-3);max-width:300px">Same readout with "Hide frame" on: only the edit-mode selection outline remains visible.</span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Style panel: background / border / text swatches (validated palette only) plus the frame toggle.</div>
+  </div>
+
+  <h2 id="flexible">Flexible layout<a class="ds-anchor" href="#flexible">#</a></h2>
+  <p>
+    A flexible layout divides its area into <strong>containers</strong>, each holding proportional
+    <strong>panes</strong> (OMCT-C09-L2-02.01). Splitters between panes and containers resize by drag
+    (OMCT-C09-L2-02.02); the toolbar toggles the whole layout between rows and columns
+    (OMCT-C09-L2-02.03). Container outlines and labels are violet — they exist only in edit mode.
+  </p>
+  <div class="ds-demo">
+    <div class="cp-toolbar cp-toolbar--editing">
+      <span class="cp-editing-badge"><svg class="cp-icon cp-icon--s"><use href="#i-pencil"/></svg>Editing</span>
+      <span class="cp-toolbar-sep"></span>
+      <button class="cp-btn cp-btn--text cp-btn--small"><svg class="cp-icon"><use href="#i-plus"/></svg>Add container</button>
+      <button class="cp-btn cp-btn--text cp-btn--small"><svg class="cp-icon"><use href="#i-trash"/></svg>Remove</button>
+      <span class="cp-toolbar-sep"></span>
+      <div class="cp-toggle-group" role="group" aria-label="Orientation">
+        <button class="cp-btn" aria-pressed="true" data-demo-toggle>Rows</button>
+        <button class="cp-btn" aria-pressed="false" data-demo-toggle>Columns</button>
+      </div>
+      <span class="cp-toolbar-spacer"></span>
+      <button class="cp-btn cp-btn--text cp-btn--small">Cancel</button>
+      <button class="cp-btn cp-btn--filled cp-btn--small"><svg class="cp-icon"><use href="#i-check"/></svg>Save</button>
+    </div>
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:0">
+      <div class="fl-canvas fl-canvas--edit" style="height:300px">
+        <div class="fl-container" style="flex:0 0 55%">
+          <span class="fl-chip">Container 1 &middot; 55%</span>
+          <div class="fl-pane">
+            <span class="name"><svg class="cp-icon"><use href="#i-plot"/></svg>Overlay plot — bus voltage</span>
+            <span class="size">62%</span>
+          </div>
+          <div class="cp-splitter cp-splitter--v is-dragging" role="separator" aria-orientation="vertical" aria-label="Resize panes"></div>
+          <div class="fl-pane">
+            <span class="name"><svg class="cp-icon"><use href="#i-table"/></svg>LAD table</span>
+            <span class="size">38%</span>
+          </div>
+        </div>
+        <div class="cp-splitter cp-splitter--h" role="separator" aria-orientation="horizontal" aria-label="Resize containers"></div>
+        <div class="fl-container" style="flex:1">
+          <span class="fl-chip">Container 2 &middot; 45%</span>
+          <div class="fl-pane">
+            <span class="name"><svg class="cp-icon"><use href="#i-camera"/></svg>Camera 2</span>
+            <span class="size">33%</span>
+          </div>
+          <div class="cp-splitter cp-splitter--v" role="separator" aria-orientation="vertical" aria-label="Resize panes"></div>
+          <div class="fl-pane fl-pane--styled">
+            <span class="name"><svg class="cp-icon"><use href="#i-gauge"/></svg>Gauge — cabin &Delta;P</span>
+            <span class="size">33% &middot; styled pane</span>
+          </div>
+          <div class="cp-splitter cp-splitter--v" role="separator" aria-orientation="vertical" aria-label="Resize panes"></div>
+          <div class="fl-pane">
+            <span class="name"><svg class="cp-icon"><use href="#i-list"/></svg>Event list</span>
+            <span class="size">34%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Edit mode, row orientation: two containers, dashed violet outlines with size chips; the first vertical splitter shows its dragging fill. Pane 2-2 carries a per-pane background/border style.</div>
+  </div>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:0">
+      <div class="fl-canvas" style="height:140px">
+        <div class="fl-container" style="flex:0 0 55%">
+          <div class="fl-pane"><span class="name"><svg class="cp-icon"><use href="#i-plot"/></svg>Overlay plot — bus voltage</span></div>
+          <div class="cp-splitter cp-splitter--v"></div>
+          <div class="fl-pane"><span class="name"><svg class="cp-icon"><use href="#i-table"/></svg>LAD table</span></div>
+        </div>
+        <div class="cp-splitter cp-splitter--h"></div>
+        <div class="fl-container" style="flex:1">
+          <div class="fl-pane"><span class="name"><svg class="cp-icon"><use href="#i-camera"/></svg>Camera 2</span></div>
+          <div class="cp-splitter cp-splitter--v"></div>
+          <div class="fl-pane fl-pane--styled"><span class="name"><svg class="cp-icon"><use href="#i-gauge"/></svg>Gauge — cabin &Delta;P</span></div>
+          <div class="cp-splitter cp-splitter--v"></div>
+          <div class="fl-pane"><span class="name"><svg class="cp-icon"><use href="#i-list"/></svg>Event list</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Same layout in browse mode: no outlines, no chips; splitters stay inert (resize is an edit-mode action). Per-pane styles persist into browse.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Containers are CSS flex rows/columns; pane sizes persist as <code class="ds-code-inline">flex-basis</code>
+    percentages. Splitters are <code class="ds-code-inline">cdkDrag</code> handles constrained to one axis;
+    orientation toggle is a <code class="ds-code-inline">mat-button-toggle-group</code>.</span>
+  </div>
+
+  <h2 id="gridster">Dashboard grid — angular-gridster2 mapping<a class="ds-anchor" href="#gridster">#</a></h2>
+  <p>
+    Free-form dashboards (multi-widget home screens) use <code class="ds-code-inline">angular-gridster2</code>
+    with a fixed cell size tied to the same 10px layout grid, so display layouts and dashboards share
+    one visual rhythm. Drag and resize are only enabled while editing.
+  </p>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">GridsterConfig</code> below is the canonical dashboard config;
+    <code class="ds-code-inline">margin</code> and cell size both read <code class="ds-code-inline">--cp-layout-grid</code>.</span>
+  </div>
+  <pre class="ds-code"><span class="cmt">// dashboard.component.ts — canonical gridster options</span>
+<span class="tag">const</span> options: GridsterConfig = {
+  gridType: <span class="str">'fixed'</span>,
+  fixedRowHeight: <span class="attr">10</span>,          <span class="cmt">// --cp-layout-grid</span>
+  fixedColWidth:  <span class="attr">10</span>,          <span class="cmt">// --cp-layout-grid</span>
+  margin: <span class="attr">10</span>,                  <span class="cmt">// gutters on the same unit</span>
+  outerMargin: <span class="attr">false</span>,
+  draggable:  { enabled: <span class="attr">this</span>.isEditing },   <span class="cmt">// browse mode is inert</span>
+  resizable:  { enabled: <span class="attr">this</span>.isEditing },
+  compactType: <span class="str">'none'</span>,        <span class="cmt">// operator geometry is never "helpfully" moved</span>
+  pushItems: <span class="attr">false</span>,
+  displayGrid: <span class="str">'onDrag&amp;Resize'</span> <span class="cmt">// lattice appears only while manipulating</span>
+};</pre>
+
+  <h2 id="embed">Tabs view &amp; web-page embed<a class="ds-anchor" href="#embed">#</a></h2>
+  <p>
+    Tabbed containers reuse the standard tab strip — see
+    <a href="../components/toolbars-tabs.html">Toolbars &amp; tabs</a> for the pattern. External pages
+    embed as sandboxed iframes inside a normal frame (OMCT-C09-L2-04.03); the URL renders read-only
+    in mono so operators can verify the source.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <div class="cp-pane" style="width:400px">
+        <div class="cp-pane-head"><svg class="cp-icon"><use href="#i-link"/></svg>Web page — TDRS schedule<span class="cp-toolbar-spacer"></span><button class="cp-icon-btn cp-icon-btn--s" aria-label="Open in new tab"><svg class="cp-icon cp-icon--s"><use href="#i-external"/></svg></button></div>
+        <div class="cp-pane-body" style="display:flex;flex-direction:column;gap:8px">
+          <span class="cp-input-wrap">
+            <svg class="cp-icon cp-icon--s cp-icon--lead"><use href="#i-link"/></svg>
+            <input class="cp-input cp-input--data" value="https://ops.example.gov/tdrs/schedule" readonly>
+          </span>
+          <div class="web-embed-frame">Sandboxed iframe renders here</div>
+        </div>
+      </div>
+      <div class="cp-pane" style="width:400px">
+        <div class="cp-pane-head"><svg class="cp-icon"><use href="#i-link"/></svg>Web page — TDRS schedule<span class="cp-toolbar-spacer"></span><button class="cp-icon-btn cp-icon-btn--s" aria-label="Open in new tab" disabled><svg class="cp-icon cp-icon--s"><use href="#i-external"/></svg></button></div>
+        <div class="cp-pane-body" style="display:flex;flex-direction:column;gap:8px">
+          <span class="cp-input-wrap">
+            <svg class="cp-icon cp-icon--s cp-icon--lead"><use href="#i-link"/></svg>
+            <input class="cp-input cp-input--data" value="https://ops.example.gov/tdrs/schedule" readonly>
+          </span>
+          <div class="cp-empty" style="padding:20px 16px">
+            <svg class="cp-icon"><use href="#i-x-circle"/></svg>
+            <h4>Page could not be loaded</h4>
+            <p>The URL did not respond or is not permitted by the embed policy.</p>
+            <button class="cp-btn cp-btn--outlined cp-btn--small"><svg class="cp-icon"><use href="#i-refresh"/></svg>Retry</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Web-page embed frame: loaded state and the load-failure empty state. The frame never renders partial content.</div>
+  </div>
+
+  <h2 id="hyperlink">Hyperlink object<a class="ds-anchor" href="#hyperlink">#</a></h2>
+  <p>
+    A hyperlink object stores a URL and a display style (OMCT-C09-L2-04.01). It presents as an inline
+    link or as a button, and can target the same tab or a new one (OMCT-C09-L2-04.02) — new-tab links
+    always show the external glyph.
+  </p>
+  <div class="ds-variants">
+    <div class="ds-variant"><div class="ds-variant-stage"><a class="cp-link" href="#hyperlink"><svg class="cp-icon cp-icon--s" style="vertical-align:-3px;margin-right:4px"><use href="#i-link"/></svg>Flight rules — EPS</a></div><div class="ds-variant-label">Link presentation &middot; same tab</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-btn cp-btn--tonal"><svg class="cp-icon"><use href="#i-link"/></svg>Flight rules — EPS</button></div><div class="ds-variant-label">Button presentation &middot; same tab</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-btn cp-btn--outlined">Ops console<svg class="cp-icon"><use href="#i-external"/></svg></button></div><div class="ds-variant-label">Button &middot; opens new tab</div></div>
+  </div>
+
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C09-L2-01.01 &middot; display layout</span>
+    <span class="ds-req">OMCT-C09-L2-01.02 &middot; composition sync</span>
+    <span class="ds-req">OMCT-C09-L2-01.03 &middot; geometry persisted</span>
+    <span class="ds-req">OMCT-C09-L2-01.04 &middot; embedded views</span>
+    <span class="ds-req">OMCT-C09-L2-01.05 &middot; copy/paste</span>
+    <span class="ds-req">OMCT-C09-L2-02.01 &middot; containers &amp; panes</span>
+    <span class="ds-req">OMCT-C09-L2-02.02 &middot; splitter resize</span>
+    <span class="ds-req">OMCT-C09-L2-02.03 &middot; orientation toggle</span>
+    <span class="ds-req">OMCT-C09-L2-04.01 &middot; hyperlink object</span>
+    <span class="ds-req">OMCT-C09-L2-04.02 &middot; link/button &amp; target</span>
+    <span class="ds-req">OMCT-C09-L2-04.03 &middot; web-page embed</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="plots.html"><span class="dir">Previous</span>&larr; Plots &amp; charts</a>
+    <a href="gauges.html"><span class="dir">Next</span>Gauges &amp; widgets &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tables — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<style>
+  /* Page-scoped helpers — tokens only */
+  .tt-title {
+    font: var(--cp-type-pane-head);
+    text-transform: uppercase;
+    letter-spacing: var(--cp-tracking-caps);
+    color: var(--cp-color-ink-2);
+  }
+  /* Paused is a mode, not an alarm: outlined, neutral ink */
+  .tt-paused {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 22px; padding: 0 var(--cp-space-3);
+    border: 1px solid var(--cp-color-line);
+    border-radius: var(--cp-radius-s);
+    color: var(--cp-color-ink-2);
+    font: var(--cp-type-overline);
+    text-transform: uppercase;
+    letter-spacing: var(--cp-tracking-caps);
+  }
+  .tt-paused .cp-icon { width: 12px; height: 12px; }
+  /* Units inside filled limit cells take the same dark ink as the value */
+  td.is-limit-caution .unit, td.is-limit-critical .unit { color: var(--cp-color-ink-inverse); }
+  /* LAD table set — sub-header row per grouped table */
+  tr.tt-lad-group th {
+    font: var(--cp-type-overline);
+    text-transform: uppercase;
+    letter-spacing: var(--cp-tracking-caps);
+    color: var(--cp-color-ink-3);
+    background: var(--cp-color-surface-2);
+    height: 24px;
+    border-bottom: 1px solid var(--cp-color-hairline);
+    position: static;
+  }
+  /* Autoflow tabular view — 24px name+value rows flowing into columns */
+  .tt-autoflow {
+    column-width: 210px;
+    column-gap: var(--cp-space-6);
+    column-rule: 1px solid var(--cp-color-hairline);
+    background: var(--cp-color-surface-1);
+    width: 100%;
+  }
+  .tt-af-row {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--cp-space-3);
+    height: var(--cp-size-row-dense);
+    padding: 0 var(--cp-space-2);
+    border-bottom: 1px solid var(--cp-color-hairline);
+    break-inside: avoid;
+  }
+  .tt-af-name {
+    font: var(--cp-type-body-s);
+    color: var(--cp-color-ink-2);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .tt-af-val {
+    font: var(--cp-type-data);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    padding: 0 var(--cp-space-2);
+    border-radius: var(--cp-radius-s);
+  }
+  .tt-af-val .unit { color: var(--cp-color-ink-3); margin-left: 4px; }
+  .tt-af-val.is-limit-caution .unit, .tt-af-val.is-limit-critical .unit { color: var(--cp-color-ink-inverse); }
+</style>
+</head>
+<body data-page="components/tables" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Components</p>
+  <h1>Tables</h1>
+  <p class="ds-lead">
+    The telemetry table is the ops workhorse: one datum per row, mono numerals, 24px row height,
+    limit and staleness semantics carried in every cell. The same anatomy scales down to
+    latest-available-data (LAD) tables and the ultra-dense autoflow view.
+  </p>
+
+  <h2 id="anatomy">Telemetry table anatomy<a class="ds-anchor" href="#anatomy">#</a></h2>
+  <p>
+    A telemetry table renders each datum as a row &mdash; Timestamp (mono, in the active time system),
+    Value, and Unit &mdash; newest first in real-time mode (OMCT-C08-L2-01.01). The header is sticky;
+    a per-column filter row sits directly beneath it. The view toolbar carries pause, mark-row,
+    export, and column-configuration controls.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:var(--cp-space-5)">
+      <div class="cp-pane">
+        <div class="cp-toolbar">
+          <span class="tt-title">PDU-2 Current</span>
+          <span class="cp-toolbar-spacer"></span>
+          <button class="cp-icon-btn cp-icon-btn--s is-active" aria-pressed="true" aria-label="Pause table"><svg class="cp-icon cp-icon--s"><use href="#i-pause"/></svg></button>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Mark selected rows"><svg class="cp-icon cp-icon--s"><use href="#i-flag"/></svg></button>
+          <span class="cp-toolbar-sep"></span>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Export as CSV"><svg class="cp-icon cp-icon--s"><use href="#i-download"/></svg></button>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Configure columns"><svg class="cp-icon cp-icon--s"><use href="#i-gear"/></svg></button>
+        </div>
+        <div class="cp-table-wrap cp-scroll" style="border:none;border-radius:0">
+          <table class="cp-table">
+            <thead>
+              <tr>
+                <th><button class="cp-th-sort is-sorted">Timestamp (UTC)<svg class="cp-icon"><use href="#i-arrow-down"/></svg></button></th>
+                <th class="num"><button class="cp-th-sort">Value<svg class="cp-icon"><use href="#i-arrow-up"/></svg></button></th>
+                <th><button class="cp-th-sort">Unit<svg class="cp-icon"><use href="#i-arrow-up"/></svg></button></th>
+              </tr>
+              <tr class="cp-filter-row">
+                <th><input class="cp-input" placeholder="Filter" aria-label="Filter timestamp"></th>
+                <th><input class="cp-input is-active" value="&gt; 4.0" aria-label="Filter value"></th>
+                <th><input class="cp-input" placeholder="Filter" aria-label="Filter unit"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>2026-07-13 18:22:04.000</td><td class="num">4.06</td><td><span class="unit">A</span></td></tr>
+              <tr><td>2026-07-13 18:22:03.000</td><td class="num">4.07</td><td><span class="unit">A</span></td></tr>
+              <tr><td>2026-07-13 18:22:02.000</td><td class="num">4.05</td><td><span class="unit">A</span></td></tr>
+              <tr><td>2026-07-13 18:22:01.000</td><td class="num">4.08</td><td><span class="unit">A</span></td></tr>
+              <tr><td>2026-07-13 18:22:00.000</td><td class="num">4.06</td><td><span class="unit">A</span></td></tr>
+              <tr><td>2026-07-13 18:21:59.000</td><td class="num">4.04</td><td><span class="unit">A</span></td></tr>
+              <tr><td>2026-07-13 18:21:58.000</td><td class="num">4.11</td><td><span class="unit">A</span></td></tr>
+              <tr><td>2026-07-13 18:21:57.000</td><td class="num">4.05</td><td><span class="unit">A</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Toolbar: pause (active) &middot; mark row &middot; export &middot; column configuration. Sticky sortable header (Timestamp sorted descending); per-column filter row with the Value filter active. Sort arrows appear on hover; the active column keeps its arrow in accent.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">cdk-table</code> inside <code class="ds-code-inline">cdk-virtual-scroll-viewport</code> (fixed 24px item size, density &minus;2). Header buttons follow <code class="ds-code-inline">MatSort</code> semantics (<code class="ds-code-inline">aria-sort</code> on the active column); filter inputs bind per-column <code class="ds-code-inline">FormControl</code>s.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C08-L2-01.01 &middot; one datum per row</span>
+    <span class="ds-req">OMCT-C08-L2-01.05 &middot; sort &amp; filter</span>
+  </div>
+
+  <h2 id="states">Row &amp; cell states<a class="ds-anchor" href="#states">#</a></h2>
+  <p>
+    Every state has to survive a wall of numerals: selection and marking fill with primary cyan,
+    limit violations fill the value cell (never the whole row) with the status color plus a
+    direction arrow, and stale rows drop to italic muted ink with a history glyph &mdash; never
+    color alone.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:var(--cp-space-5)">
+      <div class="cp-table-wrap">
+        <table class="cp-table">
+          <thead>
+            <tr><th>Name</th><th>Timestamp (UTC)</th><th class="num">Value</th><th>Unit</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Loop A supply temp</td><td>2026-07-13 18:22:04.000</td><td class="num">38.6</td><td><span class="unit">&deg;C</span></td></tr>
+            <tr><td>Loop B supply temp</td><td>2026-07-13 18:22:04.000</td><td class="num is-limit-caution">41.7 &#9650;</td><td><span class="unit">&deg;C</span></td></tr>
+            <tr><td>Bus voltage</td><td>2026-07-13 18:22:04.000</td><td class="num is-limit-critical">22.4 &#9660;</td><td><span class="unit">V</span></td></tr>
+            <tr class="is-marked"><td><svg class="cp-icon" style="width:14px;height:14px;color:var(--cp-color-primary);margin-right:6px"><use href="#i-flag"/></svg>Cabin pressure</td><td>2026-07-13 18:22:04.000</td><td class="num">101.4</td><td><span class="unit">kPa</span></td></tr>
+            <tr><td class="is-stale"><svg class="cp-icon" style="width:14px;height:14px;margin-right:6px"><use href="#i-history"/></svg>PDU-4 current</td><td class="is-stale">2026-07-13 18:20:58.223</td><td class="num is-stale">3.94</td><td class="is-stale"><span class="unit">A</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Nominal &middot; caution limit (high, &#9650;) &middot; critical limit (low, &#9660;) &middot; marked row &middot; stale row. Limit fills take dark ink; staleness is italic + glyph, not color alone (OMCT-C06-L2-04.04).</div>
+  </div>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>State</th><th>Class</th><th>Treatment</th></tr></thead>
+    <tbody>
+      <tr><td>Selected</td><td><code>tr.is-selected</code></td><td>Primary-dim fill &mdash; selection is always primary cyan, never a status color</td></tr>
+      <tr><td>Marked</td><td><code>tr.is-marked</code></td><td>Same primary-dim fill plus a flag glyph in the leading cell (OMCT-C08-L2-01.06)</td></tr>
+      <tr><td>Caution limit</td><td><code>td.is-limit-caution</code></td><td>Caution fill, dark ink, bold, direction arrow &#9650;/&#9660; on the value cell only</td></tr>
+      <tr><td>Critical limit</td><td><code>td.is-limit-critical</code></td><td>Critical fill, dark ink, bold, direction arrow &#9650;/&#9660; on the value cell only</td></tr>
+      <tr><td>Stale</td><td><code>td.is-stale</code></td><td>Italic, stale ink, history glyph beside the name &mdash; redundant to color (OMCT-C06-L2-04.03/04.04)</td></tr>
+    </tbody>
+  </table></div>
+  <p>
+    <strong>In-place updates:</strong> rows are keyed by datum identity (source key + timestamp).
+    When a datum is re-emitted &mdash; a late sample, a corrected value &mdash; the existing row is
+    replaced in place; the table never removes and re-appends, so nothing flickers or loses
+    selection (OMCT-C08-L2-01.03).
+  </p>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C08-L2-01.03 &middot; in-place update</span>
+    <span class="ds-req">OMCT-C08-L2-01.06 &middot; mark rows</span>
+    <span class="ds-req">OMCT-C06-L2-04.03 &middot; staleness detection</span>
+    <span class="ds-req">OMCT-C06-L2-04.04 &middot; stale styling</span>
+  </div>
+
+  <h2 id="modes">Paused, loading &amp; empty<a class="ds-anchor" href="#modes">#</a></h2>
+  <p>
+    Marking a row (or pressing pause) freezes real-time row motion so the operator's reference
+    point doesn't scroll away (OMCT-C08-L2-01.06). Paused is a <em>mode</em>, not an alarm &mdash;
+    the badge is outlined and neutral, like the edit badge, never status-colored. The table resumes
+    automatically when the conductor bounds change (OMCT-C08-L2-01.07).
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:var(--cp-space-5)">
+      <div class="cp-pane">
+        <div class="cp-toolbar">
+          <span class="tt-title">PDU-2 Current</span>
+          <span class="tt-paused"><svg class="cp-icon"><use href="#i-pause"/></svg>Paused</span>
+          <span class="cp-toolbar-spacer"></span>
+          <button class="cp-icon-btn cp-icon-btn--s is-active" aria-pressed="true" aria-label="Resume table"><svg class="cp-icon cp-icon--s"><use href="#i-pause"/></svg></button>
+          <button class="cp-icon-btn cp-icon-btn--s is-active" aria-pressed="true" aria-label="Unmark rows"><svg class="cp-icon cp-icon--s"><use href="#i-flag"/></svg></button>
+        </div>
+        <div class="cp-table-wrap" style="border:none;border-radius:0">
+          <table class="cp-table">
+            <thead><tr><th>Timestamp (UTC)</th><th class="num">Value</th><th>Unit</th></tr></thead>
+            <tbody>
+              <tr><td>2026-07-13 18:22:04.000</td><td class="num">4.06</td><td><span class="unit">A</span></td></tr>
+              <tr class="is-marked"><td><svg class="cp-icon" style="width:14px;height:14px;color:var(--cp-color-primary);margin-right:6px"><use href="#i-flag"/></svg>2026-07-13 18:22:01.000</td><td class="num">4.08</td><td><span class="unit">A</span></td></tr>
+              <tr><td>2026-07-13 18:22:00.000</td><td class="num">4.06</td><td><span class="unit">A</span></td></tr>
+              <tr><td>2026-07-13 18:21:59.000</td><td class="num">4.04</td><td><span class="unit">A</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Marking a row engaged pause; the outlined badge announces the mode in neutral ink-2. Unmarking or changing conductor bounds resumes real-time flow (OMCT-C08-L2-01.06/01.07).</div>
+  </div>
+
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:var(--cp-space-5)">
+      <div class="cp-table-wrap">
+        <table class="cp-table">
+          <thead><tr><th>Timestamp (UTC)</th><th class="num">Value</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr><td colspan="3" style="padding:0;height:auto;border-bottom:none">
+              <div class="cp-progress cp-progress--indeterminate" role="progressbar" aria-label="Loading telemetry"><div class="cp-progress-fill"></div></div>
+            </td></tr>
+            <tr><td colspan="3" style="height:64px;text-align:center;color:var(--cp-color-ink-3)">Loading 86,400 rows&hellip;</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Loading: the historical query is in flight &mdash; an indeterminate progress bar runs directly under the sticky header while rows stream in (OMCT-C08-L2-01.02).</div>
+  </div>
+
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:var(--cp-space-5)">
+      <div class="cp-table-wrap">
+        <table class="cp-table">
+          <thead><tr><th>Timestamp (UTC)</th><th class="num">Value</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr><td colspan="3" style="height:auto;border-bottom:none;padding:0;white-space:normal">
+              <div class="cp-empty">
+                <svg class="cp-icon"><use href="#i-table"/></svg>
+                <h4>No telemetry in the selected time range</h4>
+                <p>Widen the time conductor bounds or check that the telemetry source is producing data.</p>
+              </div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Empty state: the header stays so the operator knows what would appear; the message names the cause and the fix (OMCT-C06-L2-01.02).</div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C08-L2-01.02 &middot; loading indication</span>
+    <span class="ds-req">OMCT-C08-L2-01.06 &middot; pause on mark</span>
+    <span class="ds-req">OMCT-C08-L2-01.07 &middot; auto-resume on bounds change</span>
+  </div>
+
+  <h2 id="columns">Column configuration<a class="ds-anchor" href="#columns">#</a></h2>
+  <p>
+    The gear opens a column panel: checkboxes toggle visibility, grips reorder by drag, and
+    Auto-size lets the table fit column widths to content. Configuration persists with the view
+    (OMCT-C08-L2-01.04).
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage">
+      <div class="cp-menu" style="width:240px">
+        <div class="cp-menu-head">Columns</div>
+        <div class="cp-menu-item"><svg class="cp-icon" style="cursor:grab"><use href="#i-grip"/></svg><label class="cp-check is-checked"><span class="cp-check-box"><svg class="cp-icon"><use href="#i-check"/></svg></span>Timestamp (UTC)</label></div>
+        <div class="cp-menu-item"><svg class="cp-icon" style="cursor:grab"><use href="#i-grip"/></svg><label class="cp-check is-checked"><span class="cp-check-box"><svg class="cp-icon"><use href="#i-check"/></svg></span>Value</label></div>
+        <div class="cp-menu-item"><svg class="cp-icon" style="cursor:grab"><use href="#i-grip"/></svg><label class="cp-check is-checked"><span class="cp-check-box"><svg class="cp-icon"><use href="#i-check"/></svg></span>Unit</label></div>
+        <div class="cp-menu-item"><svg class="cp-icon" style="cursor:grab"><use href="#i-grip"/></svg><label class="cp-check"><span class="cp-check-box"></span>Limit class</label></div>
+        <div class="cp-menu-item"><svg class="cp-icon" style="cursor:grab"><use href="#i-grip"/></svg><label class="cp-check"><span class="cp-check-box"></span>Source key</label></div>
+        <div class="cp-menu-sep"></div>
+        <button class="cp-menu-item"><svg class="cp-icon"><use href="#i-columns"/></svg>Auto-size columns<svg class="cp-icon" style="margin-left:auto;color:var(--cp-color-primary)"><use href="#i-check"/></svg></button>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Checkbox = visibility &middot; grip = drag to reorder &middot; Auto-size fits widths to content (currently on). Turning it off preserves manually dragged widths with the view.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>CDK overlay panel; row order via <code class="ds-code-inline">cdkDropList</code>. Column state serializes into the view's configuration object.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C08-L2-01.04 &middot; column visibility, order &amp; sizing</span>
+  </div>
+
+  <h2 id="export">Export<a class="ds-anchor" href="#export">#</a></h2>
+  <p>
+    The export control offers the full result set or just the marked rows; the marked option is
+    disabled until at least one row is marked (OMCT-C08-L2-01.08).
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage">
+      <div class="cp-menu" style="width:260px">
+        <div class="cp-menu-head">Export</div>
+        <button class="cp-menu-item"><svg class="cp-icon"><use href="#i-download"/></svg>Export all rows as CSV</button>
+        <button class="cp-menu-item is-disabled" aria-disabled="true"><svg class="cp-icon"><use href="#i-download"/></svg>Export marked rows as CSV</button>
+      </div>
+    </div>
+    <div class="ds-demo-caption">No rows are marked, so the marked-rows export is disabled &mdash; disabled, not hidden, so the capability stays discoverable.</div>
+  </div>
+  <p>
+    <strong>CSV hardening:</strong> any cell whose text begins with <code class="ds-code-inline">=</code>,
+    <code class="ds-code-inline">+</code>, <code class="ds-code-inline">-</code>, or
+    <code class="ds-code-inline">@</code> is prefixed with a single quote on export so spreadsheet
+    applications treat it as text, never as a formula (OMCT-C16-L2-04.03).
+  </p>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C08-L2-01.08 &middot; CSV export</span>
+    <span class="ds-req">OMCT-C16-L2-04.03 &middot; formula-cell neutralization</span>
+  </div>
+
+  <h2 id="lad">LAD tables — latest available data<a class="ds-anchor" href="#lad">#</a></h2>
+  <p>
+    A LAD table shows exactly one row per telemetry object &mdash; its latest datum within the
+    conductor bounds: Name, Timestamp, Value with unit (OMCT-C08-L2-02.01). Rows update in place as
+    new data arrives (OMCT-C08-L2-02.02); limit and stale styling are identical to the full table.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:var(--cp-space-5)">
+      <div class="cp-table-wrap">
+        <table class="cp-table">
+          <thead><tr><th>Name</th><th>Timestamp (UTC)</th><th class="num">Value</th></tr></thead>
+          <tbody>
+            <tr><td>Bus voltage</td><td>2026-07-13 18:22:04.000</td><td class="num">28.4<span class="unit">V</span></td></tr>
+            <tr><td>Array output</td><td>2026-07-13 18:22:04.000</td><td class="num">84.2<span class="unit">kW</span></td></tr>
+            <tr><td>PDU-2 current</td><td>2026-07-13 18:22:04.000</td><td class="num">4.06<span class="unit">A</span></td></tr>
+            <tr><td>Loop B supply temp</td><td>2026-07-13 18:22:04.000</td><td class="num is-limit-caution">41.7 &#9650;<span class="unit">&deg;C</span></td></tr>
+            <tr><td class="is-stale"><svg class="cp-icon" style="width:14px;height:14px;margin-right:6px"><use href="#i-history"/></svg>Ku-band amp temp</td><td class="is-stale">2026-07-13 18:19:47.310</td><td class="num is-stale">36.1<span class="unit">&deg;C</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ds-demo-caption">One row per object, latest datum only. Loop B is in caution; the Ku-band amp stopped reporting at 18:19:47 and reads stale.</div>
+  </div>
+
+  <h3 id="lad-set">LAD table set</h3>
+  <p>
+    A LAD table set stacks several LAD tables in one scroll with a sub-header per member table, so a
+    whole subsystem page reads as a single column of latest values (OMCT-C08-L2-02.03).
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:var(--cp-space-5)">
+      <div class="cp-table-wrap">
+        <table class="cp-table">
+          <thead><tr><th>Name</th><th>Timestamp (UTC)</th><th class="num">Value</th></tr></thead>
+          <tbody>
+            <tr class="tt-lad-group"><th colspan="3" scope="colgroup">Electrical power</th></tr>
+            <tr><td>Bus voltage</td><td>2026-07-13 18:22:04.000</td><td class="num">28.4<span class="unit">V</span></td></tr>
+            <tr><td>Array output</td><td>2026-07-13 18:22:04.000</td><td class="num">84.2<span class="unit">kW</span></td></tr>
+            <tr><td>PDU-2 current</td><td>2026-07-13 18:22:04.000</td><td class="num">4.06<span class="unit">A</span></td></tr>
+            <tr class="tt-lad-group"><th colspan="3" scope="colgroup">Thermal control</th></tr>
+            <tr><td>Loop A supply temp</td><td>2026-07-13 18:22:04.000</td><td class="num">38.6<span class="unit">&deg;C</span></td></tr>
+            <tr><td>Loop B supply temp</td><td>2026-07-13 18:22:04.000</td><td class="num is-limit-caution">41.7 &#9650;<span class="unit">&deg;C</span></td></tr>
+            <tr class="tt-lad-group"><th colspan="3" scope="colgroup">Communications</th></tr>
+            <tr><td>Ku-band amp current</td><td>2026-07-13 18:22:03.500</td><td class="num">2.85<span class="unit">A</span></td></tr>
+            <tr><td class="is-stale"><svg class="cp-icon" style="width:14px;height:14px;margin-right:6px"><use href="#i-history"/></svg>Ku-band amp temp</td><td class="is-stale">2026-07-13 18:19:47.310</td><td class="num is-stale">36.1<span class="unit">&deg;C</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Grouped LAD set: one sticky header, condensed sub-headers per member table, shared column grid.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Same <code class="ds-code-inline">cdk-table</code> without virtual scroll (row count = object count); group rows render via a second <code class="ds-code-inline">cdkRowDef</code>.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C08-L2-02.01 &middot; LAD table</span>
+    <span class="ds-req">OMCT-C08-L2-02.02 &middot; in-place LAD update</span>
+    <span class="ds-req">OMCT-C08-L2-02.03 &middot; LAD table set</span>
+  </div>
+
+  <h2 id="autoflow">Autoflow tabular view<a class="ds-anchor" href="#autoflow">#</a></h2>
+  <p>
+    Autoflow packs name+value pairs into 24px rows that fill a column top-to-bottom, then flow into
+    the next column (OMCT-C08-L2-04.01/04.02). It is the densest telemetry surface in the system
+    &mdash; values update in place (OMCT-C08-L2-04.03) and carry the same limit and stale semantics
+    as full tables (OMCT-C08-L2-04.04).
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:var(--cp-space-5)">
+      <div class="tt-autoflow">
+        <div class="tt-af-row"><span class="tt-af-name">Array output</span><span class="tt-af-val">84.2<span class="unit">kW</span></span></div>
+        <div class="tt-af-row"><span class="tt-af-name">Batt 2 temp</span><span class="tt-af-val">24.6<span class="unit">&deg;C</span></span></div>
+        <div class="tt-af-row"><span class="tt-af-name">Bus voltage</span><span class="tt-af-val is-limit-critical">22.4 &#9660;<span class="unit">V</span></span></div>
+        <div class="tt-af-row"><span class="tt-af-name">Cabin pressure</span><span class="tt-af-val">101.4<span class="unit">kPa</span></span></div>
+        <div class="tt-af-row"><span class="tt-af-name">Cabin temp</span><span class="tt-af-val">22.8<span class="unit">&deg;C</span></span></div>
+        <div class="tt-af-row"><span class="tt-af-name">Ku-band amp current</span><span class="tt-af-val">2.85<span class="unit">A</span></span></div>
+        <div class="tt-af-row is-stale"><span class="tt-af-name is-stale">Ku-band amp temp <svg class="cp-icon" style="width:12px;height:12px;vertical-align:-2px"><use href="#i-history"/></svg></span><span class="tt-af-val is-stale">36.1<span class="unit">&deg;C</span></span></div>
+        <div class="tt-af-row"><span class="tt-af-name">Loop A supply temp</span><span class="tt-af-val">38.6<span class="unit">&deg;C</span></span></div>
+        <div class="tt-af-row"><span class="tt-af-name">Loop B supply temp</span><span class="tt-af-val is-limit-caution">41.7 &#9650;<span class="unit">&deg;C</span></span></div>
+        <div class="tt-af-row"><span class="tt-af-name">N&#8322; partial pressure</span><span class="tt-af-val">79.4<span class="unit">kPa</span></span></div>
+        <div class="tt-af-row"><span class="tt-af-name">O&#8322; partial pressure</span><span class="tt-af-val">21.2<span class="unit">kPa</span></span></div>
+        <div class="tt-af-row"><span class="tt-af-name">PDU-1 current</span><span class="tt-af-val">3.92<span class="unit">A</span></span></div>
+        <div class="tt-af-row"><span class="tt-af-name">PDU-2 current</span><span class="tt-af-val">4.06<span class="unit">A</span></span></div>
+        <div class="tt-af-row"><span class="tt-af-name">PDU-3 current</span><span class="tt-af-val">3.88<span class="unit">A</span></span></div>
+        <div class="tt-af-row"><span class="tt-af-name">Radiator outlet temp</span><span class="tt-af-val">12.9<span class="unit">&deg;C</span></span></div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Rows sort alphabetically and flow into as many columns as the width allows; a column-width stepper in the toolbar adjusts density. Limit-class values fill; stale rows italicize with the history glyph.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>CSS multi-column layout on a plain component &mdash; no table semantics needed; each row is a <code class="ds-code-inline">role="listitem"</code> with an accessible name+value label.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C08-L2-04.01 &middot; 24px name+value rows</span>
+    <span class="ds-req">OMCT-C08-L2-04.02 &middot; column flow</span>
+    <span class="ds-req">OMCT-C08-L2-04.03 &middot; in-place value update</span>
+    <span class="ds-req">OMCT-C08-L2-04.04 &middot; limit &amp; stale styling</span>
+  </div>
+
+  <h2 id="pagination">Datum detail &amp; pagination<a class="ds-anchor" href="#pagination">#</a></h2>
+  <p>
+    Double-clicking a row (or the row action <em>View datum</em>) opens a datum detail overlay
+    &mdash; a default-size dialog listing every field of the raw datum in mono, documented on the
+    <a href="overlays.html">Dialogs &amp; overlays</a> page. In fixed-time mode, historical result
+    sets beyond the virtual-scroll window paginate:
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:var(--cp-space-5)">
+      <div class="cp-table-wrap">
+        <table class="cp-table">
+          <thead><tr><th>Timestamp (UTC)</th><th class="num">Value</th><th>Unit</th></tr></thead>
+          <tbody>
+            <tr><td>2026-07-13 18:22:04.000</td><td class="num">4.06</td><td><span class="unit">A</span></td></tr>
+            <tr><td>2026-07-13 18:22:03.000</td><td class="num">4.07</td><td><span class="unit">A</span></td></tr>
+            <tr><td>2026-07-13 18:22:02.000</td><td class="num">4.05</td><td><span class="unit">A</span></td></tr>
+          </tbody>
+        </table>
+        <div class="cp-paginator">
+          <span>Rows per page</span>
+          <select class="cp-select" style="width:76px;height:24px;font:var(--cp-type-data-s)" aria-label="Rows per page"><option>500</option><option>1000</option></select>
+          <span style="font:var(--cp-type-data-s)">1&ndash;500 of 86,400</span>
+          <button class="cp-icon-btn cp-icon-btn--s" disabled aria-label="Previous page"><svg class="cp-icon cp-icon--s"><use href="#i-chevron-left"/></svg></button>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Next page"><svg class="cp-icon cp-icon--s"><use href="#i-chevron-right"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Paginator sits under the table wrap; range in mono. Material: mat-paginator, density &minus;2.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">MatPaginator</code> feeds the virtual-scroll data source; real-time mode hides it (the window is the conductor bounds).</span>
+  </div>
+
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C08-L2-01.01&ndash;01.08 &middot; telemetry table</span>
+    <span class="ds-req">OMCT-C08-L2-02.01&ndash;02.03 &middot; LAD tables</span>
+    <span class="ds-req">OMCT-C08-L2-04.01&ndash;04.04 &middot; autoflow</span>
+    <span class="ds-req">OMCT-C06-L2-04.03/04.04 &middot; staleness</span>
+    <span class="ds-req">OMCT-C16-L2-04.03 &middot; CSV neutralization</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="tree.html"><span class="dir">Previous</span>&larr; Object tree</a>
+    <a href="overlays.html"><span class="dir">Next</span>Dialogs &amp; overlays &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Application shell — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<style>
+/* patterns/shell — page-scoped composite styles */
+.sh-app {
+  display: flex; flex-direction: column;
+  height: 640px;
+  background: var(--cp-color-void);
+  font: var(--cp-type-body);
+  color: var(--cp-color-ink);
+}
+.sh-brand {
+  font: 700 15px/1 var(--cp-font-cond);
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--cp-color-ink);
+  margin-right: var(--cp-space-3);
+  cursor: pointer;
+}
+.sh-brand .o { color: var(--cp-color-primary); }
+.sh-main { display: flex; flex: 1; min-height: 0; }
+.sh-pane {
+  background: var(--cp-color-surface-1);
+  display: flex; flex-direction: column; min-height: 0; min-width: 0;
+}
+.sh-overline {
+  font: var(--cp-type-overline); text-transform: uppercase;
+  letter-spacing: var(--cp-tracking-caps); color: var(--cp-color-ink-3);
+}
+.sh-tag {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; flex: none;
+  border-radius: 50%;
+  border: 1px solid var(--cp-color-primary-border);
+  background: var(--cp-color-primary-dim);
+  color: var(--cp-color-primary);
+  font: 600 10px/1 var(--cp-font-mono);
+}
+.sh-series-swatch {
+  width: 10px; height: 10px; flex: none; border-radius: 2px;
+  display: inline-block;
+}
+.sh-phone {
+  width: 360px; flex: none;
+  border: 1px solid var(--cp-color-line);
+  border-radius: var(--cp-radius-m);
+  overflow: hidden;
+  background: var(--cp-color-void);
+  display: flex; flex-direction: column;
+  height: 560px;
+}
+</style>
+</head>
+<body data-page="patterns/shell" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Patterns</p>
+  <h1>Application shell</h1>
+  <p class="ds-lead">
+    The frame every screen lives in: app bar, browse tree, main view, inspector, time
+    conductor, and status bar. The shell mounts into a supplied element
+    (OMCT-C01-L2-02.02), exposes the full capability API surface to plugins
+    (OMCT-C01-L2-01.02), and drives everything below the app bar from the hash route
+    and the selection model (OMCT-C15-L1-01).
+  </p>
+
+  <h2 id="frame">The frame<a class="ds-anchor" href="#frame">#</a></h2>
+  <p>Numbered regions are specified in the table that follows. Panes are borderless inside the shell — the void canvas shows through 5px splitters, which highlight cyan on hover and drag to resize.</p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:0">
+      <div class="sh-app">
+
+        <!-- 1 · App bar -->
+        <div class="cp-toolbar">
+          <span class="sh-brand" title="About Cupola">Cup<span class="o">o</span>la</span>
+          <span class="cp-input-wrap" style="width:280px">
+            <svg class="cp-icon cp-icon--s cp-icon--lead"><use href="#i-search"/></svg>
+            <input class="cp-input" style="height:var(--cp-size-control-s)" placeholder="Search objects &amp; annotations">
+          </span>
+          <span class="cp-toolbar-spacer"></span>
+          <button class="cp-btn cp-btn--filled cp-btn--small"><svg class="cp-icon"><use href="#i-plus"/></svg>Create</button>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Global actions"><svg class="cp-icon"><use href="#i-kebab"/></svg></button>
+          <span class="sh-tag">1</span>
+        </div>
+
+        <!-- Three-pane row -->
+        <div class="sh-main">
+
+          <!-- 2 · Tree pane -->
+          <div class="sh-pane" style="width:264px;flex:none">
+            <div class="cp-pane-head">Browse<span class="sh-tag" style="margin-left:auto">2</span></div>
+            <div class="cp-tree cp-scroll" style="flex:1;overflow-y:auto;padding:4px">
+              <div class="cp-tree-row is-expanded"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-folder"/></svg><span class="cp-tree-label">My Items</span></div>
+              <div class="cp-tree-row is-expanded" style="--indent:1"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-folder"/></svg><span class="cp-tree-label">Station displays</span></div>
+              <div class="cp-tree-row is-leaf" style="--indent:2"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-layout"/></svg><span class="cp-tree-label">Power dashboard</span></div>
+              <div class="cp-tree-row is-leaf is-selected" style="--indent:2" aria-current="true"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-plot"/></svg><span class="cp-tree-label">Solar array output</span></div>
+              <div class="cp-tree-row is-leaf" style="--indent:1"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-notebook"/></svg><span class="cp-tree-label">Ops notebook</span></div>
+              <div class="cp-tree-row is-expanded"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-folder"/></svg><span class="cp-tree-label">Station</span></div>
+              <div class="cp-tree-row is-expanded" style="--indent:1"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-folder"/></svg><span class="cp-tree-label">Power</span></div>
+              <div class="cp-tree-row is-leaf" style="--indent:2"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-telemetry"/></svg><span class="cp-tree-label">pwr.array_out</span></div>
+              <div class="cp-tree-row is-leaf" style="--indent:2"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-telemetry"/></svg><span class="cp-tree-label">pwr.bus_v</span></div>
+              <div class="cp-tree-row" style="--indent:1"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-folder"/></svg><span class="cp-tree-label">Thermal</span></div>
+              <div class="cp-tree-row" style="--indent:1"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-folder"/></svg><span class="cp-tree-label">Comms</span></div>
+            </div>
+          </div>
+
+          <div class="cp-splitter cp-splitter--v" role="separator" aria-orientation="vertical" aria-label="Resize tree pane"></div>
+
+          <!-- 3 · Main view -->
+          <div class="sh-pane" style="flex:1">
+            <div class="cp-toolbar" style="height:36px;flex:none;overflow:hidden">
+              <svg class="cp-icon" style="color:var(--cp-color-primary)"><use href="#i-plot"/></svg>
+              <strong style="font:var(--cp-type-title-s);white-space:nowrap">Solar array output</strong>
+              <span class="cp-breadcrumb" style="margin-left:8px;flex:0 1 auto;min-width:0;flex-wrap:nowrap;overflow:hidden;white-space:nowrap">
+                <a href="#">Station displays</a>
+              </span>
+              <span class="cp-toolbar-spacer"></span>
+              <button class="cp-btn cp-btn--tonal cp-btn--small"><svg class="cp-icon"><use href="#i-pencil"/></svg>Edit</button>
+              <button class="cp-icon-btn cp-icon-btn--s" aria-label="More actions"><svg class="cp-icon"><use href="#i-kebab"/></svg></button>
+              <span class="sh-tag">3</span>
+            </div>
+            <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:10px;padding:12px 16px">
+              <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap">
+                <div>
+                  <div class="sh-overline">Array output</div>
+                  <div class="cp-gauge-value">84.2 <span class="unit">kW</span></div>
+                </div>
+                <div>
+                  <div class="sh-overline">Bus voltage</div>
+                  <div class="cp-gauge-value">120.1 <span class="unit">V</span></div>
+                </div>
+                <div style="margin-left:auto;display:flex;gap:16px;align-items:center;font:var(--cp-type-caption);color:var(--cp-color-ink-2)">
+                  <span style="display:inline-flex;align-items:center;gap:6px"><span class="sh-series-swatch" style="background:var(--cp-chart-1)"></span>pwr.array_out</span>
+                  <span style="display:inline-flex;align-items:center;gap:6px"><span class="sh-series-swatch" style="background:var(--cp-chart-2)"></span>pwr.bus_v</span>
+                </div>
+              </div>
+              <div style="flex:1;min-height:0;border:1px solid var(--cp-color-hairline);border-radius:var(--cp-radius-s);background:var(--cp-color-void);overflow:hidden">
+                <svg width="100%" height="100%" viewBox="0 0 600 240" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M0 48h600M0 96h600M0 144h600M0 192h600M100 0v240M200 0v240M300 0v240M400 0v240M500 0v240" stroke="var(--cp-chart-grid)" stroke-width="1"/>
+                  <path d="M0 239h600" stroke="var(--cp-chart-axis)" stroke-width="1.5"/>
+                  <polyline points="0,150 60,142 120,148 180,120 240,88 300,70 360,78 420,64 480,92 540,110 600,104" fill="none" stroke="var(--cp-chart-1)" stroke-width="2"/>
+                  <polyline points="0,178 60,180 120,172 180,176 240,168 300,170 360,162 420,168 480,160 540,166 600,162" fill="none" stroke="var(--cp-chart-2)" stroke-width="2"/>
+                </svg>
+              </div>
+              <div style="display:flex;justify-content:space-between;font:var(--cp-type-data-s);color:var(--cp-chart-tick)">
+                <span>17:52:04</span><span>18:02:04</span><span>18:12:04</span><span>18:22:04</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="cp-splitter cp-splitter--v" role="separator" aria-orientation="vertical" aria-label="Resize inspector"></div>
+
+          <!-- 4 · Inspector -->
+          <div class="sh-pane" style="width:300px;flex:none">
+            <div class="cp-pane-head">Inspect<span class="sh-tag" style="margin-left:auto">4</span></div>
+            <div class="cp-tabs" style="padding:0 4px;flex:none" role="tablist" aria-label="Inspector views">
+              <button class="cp-tab" role="tab" aria-selected="true" title="Properties" style="padding:0 12px"><svg class="cp-icon cp-icon--s"><use href="#i-info"/></svg></button>
+              <button class="cp-tab" role="tab" aria-selected="false" title="Elements" style="padding:0 12px"><svg class="cp-icon cp-icon--s"><use href="#i-layers"/></svg></button>
+              <button class="cp-tab" role="tab" aria-selected="false" title="Styles" style="padding:0 12px"><svg class="cp-icon cp-icon--s"><use href="#i-eye"/></svg></button>
+              <button class="cp-tab" role="tab" aria-selected="false" title="Annotations" style="padding:0 12px"><svg class="cp-icon cp-icon--s"><use href="#i-flag"/></svg></button>
+            </div>
+            <div class="cp-scroll" style="flex:1;overflow-y:auto">
+              <div style="padding:12px 12px 4px">
+                <div class="sh-overline" style="margin-bottom:8px">Properties</div>
+                <dl class="cp-props">
+                  <dt>Title</dt><dd>Solar array output</dd>
+                  <dt>Type</dt><dd>Overlay Plot</dd>
+                  <dt>Created</dt><dd>2026-07-02 14:51:08</dd>
+                  <dt>Modified</dt><dd>2026-07-13 09:12:44</dd>
+                  <dt>Created by</dt><dd>j.reyes</dd>
+                </dl>
+              </div>
+              <div class="cp-expand is-open">
+                <button class="cp-expand-head">Plot series<svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg></button>
+                <div class="cp-expand-body" style="display:flex;flex-direction:column;gap:6px">
+                  <span style="display:inline-flex;align-items:center;gap:8px;font:var(--cp-type-data)"><span class="sh-series-swatch" style="background:var(--cp-chart-1)"></span>pwr.array_out</span>
+                  <span style="display:inline-flex;align-items:center;gap:8px;font:var(--cp-type-data)"><span class="sh-series-swatch" style="background:var(--cp-chart-2)"></span>pwr.bus_v</span>
+                </div>
+              </div>
+              <div class="cp-expand">
+                <button class="cp-expand-head">Y axes<svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg></button>
+              </div>
+              <div class="cp-expand">
+                <button class="cp-expand-head">Legend<svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 · Time conductor -->
+        <div class="cp-conductor cp-conductor--realtime">
+          <span class="cp-editing-badge" style="background:var(--cp-color-ok-dim);border-color:var(--cp-color-ok-border);color:var(--cp-color-ok)">Real-time</span>
+          <span style="color:var(--cp-color-ink-3)">UTC</span>
+          <span style="color:var(--cp-color-ink-2)">&minus;00:30:00</span>
+          <span style="color:var(--cp-color-ink-3)">&rarr;</span>
+          <span class="cp-conductor-clock"><svg class="cp-icon cp-icon--s"><use href="#i-clock"/></svg>2026-07-13 18:22:04.000</span>
+          <span style="color:var(--cp-color-ink-2)">+00:00:30</span>
+          <span class="cp-toolbar-spacer"></span>
+          <span class="sh-tag">5</span>
+        </div>
+
+        <!-- 6 · Status bar -->
+        <div class="cp-statusbar">
+          <span class="cp-indicator cp-indicator--mono"><svg class="cp-icon"><use href="#i-clock"/></svg>2026-07-13 18:22:04 UTC</span>
+          <button class="cp-indicator"><span class="cp-dot cp-dot--ok"></span>Connected</button>
+          <button class="cp-indicator"><svg class="cp-icon"><use href="#i-bell"/></svg><span class="cp-count">3</span></button>
+          <span class="cp-chip cp-chip--ok" style="height:18px;font-size:11px">GO</span>
+          <span class="cp-toolbar-spacer"></span>
+          <button class="cp-indicator"><svg class="cp-icon"><use href="#i-user"/></svg>j.reyes</button>
+          <span class="sh-tag">6</span>
+        </div>
+
+      </div>
+    </div>
+    <div class="ds-demo-caption">The complete frame: app bar, tree, main view, inspector, conductor, status bar. The tree selection, the main-view title, and the document title all agree — the hash route is the single source of truth (OMCT-C15-L2-01.03).</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">bootstrapApplication(AppShellComponent)</code> into the supplied element (OMCT-C01-L2-02.02); services for object, time, action, notification, form, overlay, view, inspector, and toolbar APIs are provided at root (OMCT-C01-L2-01.02). Panes are CDK-managed with drag splitters; the tree is a CDK tree.</span>
+  </div>
+
+  <h2 id="regions">Region responsibilities &amp; sizes<a class="ds-anchor" href="#regions">#</a></h2>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>#</th><th>Region</th><th>Size</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>App bar</td><td>40px fixed (<code>--cp-size-toolbar</code>)</td><td>Brand/logo (opens the about dialog), grand search (~280px), Create — the only filled button in the shell — and global actions kebab.</td></tr>
+      <tr><td>2</td><td>Tree pane</td><td>240&ndash;320px, splitter-resizable, collapsible</td><td>Browse hierarchy. Clicking a node navigates: it writes the <code>/browse</code> hash path; it never mutates state directly.</td></tr>
+      <tr><td>3</td><td>Main view</td><td>Flexible, min 480px</td><td>Object toolbar (glyph, title, breadcrumb, Edit) above the active view resolved from the view registry (OMCT-C15-L2-02.01).</td></tr>
+      <tr><td>4</td><td>Inspector</td><td>280&ndash;360px, splitter-resizable, collapsible</td><td>Applicable inspector views in priority order — Properties, Elements, Styles, Annotations (OMCT-C15-L2-02.03/.04), plus data visualization for compatible selections (OMCT-C15-L2-02.05).</td></tr>
+      <tr><td>5</td><td>Time conductor</td><td>48px fixed (<code>--cp-size-conductor</code>)</td><td>Global time context — see the <a href="time-conductor.html">Time conductor</a> pattern.</td></tr>
+      <tr><td>6</td><td>Status bar</td><td>28px fixed (<code>--cp-size-statusbar</code>)</td><td>Clock, connection state, notification bell with count, operator GO/NO-GO status, current user.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="routing">Routing &amp; URL behavior<a class="ds-anchor" href="#routing">#</a></h2>
+  <p>
+    Everything the shell shows is reachable by URL. The router dispatches matching hash-path
+    changes to registered handlers, aborts in-flight telemetry requests, and emits the
+    path-change event (OMCT-C15-L2-01.01). Search parameters after the hash carry view and
+    time state and can be set, deleted, or replaced without a navigation (OMCT-C15-L2-01.02).
+  </p>
+  <pre class="ds-code"><span class="cmt">// Browse route: each segment is an object identifier, resolved left to right.</span>
+<span class="cmt">// The document title becomes the browsed object's name (OMCT-C15-L2-01.03).</span>
+#/browse/mine/station-displays/solar-array-output?view=plot-overlay&amp;tc.mode=local
+
+<span class="cmt">// Root redirect: /browse forwards to the last child of root composition</span>
+<span class="cmt">// (OMCT-C15-L2-01.04).</span>
+#/browse  &rarr;  #/browse/mine</pre>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">provideRouter(routes, withHashLocation())</code>; a resolver walks the identifier path, then <code class="ds-code-inline">Title.setTitle(object.name)</code>. Query params are read and written through <code class="ds-code-inline">Router.navigate</code> with <code class="ds-code-inline">queryParamsHandling: 'merge'</code>.</span>
+  </div>
+
+  <h2 id="selection">Selection model<a class="ds-anchor" href="#selection">#</a></h2>
+  <p>
+    One selection service backs the whole shell. Selecting an element (a plot series, a
+    layout frame, a table row) updates the selected collection, annotates the DOM with
+    <code class="ds-code-inline">s-selected</code> on the element and
+    <code class="ds-code-inline">s-selected-parent</code> on its container, and emits a
+    selection-change event that the inspector and toolbar listen to (OMCT-C15-L2-01.05).
+    Ctrl/Cmd-click multi-selects within one context.
+  </p>
+  <pre class="ds-code"><span class="tag">&lt;section</span> <span class="attr">class</span>=<span class="str">"cp-editable-canvas"</span> <span class="attr">s-selected-parent</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"cp-frame is-selected"</span> <span class="attr">s-selected</span><span class="tag">&gt;</span>&hellip;<span class="tag">&lt;/div&gt;</span>  <span class="cmt">&lt;!-- inspector shows this --&gt;</span>
+<span class="tag">&lt;/section&gt;</span></pre>
+
+  <h2 id="views">View resolution &amp; priority<a class="ds-anchor" href="#views">#</a></h2>
+  <p>
+    When an object is navigated to, the view registry returns every provider whose
+    <code class="ds-code-inline">canView</code> is true for the object and its path, ordered by
+    descending priority (OMCT-C15-L2-02.01). The URL's requested view wins when applicable;
+    otherwise the highest-priority provider renders. Created views carry their provider key
+    and record their parent element before <code class="ds-code-inline">show</code> runs
+    (OMCT-C15-L2-02.02), which is what makes the large-view overlay below possible.
+  </p>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Provider</th><th><code>canView</code></th><th>Priority</th><th>Result for <code>pwr.array_out</code></th></tr></thead>
+    <tbody>
+      <tr><td><code>plot-single</code></td><td>telemetry with range values</td><td>90</td><td>Applicable — <strong>default view</strong></td></tr>
+      <tr><td><code>imagery</code></td><td>telemetry with image hints</td><td>80</td><td>Not applicable</td></tr>
+      <tr><td><code>table</code></td><td>any telemetry</td><td>60</td><td>Applicable — listed second in the view switcher</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="large-view">Large-view overlay<a class="ds-anchor" href="#large-view">#</a></h2>
+  <p>An embedded view (a frame inside a layout, a plot in a stacked view) expands into a large overlay without navigating; closing it restores the embedded state (OMCT-C15-L2-02.06). Escape dismisses.</p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:0">
+      <div style="position:relative;height:320px;overflow:hidden">
+        <div style="display:flex;gap:12px;padding:16px;filter:blur(1px)" aria-hidden="true">
+          <div class="cp-card" style="flex:1;height:120px"></div>
+          <div class="cp-card" style="flex:1;height:120px"></div>
+          <div class="cp-card" style="flex:1;height:120px"></div>
+        </div>
+        <div class="cp-scrim" style="position:absolute">
+          <div style="width:88%;height:86%;background:var(--cp-color-surface-1);border:1px solid var(--cp-color-line);border-radius:var(--cp-radius-l);box-shadow:var(--cp-shadow-3);display:flex;flex-direction:column;overflow:hidden">
+            <div class="cp-toolbar" style="height:36px">
+              <svg class="cp-icon" style="color:var(--cp-color-primary)"><use href="#i-plot"/></svg>
+              <strong style="font:var(--cp-type-title-s)">Solar array output</strong>
+              <span class="cp-toolbar-spacer"></span>
+              <button class="cp-icon-btn cp-icon-btn--s" aria-label="Close large view"><svg class="cp-icon"><use href="#i-close"/></svg></button>
+            </div>
+            <div style="flex:1;margin:12px;border:1px solid var(--cp-color-hairline);border-radius:var(--cp-radius-s);background:var(--cp-color-void);overflow:hidden">
+              <svg width="100%" height="100%" viewBox="0 0 600 180" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M0 45h600M0 90h600M0 135h600M120 0v180M240 0v180M360 0v180M480 0v180" stroke="var(--cp-chart-grid)" stroke-width="1"/>
+                <polyline points="0,120 60,112 120,118 180,95 240,70 300,55 360,62 420,50 480,74 540,88 600,82" fill="none" stroke="var(--cp-chart-1)" stroke-width="2"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">The large-view action mounts a preview container in an overlay on the z-overlay layer; destroying the overlay restores the embedded view's state (OMCT-C15-L2-02.06).</div>
+  </div>
+
+  <h2 id="search">Grand search<a class="ds-anchor" href="#search">#</a></h2>
+  <p>The app-bar search field queries indexed objects <em>and</em> annotations as the operator types (OMCT-C15-L2-05.05). Results group by kind; matched substrings highlight in accent. Enter navigates to the focused result; annotation results open the owning object with the annotation targeted.</p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="align-items:flex-start">
+      <div style="width:420px">
+        <span class="cp-input-wrap">
+          <svg class="cp-icon cp-icon--s cp-icon--lead"><use href="#i-search"/></svg>
+          <input class="cp-input" value="solar" aria-label="Search objects and annotations">
+        </span>
+        <div class="cp-search-results" style="margin-top:6px">
+          <div class="cp-menu-head">Objects</div>
+          <div class="cp-result is-focus">
+            <svg class="cp-icon"><use href="#i-plot"/></svg>
+            <span class="cp-result-text">
+              <span class="cp-result-name"><mark>Solar</mark> array output</span>
+              <span class="cp-result-path">My Items / Station displays</span>
+            </span>
+          </div>
+          <div class="cp-result">
+            <svg class="cp-icon"><use href="#i-telemetry"/></svg>
+            <span class="cp-result-text">
+              <span class="cp-result-name">pwr.array_out &middot; <mark>Solar</mark> array power</span>
+              <span class="cp-result-path">Station / Power</span>
+            </span>
+          </div>
+          <div class="cp-menu-head">Annotations</div>
+          <div class="cp-result">
+            <svg class="cp-icon"><use href="#i-flag"/></svg>
+            <span class="cp-result-text">
+              <span class="cp-result-name">&ldquo;&hellip;<mark>solar</mark> pointing offset during eclipse exit&rdquo;</span>
+              <span class="cp-result-path">Ops notebook / 2026-07-12 entry</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Object results and annotation results in one panel (OMCT-C15-L2-05.05). Keyboard: arrows move focus, Enter opens, Escape dismisses and returns focus to the field.</div>
+  </div>
+
+  <h2 id="about">About dialog &amp; branding<a class="ds-anchor" href="#about">#</a></h2>
+  <p>Activating the app-bar logo opens the about dialog in a large overlay with build and license information (OMCT-C15-L2-05.04). Logo image and dialog content come from the branding options plugins can configure (OMCT-C15-L2-05.03).</p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="padding:32px">
+      <div class="cp-dialog cp-dialog--s" style="position:static">
+        <div class="cp-dialog-head">
+          <span class="sh-brand" style="font-size:20px">Cup<span class="o">o</span>la</span>
+          <h2 style="font:var(--cp-type-title-s)">Mission operations frontend</h2>
+        </div>
+        <div class="cp-dialog-body">
+          <dl class="cp-props">
+            <dt>Version</dt><dd>0.1.0</dd>
+            <dt>Build</dt><dd>2026-07-13 09:41 UTC</dd>
+            <dt>Commit</dt><dd>a3f9c21</dd>
+            <dt>Framework</dt><dd>Angular 17.2.2</dd>
+          </dl>
+          <p style="margin:12px 0 0"><a class="cp-link" href="#">Open-source licenses</a></p>
+        </div>
+        <div class="cp-dialog-foot">
+          <button class="cp-btn cp-btn--text">Close</button>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Build metadata in mono; branding options supply the logo and about content (OMCT-C15-L2-05.03/.04).</div>
+  </div>
+
+  <h2 id="device">Device classes &amp; mobile behavior<a class="ds-anchor" href="#device">#</a></h2>
+  <p>A device classifier stamps the <code class="ds-code-inline">&lt;body&gt;</code> with classes for the detected device, orientation, and touch support (OMCT-C15-L2-05.01). Styles adapt from those classes only — no user-agent branching in components.</p>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Body class</th><th>Applied when</th><th>Shell adaptation</th></tr></thead>
+    <tbody>
+      <tr><td><code>desktop</code></td><td>Pointer-first, wide viewport</td><td>Frame as mocked above; hover states active.</td></tr>
+      <tr><td><code>tablet</code></td><td>Tablet-class device</td><td>Inspector collapses by default; splitters gain a wider hit area.</td></tr>
+      <tr><td><code>phone</code></td><td>Phone-class device</td><td>Tree becomes a drawer, search goes full-screen, conductor edits in a sheet (below).</td></tr>
+      <tr><td><code>portrait</code> / <code>landscape</code></td><td>Current orientation</td><td>Pane stacking direction on tablet.</td></tr>
+      <tr><td><code>touch</code></td><td>Touch input present</td><td>Row heights grow to 40px; hover-only affordances get persistent equivalents.</td></tr>
+    </tbody>
+  </table></div>
+  <p>The mobile smoke suite (OMCT-C16-L2-03.04) mandates four behaviors on iPad landscape and iPhone-class WebKit viewports: the tree remains reachable as a drawer, search navigation works full-screen, conductor bounds stay editable, and removal always confirms.</p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="align-items:flex-start;gap:32px">
+
+      <div class="sh-phone">
+        <div class="cp-toolbar" style="flex:none">
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Open browse drawer" aria-expanded="true"><svg class="cp-icon"><use href="#i-list"/></svg></button>
+          <span class="sh-brand">Cup<span class="o">o</span>la</span>
+          <span class="cp-toolbar-spacer"></span>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Search (full-screen)"><svg class="cp-icon"><use href="#i-search"/></svg></button>
+        </div>
+        <div style="flex:1;min-height:0;position:relative">
+          <div style="padding:12px" aria-hidden="true">
+            <div class="cp-card">
+              <div class="sh-overline">Array output</div>
+              <div class="cp-gauge-value">84.2 <span class="unit">kW</span></div>
+            </div>
+          </div>
+          <div style="position:absolute;inset:0;background:var(--cp-color-scrim)"></div>
+          <div style="position:absolute;top:0;bottom:0;left:0;width:248px;background:var(--cp-color-surface-1);border-right:1px solid var(--cp-color-line);box-shadow:var(--cp-shadow-2);display:flex;flex-direction:column">
+            <div class="cp-pane-head">Browse<button class="cp-icon-btn cp-icon-btn--s" style="margin-left:auto" aria-label="Close drawer"><svg class="cp-icon cp-icon--s"><use href="#i-close"/></svg></button></div>
+            <div class="cp-tree" style="padding:4px">
+              <div class="cp-tree-row is-expanded" style="height:40px"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-folder"/></svg><span class="cp-tree-label">My Items</span></div>
+              <div class="cp-tree-row is-leaf is-selected" style="--indent:1;height:40px"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-plot"/></svg><span class="cp-tree-label">Solar array output</span></div>
+              <div class="cp-tree-row is-leaf" style="--indent:1;height:40px"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-notebook"/></svg><span class="cp-tree-label">Ops notebook</span></div>
+              <div class="cp-tree-row" style="height:40px"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-folder"/></svg><span class="cp-tree-label">Station</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="cp-conductor cp-conductor--realtime" style="height:40px;flex:none">
+          <span class="cp-editing-badge" style="background:var(--cp-color-ok-dim);border-color:var(--cp-color-ok-border);color:var(--cp-color-ok)">RT</span>
+          <span class="cp-conductor-clock" style="font:var(--cp-type-data-s)"><svg class="cp-icon cp-icon--s"><use href="#i-clock"/></svg>18:22:04</span>
+          <span class="cp-toolbar-spacer"></span>
+          <span style="font:var(--cp-type-caption);color:var(--cp-color-ink-3)">tap to edit</span>
+        </div>
+        <div class="cp-statusbar" style="flex:none">
+          <span class="cp-indicator cp-indicator--mono">18:22:04 UTC</span>
+          <span class="cp-toolbar-spacer"></span>
+          <button class="cp-indicator"><span class="cp-dot cp-dot--ok"></span></button>
+          <button class="cp-indicator"><svg class="cp-icon"><use href="#i-bell"/></svg><span class="cp-count">3</span></button>
+        </div>
+      </div>
+
+      <div style="max-width:380px">
+        <h3 style="margin-top:0">Phone-class adaptations</h3>
+        <ul style="padding-left:20px;display:flex;flex-direction:column;gap:8px;margin:0">
+          <li><strong>Tree &rarr; drawer.</strong> The browse pane leaves the flow and slides over a scrim from the app-bar toggle; selecting a node navigates and closes it.</li>
+          <li><strong>Search &rarr; full-screen.</strong> The search icon replaces the inline field; results take the whole viewport with the same object/annotation grouping.</li>
+          <li><strong>Conductor editing.</strong> The compact strip shows mode and clock only; tapping opens a full-screen sheet with the complete bounds controls.</li>
+          <li><strong>Removal confirms.</strong> Every destructive action raises the confirm dialog — no swipe-to-delete without confirmation.</li>
+        </ul>
+      </div>
+
+    </div>
+    <div class="ds-demo-caption">Narrow-viewport shell (~360px) with the browse drawer open. Touch rows are 40px; the four behaviors above are the OMCT-C16-L2-03.04 mobile smoke checks.</div>
+  </div>
+
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C15-L2-01.01&ndash;.04 &middot; routing &amp; URL</span>
+    <span class="ds-req">OMCT-C15-L2-01.05 &middot; selection</span>
+    <span class="ds-req">OMCT-C15-L2-02.01/.02 &middot; view resolution</span>
+    <span class="ds-req">OMCT-C15-L2-02.03&ndash;.05 &middot; inspector views</span>
+    <span class="ds-req">OMCT-C15-L2-02.06 &middot; large-view overlay</span>
+    <span class="ds-req">OMCT-C15-L2-05.01 &middot; device classes</span>
+    <span class="ds-req">OMCT-C15-L2-05.02 &middot; theme</span>
+    <span class="ds-req">OMCT-C15-L2-05.03/.04 &middot; branding &amp; about</span>
+    <span class="ds-req">OMCT-C15-L2-05.05 &middot; grand search</span>
+    <span class="ds-req">OMCT-C01-L2-01.02 &middot; capability APIs</span>
+    <span class="ds-req">OMCT-C01-L2-02.02 &middot; mount target</span>
+    <span class="ds-req">OMCT-C16-L2-03.04 &middot; mobile viewports</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="../components/cards-panels.html"><span class="dir">Previous</span>&larr; Panes &amp; panels</a>
+    <a href="time-conductor.html"><span class="dir">Next</span>Time conductor &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

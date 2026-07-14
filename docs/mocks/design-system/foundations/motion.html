@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motion — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body data-page="foundations/motion" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Foundations</p>
+  <h1>Motion</h1>
+  <p class="ds-lead">
+    Motion in a control room answers one question: <em>what just changed?</em> Three durations, two
+    easings, no bounce, no parallax, no page transitions. Anything decorative competes with telemetry
+    for attention and loses its place here.
+  </p>
+
+  <h2 id="tokens">Tokens<a class="ds-anchor" href="#tokens">#</a></h2>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Token</th><th>Value</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td><code>--cp-motion-fast</code></td><td>80ms</td><td>Hover fills, ink changes, border color</td></tr>
+      <tr><td><code>--cp-motion-base</code></td><td>140ms</td><td>Menus, tooltips, chevron rotation, switch travel</td></tr>
+      <tr><td><code>--cp-motion-slow</code></td><td>240ms</td><td>Dialog entry, pane collapse, progress fill</td></tr>
+      <tr><td><code>--cp-ease-standard</code></td><td>cubic-bezier(0.2, 0, 0, 1)</td><td>Everything entering or changing</td></tr>
+      <tr><td><code>--cp-ease-exit</code></td><td>cubic-bezier(0.3, 0, 1, 1)</td><td>Things leaving (menus closing, toasts dismissing)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="allowed">Where motion is allowed<a class="ds-anchor" href="#allowed">#</a></h2>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Surface</th><th>Animation</th><th>Spec</th></tr></thead>
+    <tbody>
+      <tr><td>Menus / tooltips</td><td>Fade + 4px rise, 140ms</td><td>enter only; exit is 80ms fade</td></tr>
+      <tr><td>Dialogs</td><td>Fade + scale 0.98&rarr;1, 240ms; scrim fades in parallel</td><td>OMCT-C15-L2-04.04</td></tr>
+      <tr><td>Expansion panels / tree</td><td>Chevron rotates 90&deg;, 140ms; content clips, no slide</td><td></td></tr>
+      <tr><td>Progress / spinners</td><td>Continuous; the only infinite animations in the system</td><td>OMCT-C14-L2-04.03</td></tr>
+      <tr><td>Live values</td><td><strong>No animation.</strong> Values swap instantly; tabular figures prevent jitter</td><td>OMCT-C06</td></tr>
+      <tr><td>Remote-change flash</td><td>Row background pulses <code>primary-dim</code> once, 240ms</td><td>OMCT-C04-L2-02.05</td></tr>
+      <tr><td>Plots (chart.js)</td><td><code>animation: false</code> &mdash; frames must track the conductor, not tween</td><td>OMCT-C07</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="gap:32px">
+      <button class="cp-btn cp-btn--outlined">Hover me &middot; 80ms</button>
+      <label class="cp-switch" onclick="this.classList.toggle('is-on')"><span class="cp-switch-track"></span>Switch &middot; 140ms</label>
+      <div style="width:180px"><div class="cp-progress cp-progress--indeterminate"><div class="cp-progress-fill"></div></div></div>
+      <div class="cp-spinner" role="progressbar" aria-label="Loading"></div>
+    </div>
+    <div class="ds-demo-caption">Live examples — hover fill, switch travel, indeterminate progress, spinner.</div>
+  </div>
+
+  <h2 id="reduced">Reduced motion<a class="ds-anchor" href="#reduced">#</a></h2>
+  <p>
+    <code class="ds-code-inline">prefers-reduced-motion: reduce</code> zeroes all three duration tokens,
+    so every transition collapses to an instant state change. Spinners and indeterminate bars slow to
+    a crawl instead of stopping &mdash; in-progress feedback is still information
+    (OMCT-C16-L2-03.01).
+  </p>
+  <pre class="ds-code">@media (prefers-reduced-motion: reduce) {
+  :root { --cp-motion-fast: 0ms; --cp-motion-base: 0ms; --cp-motion-slow: 0ms; }
+  .cp-spinner { animation-duration: 2.4s; }
+}</pre>
+
+  <h2 id="angular">Angular mapping<a class="ds-anchor" href="#angular">#</a></h2>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Prefer CSS transitions over Angular animations. Where Material animates internally, keep defaults but honor <code class="ds-code-inline">provideAnimationsAsync('noop')</code> when the OS requests reduced motion. Set <code class="ds-code-inline">animation:false</code> in every chart.js config.</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="iconography.html"><span class="dir">Previous</span>&larr; Iconography</a>
+    <a href="../components/buttons.html"><span class="dir">Next</span>Buttons &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

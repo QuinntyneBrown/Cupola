@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Indicators &amp; chips — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<style>
+  /* page-scoped demo helpers — all token-driven */
+  .demo-app-frame {
+    border: 1px solid var(--cp-color-hairline);
+    border-radius: var(--cp-radius-m);
+    overflow: hidden;
+  }
+  .demo-app-frame .demo-app-body {
+    height: 48px;
+    background: var(--cp-color-surface-1);
+  }
+  .demo-poll {
+    width: 320px;
+    background: var(--cp-color-surface-3);
+    border: 1px solid var(--cp-color-line);
+    border-radius: var(--cp-radius-m);
+    box-shadow: var(--cp-shadow-2);
+    padding: var(--cp-space-4) var(--cp-space-5) var(--cp-space-5);
+    display: flex; flex-direction: column; gap: var(--cp-space-3);
+  }
+  .demo-poll-head {
+    display: flex; align-items: center; gap: var(--cp-space-3);
+    font: var(--cp-type-overline);
+    text-transform: uppercase;
+    letter-spacing: var(--cp-tracking-caps);
+    color: var(--cp-color-ink-3);
+  }
+  .demo-poll-q { font: var(--cp-type-title-s); color: var(--cp-color-ink); margin: 0; }
+  .demo-poll-meta { font: var(--cp-type-caption); color: var(--cp-color-ink-3); }
+  .demo-roll { display: flex; flex-direction: column; gap: 6px; }
+  .demo-roll-row {
+    display: flex; align-items: center; gap: var(--cp-space-3);
+    font: var(--cp-type-data-s); color: var(--cp-color-ink-2);
+  }
+  .demo-roll-dots { display: inline-flex; gap: 3px; }
+</style>
+</head>
+<body data-page="components/indicators" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Components</p>
+  <h1>Indicators &amp; chips</h1>
+  <p class="ds-lead">
+    The indicator bar is the operator's peripheral vision &mdash; a 28px strip at the bottom of the
+    shell where every plugin reports health without stealing focus. One rule governs everything on
+    this page: status color never travels alone. Every state pairs its color with an icon or a label.
+  </p>
+
+  <h2 id="bar">The indicator bar<a class="ds-anchor" href="#bar">#</a></h2>
+  <p>
+    A single horizontal strip, <code class="ds-code-inline">.cp-statusbar</code>, 28px tall on the
+    <code class="ds-code-inline">void</code> surface. Plugins contribute indicators; the shell sorts
+    them by declared priority, highest first (leftmost), so the bar reads the same on every screen.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:24px">
+      <div class="demo-app-frame">
+        <div class="demo-app-body"></div>
+        <div class="cp-statusbar">
+          <button class="cp-indicator cp-indicator--mono" title="App clock — UTC"><svg class="cp-icon"><use href="#i-clock"/></svg>2026-07-13 17:52:04 UTC</button>
+          <button class="cp-indicator" title="Telemetry connection"><span class="cp-dot cp-dot--ok"></span>Connected</button>
+          <button class="cp-indicator" title="Persistence"><svg class="cp-icon" style="color:var(--cp-color-ok)"><use href="#i-check"/></svg>Saved</button>
+          <button class="cp-indicator" title="Notifications" aria-label="3 notifications"><svg class="cp-icon"><use href="#i-bell"/></svg><span class="cp-count cp-count--info">3</span></button>
+          <span class="cp-chip cp-chip--ok" title="Operator status">GO</span>
+          <button class="cp-indicator" title="User &amp; role"><svg class="cp-icon"><use href="#i-user"/></svg>j.reyes &middot; Flight<svg class="cp-icon"><use href="#i-chevron-down"/></svg></button>
+          <button class="cp-indicator" title="URL health"><svg class="cp-icon"><use href="#i-link"/></svg><span class="cp-dot cp-dot--ok"></span>Gateway</button>
+          <button class="cp-indicator cp-indicator--mono" title="Frame rate"><svg class="cp-icon"><use href="#i-activity"/></svg>60 fps</button>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Assembled bar in priority order, left to right: app clock &middot; connection &middot; save &middot; notifications &middot; operator status &middot; user &middot; URL health &middot; FPS. Indicators are 22px controls in the 28px bar.</div>
+  </div>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Priority</th><th>Indicator</th><th>Content</th><th>Popup on click</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>App clock</td><td>Mono UTC timestamp in the active time-system format</td><td>&mdash;</td></tr>
+      <tr><td>2</td><td>Connection</td><td>Status dot + state label</td><td>Endpoint detail</td></tr>
+      <tr><td>3</td><td>Save</td><td>Icon + state label</td><td>Failure list</td></tr>
+      <tr><td>4</td><td>Notifications</td><td>Bell + count badge</td><td>Notification list</td></tr>
+      <tr><td>5</td><td>Operator status</td><td>Filled status chip</td><td>Status poll widget</td></tr>
+      <tr><td>6</td><td>User &amp; role</td><td>User icon + name &middot; role</td><td>Role selector</td></tr>
+      <tr><td>7</td><td>URL health</td><td>Link icon + dot + endpoint label</td><td>Last check detail</td></tr>
+      <tr><td>8</td><td>Performance</td><td>Mono fps readout (plugin-installed only)</td><td>&mdash;</td></tr>
+    </tbody>
+  </table></div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">cp-status-bar</code> component; plugins register through an <code class="ds-code-inline">IndicatorService</code> with an explicit priority. Popups open via CDK overlay anchored to the indicator.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C01-L2-01.02 &middot; indicator bar</span>
+    <span class="ds-req">OMCT-C14-L2-05.01 &middot; priority order</span>
+  </div>
+
+  <h2 id="connection">Connection status<a class="ds-anchor" href="#connection">#</a></h2>
+  <p>Reports the realtime telemetry socket. Four mandated states &mdash; the dot carries the color, the label carries the meaning.</p>
+  <div class="ds-variants">
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-indicator"><span class="cp-dot cp-dot--pending"></span>Connecting&hellip;</button></div><div class="ds-variant-label">Pending</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-indicator"><span class="cp-dot cp-dot--ok"></span>Connected</button></div><div class="ds-variant-label">Connected</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-indicator"><span class="cp-dot cp-dot--critical"></span>Disconnected</button></div><div class="ds-variant-label">Disconnected</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-indicator"><svg class="cp-icon"><use href="#i-help"/></svg>Unknown</button></div><div class="ds-variant-label">Unknown — no provider report</div></div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C04-L2-02.06 &middot; connection states</span>
+  </div>
+
+  <h2 id="save">Save &amp; persistence<a class="ds-anchor" href="#save">#</a></h2>
+  <p>
+    Every persistence round-trip reports here. Batched saves report <strong>per object</strong>:
+    a partial failure names the count, and the popup lists exactly which objects failed so the
+    operator can retry them individually.
+  </p>
+  <div class="ds-variants">
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-indicator" style="color:var(--cp-color-ink-3)"><svg class="cp-icon"><use href="#i-save"/></svg>Idle</button></div><div class="ds-variant-label">Idle — nothing pending</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-indicator"><span class="cp-spinner" style="width:14px;height:14px;border-width:2px"></span>Saving&hellip;</button></div><div class="ds-variant-label">Saving (OMCT-C04-L2-02.02)</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-indicator"><svg class="cp-icon" style="color:var(--cp-color-ok)"><use href="#i-check"/></svg>Saved</button></div><div class="ds-variant-label">Saved</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-indicator" style="color:var(--cp-color-caution)"><svg class="cp-icon"><use href="#i-alert-triangle"/></svg>2 of 5 failed</button></div><div class="ds-variant-label">Partial failure (OMCT-C04-L2-02.03)</div></div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C04-L2-02.02 &middot; save progress</span>
+    <span class="ds-req">OMCT-C04-L2-02.03 &middot; per-object failure</span>
+  </div>
+
+  <h2 id="notifications">Notifications<a class="ds-anchor" href="#notifications">#</a></h2>
+  <p>The bell aggregates active notifications. No badge at zero; when any active notification carries error severity, the whole indicator takes the critical tint &mdash; the badge count plus the tinted bell, never the color alone.</p>
+  <div class="ds-variants">
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-indicator" aria-label="No notifications"><svg class="cp-icon"><use href="#i-bell"/></svg></button></div><div class="ds-variant-label">Zero state — no badge</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-indicator" aria-label="3 notifications"><svg class="cp-icon"><use href="#i-bell"/></svg><span class="cp-count cp-count--info">3</span></button></div><div class="ds-variant-label">3 active — info severity</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-indicator" style="color:var(--cp-color-critical)" aria-label="4 notifications, 1 error"><svg class="cp-icon"><use href="#i-bell"/></svg><span class="cp-count">4</span></button></div><div class="ds-variant-label">Error notification active</div></div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Badge is <code class="ds-code-inline">matBadge</code>-equivalent (<code class="ds-code-inline">.cp-count</code>); clicking opens the notification list overlay.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C14-L2-04.04 &middot; notification indicator</span>
+  </div>
+
+  <h2 id="user">User &amp; role<a class="ds-anchor" href="#user">#</a></h2>
+  <p>
+    When a user provider is installed the indicator shows the user icon, the login name, and the
+    active role. Clicking opens the role selector; choosing a role broadcasts to everything
+    role-aware (poll visibility, annotation attribution). Without a provider, no name is shown
+    &mdash; the indicator does not render at all.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <button class="cp-indicator"><svg class="cp-icon"><use href="#i-user"/></svg>j.reyes &middot; Flight<svg class="cp-icon"><use href="#i-chevron-down"/></svg></button>
+      <div class="cp-menu" style="min-width:180px">
+        <div class="cp-menu-head">Operator role</div>
+        <button class="cp-menu-item"><svg class="cp-icon" style="color:var(--cp-color-primary)"><use href="#i-check"/></svg>Flight</button>
+        <button class="cp-menu-item"><svg class="cp-icon" style="visibility:hidden"><use href="#i-check"/></svg>CAPCOM</button>
+        <button class="cp-menu-item"><svg class="cp-icon" style="visibility:hidden"><use href="#i-check"/></svg>EECOM</button>
+      </div>
+      <span style="font:var(--cp-type-caption);color:var(--cp-color-ink-disabled);border:1px dashed var(--cp-color-hairline);border-radius:var(--cp-radius-s);padding:6px 12px">no user provider &mdash; indicator not rendered</span>
+    </div>
+    <div class="ds-demo-caption">Indicator with role dropdown open &middot; the no-provider state renders nothing (no anonymous placeholder).</div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C14-L2-01.02 &middot; user indicator</span>
+    <span class="ds-req">OMCT-C14-L2-01.03 &middot; role display</span>
+    <span class="ds-req">OMCT-C14-L2-01.04 &middot; role selection</span>
+  </div>
+
+  <h2 id="poll">Operator status &amp; poll<a class="ds-anchor" href="#poll">#</a></h2>
+  <p>Operator status is a filled chip &mdash; the only filled status element in the bar, because it is the one the whole room reads at a glance. Four states:</p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage">
+      <span class="cp-chip cp-chip--ok">GO</span>
+      <span class="cp-chip cp-chip--critical">NO-GO</span>
+      <span class="cp-chip cp-chip--caution">STANDBY</span>
+      <span class="cp-chip">NOT SET</span>
+    </div>
+    <div class="ds-demo-caption">Filled status chips take dark ink; NOT SET stays a plain chip — an unanswered poll is not an alarm.</div>
+  </div>
+  <p>Clicking the chip opens the status poll widget. The poll question is set by an authorized role; everyone else sees it read-only. Responses roll up anonymously by status.</p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="padding:32px">
+      <div class="demo-poll">
+        <div class="demo-poll-head">
+          Operator status poll
+          <span class="cp-toolbar-spacer"></span>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Edit poll question"><svg class="cp-icon cp-icon--s"><use href="#i-pencil"/></svg></button>
+        </div>
+        <p class="demo-poll-q">Go for eclipse ops?</p>
+        <span class="demo-poll-meta">Set by m.okafor (Flight Director) &middot; 17:45:00 UTC</span>
+        <hr class="cp-divider" style="margin:4px 0">
+        <span class="cp-field-label">My status</span>
+        <div style="display:flex;gap:6px" role="radiogroup" aria-label="My status">
+          <span class="cp-chip cp-chip--ok" style="outline:2px solid var(--cp-color-focus-ring);outline-offset:2px">GO</span>
+          <span class="cp-chip">NO-GO</span>
+          <span class="cp-chip">STANDBY</span>
+        </div>
+        <hr class="cp-divider" style="margin:4px 0">
+        <span class="cp-field-label">Responses</span>
+        <div class="demo-roll">
+          <div class="demo-roll-row"><span class="demo-roll-dots"><span class="cp-dot cp-dot--ok"></span><span class="cp-dot cp-dot--ok"></span><span class="cp-dot cp-dot--ok"></span><span class="cp-dot cp-dot--ok"></span><span class="cp-dot cp-dot--ok"></span><span class="cp-dot cp-dot--ok"></span></span>6 &middot; GO</div>
+          <div class="demo-roll-row"><span class="demo-roll-dots"><span class="cp-dot cp-dot--caution"></span><span class="cp-dot cp-dot--caution"></span></span>2 &middot; STANDBY</div>
+          <div class="demo-roll-row"><span class="demo-roll-dots"><span class="cp-dot cp-dot--critical"></span></span>1 &middot; NO-GO</div>
+          <div class="demo-roll-row"><span class="demo-roll-dots"><span class="cp-dot"></span><span class="cp-dot"></span><span class="cp-dot"></span></span>3 &middot; NOT SET</div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Poll widget: question with edit affordance (authorized roles only), chip selector for my status, anonymous response roll-up by status.</div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C14-L2-02.01 &middot; status chip</span>
+    <span class="ds-req">OMCT-C14-L2-02.02 &middot; status poll</span>
+    <span class="ds-req">OMCT-C14-L2-02.03 &middot; poll administration</span>
+  </div>
+
+  <h2 id="health">URL health &amp; performance<a class="ds-anchor" href="#health">#</a></h2>
+  <p>URL health watches a configured endpoint and names it. The performance indicator is a mono fps readout &mdash; present only when the performance plugin is installed; it never renders as an empty slot.</p>
+  <div class="ds-variants">
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-indicator"><svg class="cp-icon"><use href="#i-link"/></svg><span class="cp-dot cp-dot--ok"></span>Telemetry gateway &middot; Connected</button></div><div class="ds-variant-label">URL health — nominal</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-indicator" style="color:var(--cp-color-critical)"><svg class="cp-icon"><use href="#i-link"/></svg><span class="cp-dot cp-dot--critical"></span>Telemetry gateway &middot; Unreachable</button></div><div class="ds-variant-label">URL health — error</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-indicator cp-indicator--mono"><svg class="cp-icon"><use href="#i-activity"/></svg>60 fps</button></div><div class="ds-variant-label">Performance (plugin-installed only)</div></div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C14-L2-05.02 &middot; URL health</span>
+    <span class="ds-req">OMCT-C14-L2-05.03 &middot; performance</span>
+  </div>
+
+  <h2 id="clear-data">Clear Data<a class="ds-anchor" href="#clear-data">#</a></h2>
+  <p>
+    An action indicator, not a status: clicking clears buffered telemetry from every open view
+    without a page reload. Because it destroys the operator's working context, it always confirms
+    first &mdash; a dialog naming what will be cleared, with the danger button carrying the verb.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage">
+      <button class="cp-indicator"><svg class="cp-icon"><use href="#i-trash"/></svg>Clear Data</button>
+      <div class="cp-banner cp-banner--info" style="max-width:420px">
+        <svg class="cp-icon"><use href="#i-info"/></svg>
+        <span class="cp-banner-msg"><strong>Confirmation required.</strong> "Clear all telemetry from open views? New data continues to stream." &mdash; Cancel &middot; <em>Clear Data</em> (danger).</span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">The indicator and its confirmation contract — data clears only after explicit confirm.</div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C03-L2-04.04 &middot; clear data confirm</span>
+  </div>
+
+  <h2 id="chips">Chips &amp; tags<a class="ds-anchor" href="#chips">#</a></h2>
+  <p>
+    Chips label and filter; they never alarm (status chips above are the only filled ones). Tag chips
+    carry a dot colored by the tag's configuration &mdash; colors come from the chart palette slots,
+    so tags stay inside the validated palette.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage">
+      <span class="cp-chip">Baseline</span>
+      <span class="cp-chip"><span class="cp-chip-dot" style="background:var(--cp-chart-3)"></span>Anomaly</span>
+      <span class="cp-chip"><span class="cp-chip-dot" style="background:var(--cp-chart-1)"></span>Eclipse</span>
+      <span class="cp-chip"><span class="cp-chip-dot" style="background:var(--cp-chart-2)"></span>Crew ops</span>
+      <span class="cp-chip"><span class="cp-chip-dot" style="background:var(--cp-chart-3)"></span>Anomaly<button class="cp-chip-x" aria-label="Remove tag Anomaly"><svg class="cp-icon" style="width:10px;height:10px"><use href="#i-close"/></svg></button></span>
+      <span class="cp-chip is-selected"><span class="cp-chip-dot" style="background:var(--cp-chart-1)"></span>Eclipse</span>
+    </div>
+    <div class="ds-demo-caption">Plain · tagged (dot per tag config, chart palette slots) · removable · selected (active filter).</div>
+  </div>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <div class="cp-field" style="width:220px">
+        <label class="cp-field-label">Add tag</label>
+        <span class="cp-input-wrap">
+          <svg class="cp-icon cp-icon--s cp-icon--lead"><use href="#i-plus"/></svg>
+          <input class="cp-input" value="ec" placeholder="Type to search tags">
+        </span>
+        <span class="cp-field-help">Enter creates a new tag if no match</span>
+      </div>
+      <div class="cp-menu" style="width:220px;margin-top:20px">
+        <button class="cp-menu-item is-focus"><span class="cp-chip-dot" style="width:8px;height:8px;border-radius:50%;background:var(--cp-chart-1)"></span><span><b style="color:var(--cp-color-primary)">Ec</b>lipse</span></button>
+        <button class="cp-menu-item"><span class="cp-chip-dot" style="width:8px;height:8px;border-radius:50%;background:var(--cp-chart-5)"></span><span><b style="color:var(--cp-color-primary)">EC</b>LSS watch</span></button>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Tag search suggests only after input — an empty term shows no suggestions (OMCT-C13-L2-04.05).</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">mat-chip-set</code> / <code class="ds-code-inline">mat-chip-row</code>; removable chips emit <code class="ds-code-inline">(removed)</code> with <code class="ds-code-inline">aria-label="Remove tag &hellip;"</code> on the trailing button.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C13-L2-04.04 &middot; tag chips</span>
+    <span class="ds-req">OMCT-C13-L2-04.05 &middot; tag search</span>
+  </div>
+
+  <h2 id="badges">Badges &amp; progress<a class="ds-anchor" href="#badges">#</a></h2>
+  <div class="ds-variants">
+    <div class="ds-variant"><div class="ds-variant-stage" style="gap:12px"><span class="cp-count">3</span><span class="cp-count">99+</span></div><div class="ds-variant-label">Count — critical (default)</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage" style="gap:12px"><span class="cp-count cp-count--info">12</span></div><div class="ds-variant-label">Count — info</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="cp-progress" style="width:160px"><div class="cp-progress-fill" style="width:64%"></div></div></div><div class="ds-variant-label">Progress — determinate 64%</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="cp-progress cp-progress--indeterminate" style="width:160px"><div class="cp-progress-fill"></div></div></div><div class="ds-variant-label">Progress — indeterminate</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage" style="gap:16px"><span class="cp-spinner" style="width:14px;height:14px;border-width:2px"></span><span class="cp-spinner"></span><span class="cp-spinner cp-spinner--l"></span></div><div class="ds-variant-label">Spinner — 14 inline · 20 default · 32 large</div></div>
+  </div>
+  <p>
+    Progress bars carry ongoing work inside a view (imports, history loads); spinners mark a region
+    still resolving. Both respect <code class="ds-code-inline">prefers-reduced-motion</code> by
+    slowing, never by disappearing &mdash; the operator must still see that work is pending.
+  </p>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">mat-progress-bar</code> / <code class="ds-code-inline">mat-progress-spinner</code> restyled to 4px track and 2px ring.</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="overlays.html"><span class="dir">Previous</span>&larr; Dialogs &amp; overlays</a>
+    <a href="cards-panels.html"><span class="dir">Next</span>Panes &amp; panels &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

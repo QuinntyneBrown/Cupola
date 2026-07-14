@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Imagery — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<style>
+  /* ---- camera frame stage (pure CSS — no external images) --------------- */
+  .im-stage {
+    position: relative; overflow: hidden;
+    border-radius: var(--cp-radius-s);
+    background:
+      radial-gradient(ellipse 60% 50% at 52% 44%, rgba(148, 178, 214, 0.18), rgba(148, 178, 214, 0.05) 55%, transparent 78%),
+      linear-gradient(rgba(139, 168, 204, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139, 168, 204, 0.05) 1px, transparent 1px),
+      #05070C;
+    background-size: auto, 48px 48px, 48px 48px, auto;
+  }
+  .im-stage--zoom { background-size: auto, 120px 120px, 120px 120px, auto; cursor: grab; }
+  .im-cross { position: absolute; inset: 0; pointer-events: none; }
+  .im-cross::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(139, 168, 204, 0.16); }
+  .im-cross::after { content: ""; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(139, 168, 204, 0.16); }
+  .im-reticle {
+    position: absolute; left: 50%; top: 50%;
+    width: 120px; height: 120px; margin: -60px 0 0 -60px;
+    border: 1px solid rgba(139, 168, 204, 0.24); border-radius: 50%;
+    pointer-events: none;
+  }
+
+  /* overlays */
+  .im-chip {
+    position: absolute;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 3px 10px;
+    background: rgba(7, 10, 16, 0.78);
+    border: 1px solid var(--cp-color-hairline);
+    border-radius: var(--cp-radius-s);
+    font: var(--cp-type-data-s); color: var(--cp-color-ink);
+    white-space: nowrap; z-index: 4;
+  }
+  .im-chip .live { color: var(--cp-color-ok); font-weight: 500; letter-spacing: 0.06em; }
+  .im-controls {
+    position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 2px;
+    padding: 2px;
+    background: rgba(20, 26, 36, 0.92);
+    border: 1px solid var(--cp-color-line);
+    border-radius: var(--cp-radius-s);
+    z-index: 4;
+  }
+  .im-compass { position: absolute; top: 10px; right: 10px; z-index: 4; text-align: center; }
+  .im-compass .hdg { display: block; margin-top: 2px; font: var(--cp-type-data-s); color: var(--cp-color-ink-2); }
+
+  /* thumbnail strip */
+  .im-thumbs { display: flex; gap: 8px; align-items: flex-start; overflow-x: auto; }
+  .im-thumb { flex: none; width: 92px; background: transparent; border: none; padding: 0; cursor: pointer; text-align: center; border-radius: var(--cp-radius-s); }
+  .im-thumb-img {
+    display: block; height: 54px; border-radius: 2px;
+    border: 1px solid var(--cp-color-hairline);
+    background:
+      radial-gradient(ellipse 70% 60% at 52% 44%, rgba(148, 178, 214, 0.16), transparent 75%),
+      #05070C;
+  }
+  .im-thumb.is-selected .im-thumb-img { border-color: var(--cp-color-primary); box-shadow: 0 0 0 1px var(--cp-color-primary); }
+  .im-thumb-ts { display: block; margin-top: 4px; font: var(--cp-type-data-s); color: var(--cp-color-ink-3); }
+  .im-thumb.is-selected .im-thumb-ts { color: var(--cp-color-primary); }
+
+  /* viewable-area (overview) indicator */
+  .im-overview {
+    position: absolute; right: 10px; bottom: 10px;
+    width: 132px; height: 84px;
+    background: rgba(7, 10, 16, 0.82);
+    border: 1px solid var(--cp-color-line);
+    border-radius: 2px; z-index: 4;
+  }
+  .im-overview::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 52% 44%, rgba(148, 178, 214, 0.16), transparent 75%);
+  }
+  .im-overview-vis {
+    position: absolute; left: 46%; top: 30%; width: 34%; height: 38%;
+    border: 1px solid var(--cp-color-primary);
+    background: var(--cp-color-primary-dim);
+  }
+
+  /* annotations */
+  .im-anno { position: absolute; border: 1.5px solid var(--cp-chart-3); border-radius: 2px; z-index: 3; }
+  .im-anno-tag {
+    position: absolute; top: -21px; left: -1.5px;
+    font: var(--cp-type-data-s); line-height: 16px;
+    padding: 0 6px; border-radius: 2px;
+    background: var(--cp-chart-3); color: var(--cp-color-ink-inverse);
+    white-space: nowrap;
+  }
+  .im-anno.is-selected { border-color: var(--cp-color-primary); }
+  .im-anno.is-selected .im-anno-tag { background: var(--cp-color-primary); }
+  .im-handle {
+    position: absolute; width: 7px; height: 7px;
+    background: var(--cp-color-primary);
+    border: 1px solid var(--cp-color-void); border-radius: 1px; z-index: 4;
+  }
+  .im-handle--nw { top: -4px; left: -4px; }   .im-handle--ne { top: -4px; right: -4px; }
+  .im-handle--sw { bottom: -4px; left: -4px; } .im-handle--se { bottom: -4px; right: -4px; }
+  .im-handle--n { top: -4px; left: calc(50% - 4px); } .im-handle--s { bottom: -4px; left: calc(50% - 4px); }
+  .im-handle--e { right: -4px; top: calc(50% - 4px); } .im-handle--w { left: -4px; top: calc(50% - 4px); }
+  .im-marquee { position: absolute; border: 1px dashed var(--cp-color-primary); background: var(--cp-color-primary-dim); z-index: 3; }
+
+  /* time-strip imagery track */
+  .im-track { position: relative; height: 104px; background: var(--cp-color-surface-1); }
+  .im-track-axis { position: absolute; left: 0; right: 0; bottom: 24px; height: 1px; background: var(--cp-chart-axis); }
+  .im-track-tick { position: absolute; bottom: 0; transform: translateX(-50%); text-align: center; font: var(--cp-type-data-s); color: var(--cp-chart-tick); }
+  .im-track-tick::before { content: ""; display: block; width: 1px; height: 5px; background: var(--cp-chart-axis); margin: 0 auto 3px; }
+  .im-track-thumb {
+    position: absolute; bottom: 32px; transform: translateX(-50%);
+    width: 58px; height: 38px; border-radius: 2px;
+    border: 1px solid var(--cp-color-hairline);
+    background:
+      radial-gradient(ellipse 70% 60% at 52% 44%, rgba(148, 178, 214, 0.16), transparent 75%),
+      #05070C;
+  }
+  .im-track-thumb.is-selected { border-color: var(--cp-color-primary); box-shadow: 0 0 0 1px var(--cp-color-primary); }
+</style>
+</head>
+<body data-page="patterns/imagery" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Patterns</p>
+  <h1>Imagery</h1>
+  <p class="ds-lead">
+    The imagery view renders image telemetry as a focused frame with a history strip
+    (OMCT-C11-L2-01.01). Every overlay — timestamp, freshness, controls, compass — floats on the
+    frame in low-alpha chips so the picture stays the subject. Timestamps and headings are always mono.
+  </p>
+
+  <h2 id="anatomy">Anatomy<a class="ds-anchor" href="#anatomy">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:12px">
+      <div class="im-stage" style="height:440px">
+        <div class="im-cross"></div>
+        <div class="im-reticle"></div>
+        <span class="im-chip" style="top:10px;left:10px">
+          <span style="display:inline-flex;align-items:center;gap:6px"><span class="cp-dot cp-dot--ok"></span><span class="live">LIVE</span></span>
+          2026-07-13 18:20:08.412 UTC
+        </span>
+        <div class="im-compass">
+          <svg width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Compass rose, heading 213.6 degrees">
+            <circle cx="32" cy="32" r="27" fill="rgba(7,10,16,0.72)" stroke="#384357"/>
+            <g stroke="#4E5B74" stroke-width="1">
+              <line x1="47.6" y1="16.4" x2="44.7" y2="19.3"/>
+              <line x1="47.6" y1="47.6" x2="44.7" y2="44.7"/>
+              <line x1="16.4" y1="47.6" x2="19.3" y2="44.7"/>
+              <line x1="16.4" y1="16.4" x2="19.3" y2="19.3"/>
+            </g>
+            <g transform="rotate(213.6 32 32)">
+              <path d="M32 32 L27.5 12.5 A20 20 0 0 1 36.5 12.5 Z" fill="rgba(88,183,236,0.35)" stroke="#58B7EC" stroke-width="1"/>
+            </g>
+            <text x="32" y="15" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8" fill="#E9EDF5">N</text>
+            <text x="53" y="35" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8" fill="#8290A9">E</text>
+            <text x="32" y="57" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8" fill="#8290A9">S</text>
+            <text x="11" y="35" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8" fill="#8290A9">W</text>
+          </svg>
+          <span class="hdg">HDG 213.6&deg;</span>
+        </div>
+        <div class="im-controls" role="toolbar" aria-label="Imagery controls">
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Zoom in"><svg class="cp-icon"><use href="#i-zoom-in"/></svg></button>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Zoom out"><svg class="cp-icon"><use href="#i-zoom-out"/></svg></button>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Reset view"><svg class="cp-icon"><use href="#i-crosshair"/></svg></button>
+          <span class="cp-toolbar-sep"></span>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Pause incoming imagery"><svg class="cp-icon"><use href="#i-pause"/></svg></button>
+          <span class="cp-toolbar-sep"></span>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Brightness and contrast"><svg class="cp-icon"><use href="#i-filter"/></svg></button>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Layers"><svg class="cp-icon"><use href="#i-layers"/></svg></button>
+        </div>
+      </div>
+      <div class="im-thumbs" style="margin-top:10px">
+        <button class="im-thumb"><span class="im-thumb-img"></span><span class="im-thumb-ts">18:17:38</span></button>
+        <button class="im-thumb"><span class="im-thumb-img"></span><span class="im-thumb-ts">18:18:08</span></button>
+        <button class="im-thumb"><span class="im-thumb-img"></span><span class="im-thumb-ts">18:18:38</span></button>
+        <button class="im-thumb"><span class="im-thumb-img"></span><span class="im-thumb-ts">18:19:08</span></button>
+        <button class="im-thumb"><span class="im-thumb-img"></span><span class="im-thumb-ts">18:19:38</span></button>
+        <button class="im-thumb is-selected" aria-current="true"><span class="im-thumb-img"></span><span class="im-thumb-ts">18:20:08</span></button>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Focused frame with timestamp + freshness chip (top-left), compass rose with heading wedge (top-right, OMCT-C11-L2-02.05), control strip (bottom-center), and the thumbnail strip below. Camera frame is a CSS placeholder — no external images.</div>
+  </div>
+  <div class="ds-variants">
+    <div class="ds-variant"><div class="ds-variant-stage" style="background:var(--cp-color-void)"><span class="im-chip" style="position:static"><span style="display:inline-flex;align-items:center;gap:6px"><span class="cp-dot cp-dot--ok"></span><span class="live">LIVE</span></span>2026-07-13 18:20:08.412 UTC</span></div><div class="ds-variant-label">Tracking latest — new frames auto-focus</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage" style="background:var(--cp-color-void)"><span class="im-chip" style="position:static;color:var(--cp-color-ink-2)"><svg class="cp-icon cp-icon--s" style="color:var(--cp-color-ink-3)"><use href="#i-history"/></svg>2026-07-13 18:20:11 UTC</span></div><div class="ds-variant-label">Historical — a past frame is focused</div></div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Overlays are absolutely positioned siblings of the <code class="ds-code-inline">&lt;img&gt;</code> inside
+    one <code class="ds-code-inline">position: relative</code> host; the control strip reuses
+    <code class="ds-code-inline">mat-icon-button</code> density &minus;2.</span>
+  </div>
+
+  <h2 id="thumbs">Thumbnail strip<a class="ds-anchor" href="#thumbs">#</a></h2>
+  <p>
+    Every frame in the current bounds gets a thumbnail with its mono timestamp
+    (OMCT-C11-L2-01.03). While tracking latest, the newest thumbnail is auto-focused as frames
+    arrive; selecting an older one switches to historical mode. <kbd class="cp-kbd">&larr;</kbd> /
+    <kbd class="cp-kbd">&rarr;</kbd> step the focused frame through the strip (OMCT-C11-L2-01.04);
+    <kbd class="cp-kbd">End</kbd> re-joins the live edge.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void">
+      <button class="cp-icon-btn cp-icon-btn--s" aria-label="Earlier frames"><svg class="cp-icon"><use href="#i-chevron-left"/></svg></button>
+      <div class="im-thumbs" style="flex:1">
+        <button class="im-thumb"><span class="im-thumb-img"></span><span class="im-thumb-ts">18:16:38</span></button>
+        <button class="im-thumb"><span class="im-thumb-img"></span><span class="im-thumb-ts">18:17:08</span></button>
+        <button class="im-thumb is-selected" aria-current="true"><span class="im-thumb-img"></span><span class="im-thumb-ts">18:17:38</span></button>
+        <button class="im-thumb"><span class="im-thumb-img"></span><span class="im-thumb-ts">18:18:08</span></button>
+        <button class="im-thumb"><span class="im-thumb-img"></span><span class="im-thumb-ts">18:18:38</span></button>
+        <button class="im-thumb"><span class="im-thumb-img"></span><span class="im-thumb-ts">18:19:08</span></button>
+        <button class="im-thumb"><span class="im-thumb-img"></span><span class="im-thumb-ts">18:19:38</span></button>
+        <button class="im-thumb"><span class="im-thumb-img"></span><span class="im-thumb-ts">18:20:08</span></button>
+      </div>
+      <button class="cp-icon-btn cp-icon-btn--s" aria-label="Later frames"><svg class="cp-icon"><use href="#i-chevron-right"/></svg></button>
+    </div>
+    <div class="ds-demo-caption">Historical selection: 18:17:38 is focused (primary outline); the strip keeps filling on the right as live frames arrive.</div>
+  </div>
+
+  <h2 id="zoom">Zoom, pan &amp; the viewable-area indicator<a class="ds-anchor" href="#zoom">#</a></h2>
+  <p>
+    Wheel or the strip buttons zoom about the cursor; past 1&times; the image pans by drag
+    (OMCT-C11-L2-02.01). A corner overview shows the full frame with the visible region outlined
+    (OMCT-C11-L2-02.02) — it appears only while zoomed and vanishes at 1&times;.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:12px">
+      <div class="im-stage im-stage--zoom" style="height:300px">
+        <div class="im-cross"></div>
+        <span class="im-chip" style="top:10px;left:10px">ZOOM 4.0&times; &middot; drag to pan</span>
+        <div class="im-overview" role="img" aria-label="Viewable area indicator">
+          <span class="im-overview-vis"></span>
+        </div>
+        <div class="im-controls" role="toolbar" aria-label="Imagery controls">
+          <button class="cp-icon-btn cp-icon-btn--s is-active" aria-pressed="true" aria-label="Zoom in"><svg class="cp-icon"><use href="#i-zoom-in"/></svg></button>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Zoom out"><svg class="cp-icon"><use href="#i-zoom-out"/></svg></button>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Reset view"><svg class="cp-icon"><use href="#i-crosshair"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Zoomed 4×: the bottom-right overview outlines the visible region in primary. The crosshair button resets zoom and pan; the indicator is hidden at zoom = 1.</div>
+  </div>
+
+  <h2 id="filters">Brightness / contrast &amp; layers<a class="ds-anchor" href="#filters">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <div class="cp-menu" style="width:280px">
+        <div class="cp-menu-head">Brightness &amp; contrast</div>
+        <div style="padding:8px 12px 10px;display:flex;flex-direction:column;gap:16px">
+          <div class="cp-field" style="max-width:none">
+            <label class="cp-field-label">Brightness</label>
+            <div class="cp-slider"><div class="cp-slider-track"></div><div class="cp-slider-fill" style="width:41%"></div><div class="cp-slider-thumb" style="left:41%"></div></div>
+            <span class="cp-field-help" style="justify-content:space-between"><span>0%</span><span style="font:var(--cp-type-data-s);color:var(--cp-color-ink)">124%</span><span>300%</span></span>
+          </div>
+          <div class="cp-field" style="max-width:none">
+            <label class="cp-field-label">Contrast</label>
+            <div class="cp-slider"><div class="cp-slider-track"></div><div class="cp-slider-fill" style="width:33%"></div><div class="cp-slider-thumb" style="left:33%"></div></div>
+            <span class="cp-field-help" style="justify-content:space-between"><span>0%</span><span style="font:var(--cp-type-data-s);color:var(--cp-color-ink)">100%</span><span>300%</span></span>
+          </div>
+          <button class="cp-btn cp-btn--outlined cp-btn--small" style="align-self:flex-start"><svg class="cp-icon"><use href="#i-refresh"/></svg>Reset to 100%</button>
+        </div>
+      </div>
+      <div class="cp-menu" style="width:240px">
+        <div class="cp-menu-head">Layers</div>
+        <button class="cp-menu-item"><svg class="cp-icon" style="color:var(--cp-color-primary)"><use href="#i-eye"/></svg>Reticle grid</button>
+        <button class="cp-menu-item"><svg class="cp-icon" style="color:var(--cp-color-primary)"><use href="#i-eye"/></svg>Horizon limb</button>
+        <button class="cp-menu-item"><svg class="cp-icon" style="color:var(--cp-color-ink-disabled)"><use href="#i-eye"/></svg><span style="color:var(--cp-color-ink-3)">Sun vector</span></button>
+        <button class="cp-menu-item"><svg class="cp-icon" style="color:var(--cp-color-ink-disabled)"><use href="#i-eye"/></svg><span style="color:var(--cp-color-ink-3)">Star field ID</span></button>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Filter popover with per-image reset to 100% (OMCT-C11-L2-02.03); layers menu toggles named overlays — bright eye = visible, dim eye = hidden (OMCT-C11-L2-02.04).</div>
+  </div>
+
+  <h2 id="annotations">Image annotations<a class="ds-anchor" href="#annotations">#</a></h2>
+  <p>
+    Annotations draw as tagged rectangles on the frame (OMCT-C11-L2-03.02). Default outlines use
+    <code class="ds-code-inline">--cp-chart-3</code> at 1.5px with the tag chip; the selected annotation
+    switches to primary with resize handles. Dragging on empty image marquee-selects — or creates —
+    a new annotation (OMCT-C11-L2-03.03).
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:12px">
+      <div class="im-stage" style="height:320px">
+        <div class="im-cross"></div>
+        <span class="im-chip" style="top:10px;left:10px"><svg class="cp-icon cp-icon--s" style="color:var(--cp-color-ink-3)"><use href="#i-history"/></svg>2026-07-13 18:17:38.020 UTC</span>
+        <div class="im-anno" style="left:14%;top:24%;width:150px;height:90px">
+          <span class="im-anno-tag">debris-track A</span>
+        </div>
+        <div class="im-anno is-selected" style="left:52%;top:38%;width:180px;height:110px">
+          <span class="im-anno-tag">panel glint</span>
+          <span class="im-handle im-handle--nw"></span><span class="im-handle im-handle--n"></span><span class="im-handle im-handle--ne"></span>
+          <span class="im-handle im-handle--e"></span><span class="im-handle im-handle--se"></span><span class="im-handle im-handle--s"></span>
+          <span class="im-handle im-handle--sw"></span><span class="im-handle im-handle--w"></span>
+        </div>
+        <div class="im-marquee" style="left:16%;top:64%;width:120px;height:70px"></div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Default annotation (chart-3 outline + tag chip), selected annotation (primary outline + handles), and an in-progress marquee (dashed). Selection fills stay cyan — annotations are content, not edit chrome.</div>
+  </div>
+
+  <h2 id="related">Related telemetry readout<a class="ds-anchor" href="#related">#</a></h2>
+  <p>
+    Alongside the focused frame, linked parameters display their value <strong>at or before</strong>
+    the frame's timestamp (OMCT-C11-L2-03.01) — never a later sample, so image and numbers describe
+    the same instant.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="align-items:stretch">
+      <div class="im-stage" style="flex:1;min-width:320px;min-height:240px">
+        <div class="im-cross"></div>
+        <span class="im-chip" style="top:10px;left:10px"><svg class="cp-icon cp-icon--s" style="color:var(--cp-color-ink-3)"><use href="#i-history"/></svg>2026-07-13 18:20:08.412 UTC</span>
+      </div>
+      <div class="cp-pane" style="width:340px">
+        <div class="cp-pane-head"><svg class="cp-icon"><use href="#i-telemetry"/></svg>Related telemetry</div>
+        <table class="cp-table">
+          <thead><tr><th>Parameter</th><th class="num">Value</th><th>Sampled</th></tr></thead>
+          <tbody>
+            <tr><td>ADCS heading</td><td class="num">213.6<span class="unit">&deg;</span></td><td>18:20:08.400</td></tr>
+            <tr><td>Bus voltage</td><td class="num">28.4<span class="unit">V</span></td><td>18:20:08.100</td></tr>
+            <tr><td>CAM-2 exposure</td><td class="num">4.0<span class="unit">ms</span></td><td>18:20:08.412</td></tr>
+            <tr><td>Cabin pressure</td><td class="num">101.2<span class="unit">kPa</span></td><td>18:20:06.550</td></tr>
+            <tr><td class="is-stale">Sun elevation</td><td class="num is-stale">-12.8<span class="unit">&deg;</span></td><td class="is-stale">18:14:52.000</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Each row shows the latest sample at-or-before 18:20:08.412; a sample older than its expected rate renders stale (italic + reduced ink).</div>
+  </div>
+
+  <h2 id="track">Time-strip imagery track<a class="ds-anchor" href="#track">#</a></h2>
+  <p>
+    Inside a time strip, an imagery row positions thumbnails along the shared time axis
+    (OMCT-C11-L2-01.05); selecting one focuses it in the paired imagery view.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:0">
+      <div class="im-track">
+        <div class="im-track-axis"></div>
+        <span class="im-track-thumb" style="left:8%"></span>
+        <span class="im-track-thumb" style="left:21%"></span>
+        <span class="im-track-thumb" style="left:37%"></span>
+        <span class="im-track-thumb" style="left:52%"></span>
+        <span class="im-track-thumb is-selected" style="left:66%"></span>
+        <span class="im-track-thumb" style="left:83%"></span>
+        <span class="im-track-thumb" style="left:94%"></span>
+        <span class="im-track-tick" style="left:10%">17:40:00</span>
+        <span class="im-track-tick" style="left:30%">17:50:00</span>
+        <span class="im-track-tick" style="left:50%">18:00:00</span>
+        <span class="im-track-tick" style="left:70%">18:10:00</span>
+        <span class="im-track-tick" style="left:90%">18:20:00</span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Imagery track: thumbnails anchored at capture time on the strip's axis; the focused frame is outlined primary. Irregular spacing is real — cameras are event-driven.</div>
+  </div>
+
+  <h2 id="actions">Actions<a class="ds-anchor" href="#actions">#</a></h2>
+  <div class="ds-variants">
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-btn cp-btn--outlined">Open image in new tab<svg class="cp-icon"><use href="#i-external"/></svg></button></div><div class="ds-variant-label">Full-resolution frame in a browser tab (OMCT-C11-L2-04.01)</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage" style="flex-direction:column;gap:8px"><button class="cp-btn cp-btn--outlined" disabled>Open image in new tab<svg class="cp-icon"><use href="#i-external"/></svg></button><span style="font:var(--cp-type-caption);color:var(--cp-color-caution);display:inline-flex;align-items:center;gap:4px"><svg class="cp-icon cp-icon--s"><use href="#i-alert-triangle"/></svg>Host not on the imagery URL allow-list</span></div><div class="ds-variant-label">Blocked — allow-list denies the host (OMCT-C16-L2-04.06)</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-btn cp-btn--outlined"><svg class="cp-icon"><use href="#i-download"/></svg>Save image as&hellip;</button></div><div class="ds-variant-label">Download with timestamped filename (OMCT-C11-L2-04.02)</div></div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Both actions come from the action registry for image objects. "Open in new tab" validates the
+    resolved URL against the configured allow-list <em>before</em> enabling; blocked hosts disable the
+    action with the reason in a tooltip.</span>
+  </div>
+
+  <h2 id="empty">Empty &amp; error states<a class="ds-anchor" href="#empty">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="align-items:stretch">
+      <div style="flex:1;min-width:300px;border:1px solid var(--cp-color-hairline);border-radius:var(--cp-radius-s)">
+        <div class="cp-empty">
+          <svg class="cp-icon"><use href="#i-camera"/></svg>
+          <h4>No imagery in the current bounds</h4>
+          <p>CAM-2 returned no frames between <span style="font:var(--cp-type-data-s)">17:52:04</span> and <span style="font:var(--cp-type-data-s)">18:52:04</span>. Widen the time bounds or pick another camera.</p>
+        </div>
+      </div>
+      <div class="im-stage" style="flex:1;min-width:300px;display:flex;align-items:center;justify-content:center">
+        <div class="cp-empty" style="padding:24px 16px">
+          <svg class="cp-icon" style="color:var(--cp-color-caution)"><use href="#i-alert-triangle"/></svg>
+          <h4>Image could not be loaded</h4>
+          <p>Frame <span style="font:var(--cp-type-data-s)">18:19:38.201</span> failed to fetch. The thumbnail keeps its slot in the strip.</p>
+          <button class="cp-btn cp-btn--outlined cp-btn--small"><svg class="cp-icon"><use href="#i-refresh"/></svg>Retry</button>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">No-imagery empty state (left) and a failed frame (right) — a broken frame never collapses the strip or shifts neighboring thumbnails.</div>
+  </div>
+
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C11-L2-01.01 &middot; imagery view</span>
+    <span class="ds-req">OMCT-C11-L2-01.02 &middot; historical frames</span>
+    <span class="ds-req">OMCT-C11-L2-01.03 &middot; thumbnail strip</span>
+    <span class="ds-req">OMCT-C11-L2-01.04 &middot; keyboard navigation</span>
+    <span class="ds-req">OMCT-C11-L2-01.05 &middot; time-strip track</span>
+    <span class="ds-req">OMCT-C11-L2-02.01 &middot; zoom &amp; pan</span>
+    <span class="ds-req">OMCT-C11-L2-02.02 &middot; viewable-area indicator</span>
+    <span class="ds-req">OMCT-C11-L2-02.03 &middot; brightness/contrast</span>
+    <span class="ds-req">OMCT-C11-L2-02.04 &middot; layers</span>
+    <span class="ds-req">OMCT-C11-L2-02.05 &middot; compass rose</span>
+    <span class="ds-req">OMCT-C11-L2-03.01 &middot; related telemetry</span>
+    <span class="ds-req">OMCT-C11-L2-03.02 &middot; annotation display</span>
+    <span class="ds-req">OMCT-C11-L2-03.03 &middot; annotation select/create</span>
+    <span class="ds-req">OMCT-C11-L2-04.01 &middot; open in new tab</span>
+    <span class="ds-req">OMCT-C11-L2-04.02 &middot; save image as</span>
+    <span class="ds-req">OMCT-C16-L2-04.06 &middot; URL allow-list</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="gauges.html"><span class="dir">Previous</span>&larr; Gauges &amp; widgets</a>
+    <a href="timeline.html"><span class="dir">Next</span>Plans &amp; timelines &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

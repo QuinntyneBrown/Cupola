@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Iconography — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<style>
+  .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); gap: 8px; margin: 16px 0; }
+  .icon-cell {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 16px 8px 10px;
+    background: var(--cp-color-surface-1);
+    border: 1px solid var(--cp-color-hairline);
+    border-radius: var(--cp-radius-m);
+  }
+  .icon-cell .cp-icon { width: 22px; height: 22px; color: var(--cp-color-ink-2); }
+  .icon-cell code { font: var(--cp-type-data-s); color: var(--cp-color-ink-3); background: none; border: none; padding: 0; }
+</style>
+</head>
+<body data-page="foundations/iconography" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Foundations</p>
+  <h1>Iconography</h1>
+  <p class="ds-lead">
+    A single stroke set: 24px grid, 1.75px stroke, round caps and joins, no fills except dot glyphs.
+    Object-type glyphs identify every node in the tree (OMCT-C02-L2-01.02); action and status icons
+    share the same construction so nothing looks imported.
+  </p>
+
+  <h2 id="sizes">Sizes &amp; color<a class="ds-anchor" href="#sizes">#</a></h2>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Context</th><th>Size</th><th>Ink</th></tr></thead>
+    <tbody>
+      <tr><td>Default (buttons, indicators)</td><td>20px (<code>.cp-icon</code>)</td><td><code>ink-2</code>; <code>ink</code> on hover</td></tr>
+      <tr><td>Inline / decorator (tree glyphs, chips, cells)</td><td>16px (<code>.cp-icon--s</code>)</td><td>inherits text color</td></tr>
+      <tr><td>Empty states, super-menu preview</td><td>32px</td><td><code>line-strong</code> / <code>primary</code></td></tr>
+      <tr><td>Status glyphs</td><td>14&ndash;16px</td><td>always the status token + label</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="objects">Object-type glyphs<a class="ds-anchor" href="#objects">#</a></h2>
+  <p>One glyph per creatable type. The glyph appears in the tree, the Create menu, search results, breadcrumbs, and view headers — always the same shape.</p>
+  <div class="icon-grid" data-icons="folder:Folder,telemetry:Telemetry,plot:Overlay plot,plot-stacked:Stacked plot,scatter:Scatter plot,chart-bar:Bar chart,table:Table,gauge:Gauge,image:Imagery,timeline:Plan,notebook:Notebook,condition:Condition set,widget:Widget,layout:Display layout,columns:Flexible layout,tabs:Tabs view,clock:Clock,timer:Timer,link:Hyperlink,derived:Derived telemetry,sum:Math,list:Time list,layers:Layers,compass:Compass"></div>
+
+  <h2 id="actions">Action icons<a class="ds-anchor" href="#actions">#</a></h2>
+  <div class="icon-grid" data-icons="plus:Create,pencil:Edit,trash:Remove,copy:Duplicate,move:Move,download:Export,upload:Import,save:Save,refresh:Reload,search:Search,filter:Filter,close:Close,check:Confirm,pause:Pause,play:Resume,camera:Snapshot,external:New tab,expand:View large,zoom-in:Zoom in,zoom-out:Zoom out,crosshair:Center,rotate:Rotate,grid:Snap grid,pin:Set default,star:Favorite,eye:Show layer,kebab:More,grip:Drag,gear:Settings,calendar:Date pick,history:History,flag:Mark row"></div>
+
+  <h2 id="status">Status &amp; navigation glyphs<a class="ds-anchor" href="#status">#</a></h2>
+  <div class="icon-grid" data-icons="check-circle:OK / go,alert-triangle:Caution,alert-circle:Critical,x-circle:No-go,info:Info,help:Unknown / missing,bell:Notifications,lock:Locked,user:Operator,activity:Performance,chevron-right:Expand,chevron-down:Open,chevron-left:Back,arrow-up:Sort asc,arrow-down:Sort desc"></div>
+
+  <h2 id="rules">Usage rules<a class="ds-anchor" href="#rules">#</a></h2>
+  <ul>
+    <li><strong>Icon-only controls carry an accessible name</strong> (<code class="ds-code-inline">aria-label</code>) and a tooltip. No unlabeled mysteries in an ops console.</li>
+    <li><strong>Status glyphs never travel alone</strong> — pair with a label or value (OMCT-C16-L2-03.01, no color-only signaling).</li>
+    <li><strong>Decorations stack right of the glyph:</strong> alias (link), lock, and missing badges render at 12px after the type glyph in tree rows.</li>
+    <li><strong>Never restyle stroke weight per icon.</strong> Emphasis comes from ink color, not thickness.</li>
+  </ul>
+
+  <h2 id="angular">Angular mapping<a class="ds-anchor" href="#angular">#</a></h2>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Register the sprite with <code class="ds-code-inline">MatIconRegistry.addSvgIconSet()</code> and render via <code class="ds-code-inline">&lt;mat-icon svgIcon="folder"&gt;</code>. The sprite ships as a build asset; ids match the names above.</span>
+  </div>
+
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C02-L2-01.02 &middot; type glyphs</span>
+    <span class="ds-req">OMCT-C03-L2-02.03 &middot; alias badge</span>
+    <span class="ds-req">OMCT-C03-L2-02.06 &middot; lock badge</span>
+    <span class="ds-req">OMCT-C02-L2-01.06 &middot; missing treatment</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="elevation.html"><span class="dir">Previous</span>&larr; Elevation &amp; shape</a>
+    <a href="motion.html"><span class="dir">Next</span>Motion &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".icon-grid[data-icons]").forEach(function (grid) {
+      grid.getAttribute("data-icons").split(",").forEach(function (pair) {
+        var p = pair.split(":");
+        grid.insertAdjacentHTML("beforeend",
+          '<div class="icon-cell"><svg class="cp-icon"><use href="#i-' + p[0] + '"/></svg><code>' + p[1] + "</code></div>");
+      });
+    });
+  });
+</script>
+</body>
+</html>

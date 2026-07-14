@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dialogs &amp; overlays — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<style>
+  /* Page-scoped helpers — tokens only */
+  .ov-backdrop-demo { position: relative; width: 100%; min-height: 300px; overflow: hidden; }
+  .ov-backdrop-demo .cp-scrim { position: absolute; }
+  /* Notification list rows inside the bell panel */
+  .ov-ntf-row {
+    display: flex; align-items: flex-start; gap: var(--cp-space-3);
+    padding: var(--cp-space-3);
+    border-radius: var(--cp-radius-s);
+  }
+  .ov-ntf-row:hover { background: var(--cp-color-surface-hover); }
+  .ov-ntf-row .cp-icon { width: var(--cp-size-icon-s); height: var(--cp-size-icon-s); margin-top: 1px; }
+  .ov-ntf-msg { font: var(--cp-type-body-s); color: var(--cp-color-ink); }
+  .ov-ntf-time { font: var(--cp-type-data-s); color: var(--cp-color-ink-3); margin-top: 2px; }
+  /* Dismiss button pinned to a banner's trailing edge */
+  .cp-banner .ov-dismiss { margin: -5px -6px -5px 0; }
+</style>
+</head>
+<body data-page="components/overlays" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Components</p>
+  <h1>Dialogs &amp; overlays</h1>
+  <p class="ds-lead">
+    One overlay service shows any view above the shell (OMCT-C15-L2-04.03): confirmations, forms,
+    selection overlays, progress, and full-screen views share the same surface, scrim, and
+    dismissal rules. Notifications layer on top &mdash; banners, snackbars, and the bell panel
+    &mdash; with severity semantics borrowed from telemetry, never invented per message.
+  </p>
+
+  <h2 id="sizes">Dialog anatomy &amp; sizes<a class="ds-anchor" href="#sizes">#</a></h2>
+  <p>
+    Every dialog is three regions: a <strong>head</strong> (type icon, title, close button), a
+    <strong>body</strong> in secondary ink, and a <strong>foot</strong> with actions right-aligned,
+    affirmative last. Width is the only size variable &mdash; height fits content up to 90% of the
+    viewport, then the body scrolls.
+  </p>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Size</th><th>Class</th><th>Width</th><th>Use for</th></tr></thead>
+    <tbody>
+      <tr><td>Small</td><td><code>.cp-dialog--s</code></td><td>360px</td><td>Confirmations, progress dialogs, About</td></tr>
+      <tr><td>Default</td><td><code>.cp-dialog</code></td><td>480px</td><td>Forms: Create, Edit Properties, export options, datum detail</td></tr>
+      <tr><td>Large</td><td><code>.cp-dialog--l</code></td><td>720px</td><td>Selection overlays: telemetry source pickers, condition set editors</td></tr>
+      <tr><td>Full screen</td><td>overlay service option</td><td>shell &minus; 24px</td><td>Large-view overlay ("View large" on any view, OMCT-C15-L2-02.06); third-party licenses (OMCT-C16-L2-06.03)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:0">
+      <div class="ov-backdrop-demo">
+        <div style="padding:var(--cp-space-5)">
+          <div class="cp-table-wrap" style="background:var(--cp-color-surface-1)">
+            <table class="cp-table">
+              <thead><tr><th>Timestamp (UTC)</th><th class="num">Value</th><th>Unit</th></tr></thead>
+              <tbody>
+                <tr><td>2026-07-13 18:22:04.000</td><td class="num">4.06</td><td><span class="unit">A</span></td></tr>
+                <tr><td>2026-07-13 18:22:03.000</td><td class="num">4.07</td><td><span class="unit">A</span></td></tr>
+                <tr><td>2026-07-13 18:22:02.000</td><td class="num">4.05</td><td><span class="unit">A</span></td></tr>
+                <tr><td>2026-07-13 18:22:01.000</td><td class="num">4.08</td><td><span class="unit">A</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="cp-scrim">
+          <div class="cp-dialog cp-dialog--s" role="dialog" aria-modal="true" aria-labelledby="ov-confirm-title">
+            <div class="cp-dialog-head">
+              <svg class="cp-icon" style="color:var(--cp-color-critical)"><use href="#i-alert-triangle"/></svg>
+              <h2 id="ov-confirm-title">Remove PDU-2 current?</h2>
+            </div>
+            <div class="cp-dialog-body">
+              This removes the object from its parent. The object itself is kept.
+            </div>
+            <div class="cp-dialog-foot">
+              <button class="cp-btn cp-btn--text">Cancel</button>
+              <button class="cp-btn cp-btn--danger">Remove</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Small confirmation dialog over the scrim. Destructive confirms name the object, state the consequence, and pair Cancel with a danger-filled verb (OMCT-C03-L2-02.05). No close button &mdash; the two actions are the only exits.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">MatDialog</code> with <code class="ds-code-inline">panelClass</code> per size, <code class="ds-code-inline">autoFocus="first-tabbable"</code>, <code class="ds-code-inline">restoreFocus</code> on. The overlay service wraps <code class="ds-code-inline">MatDialog</code> so plugins pass any component + size + an <code class="ds-code-inline">onDestroy</code> callback.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C15-L2-04.03 &middot; overlay service</span>
+    <span class="ds-req">OMCT-C15-L2-02.06 &middot; large-view overlay</span>
+    <span class="ds-req">OMCT-C03-L2-02.05 &middot; remove confirmation</span>
+  </div>
+
+  <h2 id="stack">Overlay stacking &amp; dismissal<a class="ds-anchor" href="#stack">#</a></h2>
+  <ul>
+    <li><strong>Stacking:</strong> overlays stack in opening order; each new overlay renders above the previous with its own scrim. When a full-screen overlay opens above existing dialogs, the covered overlays auto-hide and are restored intact when it closes (OMCT-C15-L2-04.04).</li>
+    <li><strong>Escape and scrim click</strong> dismiss only the topmost <em>dismissible</em> overlay &mdash; dismissal is strictly last-in-first-out. Dialogs with unsaved input confirm before closing.</li>
+    <li><strong>Non-dismissible overlays</strong> (the licenses overlay, blocking progress) ignore Escape and scrim clicks; their only exit is the explicit control they render, or the dismiss handle returned to the code that opened them (OMCT-C16-L2-06.03).</li>
+  </ul>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C15-L2-04.04 &middot; stack, Escape, auto-hide/restore</span>
+    <span class="ds-req">OMCT-C16-L2-06.03 &middot; non-dismissible licenses overlay</span>
+  </div>
+
+  <h2 id="progress">Progress dialogs<a class="ds-anchor" href="#progress">#</a></h2>
+  <p>
+    Long operations report through a small progress dialog (OMCT-C14-L2-04.03). Determinate when
+    the total is known &mdash; bar, percentage, and a counted message &mdash; indeterminate
+    otherwise. The dialog renders no close control: the <em>dismiss handle is returned to the
+    caller</em>, which closes it when the operation settles (or swaps in an error banner).
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="padding:40px;align-items:flex-start">
+      <div class="cp-dialog cp-dialog--s" style="position:static" role="dialog" aria-modal="true" aria-labelledby="ov-prog-1">
+        <div class="cp-dialog-head"><h2 id="ov-prog-1" style="font:var(--cp-type-title-s)">Exporting objects</h2></div>
+        <div class="cp-dialog-body">
+          <p style="margin:0 0 var(--cp-space-3)">Exporting 3 of 5 objects&hellip;</p>
+          <div class="cp-progress" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"><div class="cp-progress-fill" style="width:60%"></div></div>
+          <div style="font:var(--cp-type-data-s);color:var(--cp-color-ink-3);text-align:right;margin-top:var(--cp-space-2)">60%</div>
+        </div>
+        <div style="height:var(--cp-space-5)"></div>
+      </div>
+      <div class="cp-dialog cp-dialog--s" style="position:static" role="dialog" aria-modal="true" aria-labelledby="ov-prog-2">
+        <div class="cp-dialog-head"><h2 id="ov-prog-2" style="font:var(--cp-type-title-s)">Importing</h2></div>
+        <div class="cp-dialog-body">
+          <p style="margin:0 0 var(--cp-space-3)">Reading station-power.json&hellip;</p>
+          <div class="cp-progress cp-progress--indeterminate" role="progressbar" aria-label="Importing"><div class="cp-progress-fill"></div></div>
+        </div>
+        <div style="height:var(--cp-space-5)"></div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Determinate (known total: bar + % + "3 of 5" message) and indeterminate (unknown total). Neither offers Escape or a close button; the caller holds the dismiss handle.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">MatDialog</code> with <code class="ds-code-inline">disableClose: true</code> + <code class="ds-code-inline">mat-progress-bar</code>; the service returns the <code class="ds-code-inline">MatDialogRef</code> so the caller controls dismissal.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C14-L2-04.03 &middot; progress dialog</span>
+  </div>
+
+  <h2 id="about">About dialog<a class="ds-anchor" href="#about">#</a></h2>
+  <p>
+    The About dialog identifies exactly what is running: version, build date, revision, and branch
+    in mono (OMCT-C16-L2-06.01/06.02), reachable from the app menu (OMCT-C15-L2-05.04). The
+    licenses link opens a full-screen overlay of third-party license texts that only its own Done
+    button dismisses (OMCT-C16-L2-06.03).
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="padding:40px">
+      <div class="cp-dialog cp-dialog--s" style="position:static" role="dialog" aria-modal="true" aria-label="About Cupola">
+        <div class="cp-dialog-head">
+          <span class="ds-brand-mark" style="font-size:20px">Cup<span class="o">o</span>la</span>
+          <span style="flex:1"></span>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Close"><svg class="cp-icon"><use href="#i-close"/></svg></button>
+        </div>
+        <div class="cp-dialog-body">
+          <p style="margin:0 0 var(--cp-space-4)">Mission-control telemetry display suite.</p>
+          <dl class="cp-props" style="margin:0">
+            <dt>Version</dt><dd>0.1.0</dd>
+            <dt>Build date</dt><dd>2026-07-13</dd>
+            <dt>Revision</dt><dd>a4aae41</dd>
+            <dt>Branch</dt><dd>main</dd>
+          </dl>
+          <hr class="cp-divider">
+          <p style="margin:0;font:var(--cp-type-body-s)">Licensed under the Apache License, Version 2.0.<br>
+          <a class="cp-link" href="#about">Third-party licenses</a></p>
+        </div>
+        <div style="height:var(--cp-space-5)"></div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Brand mark in the head; build identity as a mono property list so operators can paste it into a report verbatim.</div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C16-L2-06.01 &middot; About contents</span>
+    <span class="ds-req">OMCT-C16-L2-06.02 &middot; build identity</span>
+    <span class="ds-req">OMCT-C15-L2-05.04 &middot; app-menu entry</span>
+    <span class="ds-req">OMCT-C16-L2-06.03 &middot; licenses overlay</span>
+  </div>
+
+  <h2 id="banners">Notification banners<a class="ds-anchor" href="#banners">#</a></h2>
+  <p>
+    Banners are the persistent notification surface, pinned above the affected region. Severity
+    reuses status semantics: <strong>info</strong> and <strong>success</strong> auto-dismiss after a
+    timeout (OMCT-C14-L2-04.01); <strong>caution</strong> and <strong>critical</strong> persist
+    until the operator dismisses them (OMCT-C14-L2-04.02). Every banner is icon + strong lead +
+    plain sentence + dismiss button &mdash; the icon makes severity legible without color.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--col">
+      <div class="cp-banner cp-banner--info" role="status">
+        <svg class="cp-icon"><use href="#i-info"/></svg>
+        <span class="cp-banner-msg"><strong>Time conductor updated.</strong> Now following real time, 18:12:04&ndash;18:22:04 UTC.</span>
+        <button class="cp-icon-btn cp-icon-btn--s ov-dismiss" aria-label="Dismiss"><svg class="cp-icon cp-icon--s"><use href="#i-close"/></svg></button>
+      </div>
+      <div class="cp-banner cp-banner--ok" role="status">
+        <svg class="cp-icon"><use href="#i-check-circle"/></svg>
+        <span class="cp-banner-msg"><strong>Export complete.</strong> 5 objects written to station-power.json.</span>
+        <button class="cp-icon-btn cp-icon-btn--s ov-dismiss" aria-label="Dismiss"><svg class="cp-icon cp-icon--s"><use href="#i-close"/></svg></button>
+      </div>
+      <div class="cp-banner cp-banner--caution" role="alert">
+        <svg class="cp-icon"><use href="#i-alert-triangle"/></svg>
+        <span class="cp-banner-msg"><strong>Ku-band link degraded.</strong> Telemetry updates may lag until next acquisition of signal.</span>
+        <button class="cp-icon-btn cp-icon-btn--s ov-dismiss" aria-label="Dismiss"><svg class="cp-icon cp-icon--s"><use href="#i-close"/></svg></button>
+      </div>
+      <div class="cp-banner cp-banner--critical" role="alert">
+        <svg class="cp-icon"><use href="#i-alert-circle"/></svg>
+        <span class="cp-banner-msg"><strong>Couldn't save.</strong> This object was changed by someone else while you were editing. Your values are kept &mdash; review the newer version, then retry.</span>
+        <button class="cp-icon-btn cp-icon-btn--s ov-dismiss" aria-label="Dismiss"><svg class="cp-icon cp-icon--s"><use href="#i-close"/></svg></button>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Info &middot; success (auto-dismiss ~5s, OMCT-C14-L2-04.01) &middot; caution &middot; critical (persist until dismissed, OMCT-C14-L2-04.02). The critical example is the save-conflict banner (OMCT-C04-L2-02.07) &mdash; it never discards the operator's input.</div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C14-L2-04.01 &middot; auto-dismiss info</span>
+    <span class="ds-req">OMCT-C14-L2-04.02 &middot; persistent alerts</span>
+    <span class="ds-req">OMCT-C04-L2-02.07 &middot; save conflict</span>
+  </div>
+
+  <h2 id="snackbar">Snackbars<a class="ds-anchor" href="#snackbar">#</a></h2>
+  <p>
+    Snackbars confirm completed low-stakes actions from the bottom-left and auto-dismiss. At most
+    one shows at a time; a second replaces the first. Anything an operator must act on is a banner,
+    not a snackbar.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--col" style="align-items:flex-start">
+      <div class="cp-snackbar" role="status">Saved</div>
+      <div class="cp-snackbar" role="status">Object created<button class="cp-btn cp-btn--text" style="color:var(--cp-color-primary)">Go to object</button></div>
+    </div>
+    <div class="ds-demo-caption">Plain confirmation, and the action variant &mdash; one optional text action, phrased as a destination.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">MatSnackBar</code>, <code class="ds-code-inline">horizontalPosition: 'left'</code>, politeness <code class="ds-code-inline">polite</code>, 4s duration.</span>
+  </div>
+
+  <h2 id="bell">Notification list<a class="ds-anchor" href="#bell">#</a></h2>
+  <p>
+    Dismissing a banner doesn't destroy it: the bell indicator in the status bar keeps the session's
+    notification history. Its panel lists severity, message, and timestamp, newest first, with a
+    single Dismiss all (OMCT-C14-L2-04.04).
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage">
+      <div class="cp-menu" style="width:340px">
+        <div class="cp-menu-head" style="display:flex;align-items:center;gap:6px"><svg class="cp-icon cp-icon--s"><use href="#i-bell"/></svg>Notifications<span class="cp-count" style="margin-left:auto">3</span></div>
+        <div class="ov-ntf-row">
+          <svg class="cp-icon" style="color:var(--cp-color-critical)"><use href="#i-alert-circle"/></svg>
+          <div><div class="ov-ntf-msg">Bus voltage below critical low &mdash; 22.4 V &#9660;</div><div class="ov-ntf-time">2026-07-13 18:22:04.000</div></div>
+        </div>
+        <div class="ov-ntf-row">
+          <svg class="cp-icon" style="color:var(--cp-color-caution)"><use href="#i-alert-triangle"/></svg>
+          <div><div class="ov-ntf-msg">Ku-band link degraded &mdash; telemetry may lag</div><div class="ov-ntf-time">2026-07-13 18:21:47.512</div></div>
+        </div>
+        <div class="ov-ntf-row">
+          <svg class="cp-icon" style="color:var(--cp-color-info)"><use href="#i-info"/></svg>
+          <div><div class="ov-ntf-msg">Export complete &mdash; station-power.json</div><div class="ov-ntf-time">2026-07-13 18:19:32.006</div></div>
+        </div>
+        <div class="cp-menu-sep"></div>
+        <button class="cp-menu-item"><svg class="cp-icon"><use href="#i-close"/></svg>Dismiss all</button>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Opened from the bell indicator; severity icon + message + mono timestamp per row. Dismiss all clears the list and the bell's count badge.</div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C14-L2-04.04 &middot; notification list</span>
+  </div>
+
+  <h2 id="tooltips">Tooltips<a class="ds-anchor" href="#tooltips">#</a></h2>
+  <p>
+    Two kinds: <strong>text tooltips</strong> name a control; <strong>data tooltips</strong> add one
+    mono line &mdash; an object path, or a value with its timestamp. Exactly one tooltip is visible
+    at a time (OMCT-C15-L2-04.05); showing a new one hides the previous. Tooltips appear on hover
+    <em>and</em> on keyboard focus, and Escape hides them.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <div class="cp-tooltip" role="tooltip">Pause table</div>
+      <div class="cp-tooltip" role="tooltip">PDU-2 current<br><span class="cp-tooltip-data">My Items / Station power / PDU-2 current</span></div>
+      <div class="cp-tooltip" role="tooltip">Bus voltage<br><span class="cp-tooltip-data">28.4 V &middot; 2026-07-13 18:22:04.000</span></div>
+    </div>
+    <div class="ds-demo-caption">Text tooltip &middot; path data tooltip &middot; value+timestamp data tooltip. 280px max width; longer content belongs in the inspector, not a tooltip.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">matTooltip</code> with a custom panel class; a single shared <code class="ds-code-inline">TooltipService</code> instance enforces the one-visible rule and focus triggering.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C15-L2-04.05 &middot; single active tooltip</span>
+  </div>
+
+  <h2 id="aria">Accessibility<a class="ds-anchor" href="#aria">#</a></h2>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Surface</th><th>Semantics</th><th>Behavior</th></tr></thead>
+    <tbody>
+      <tr><td>Dialog</td><td><code>role="dialog"</code> + <code>aria-modal="true"</code>, labelled by its title</td><td>Focus trapped inside; on close, focus returns to the triggering element</td></tr>
+      <tr><td>Info / success banner, snackbar</td><td><code>role="status"</code></td><td>Polite announcement; never steals focus</td></tr>
+      <tr><td>Caution / critical banner</td><td><code>role="alert"</code></td><td>Assertive announcement; dismiss button is tabbable</td></tr>
+      <tr><td>Tooltip</td><td><code>role="tooltip"</code>, referenced by <code>aria-describedby</code></td><td>Shown on hover and focus-visible; Escape hides</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C15-L2-04.03&ndash;04.05 &middot; overlay service, stack, tooltip</span>
+    <span class="ds-req">OMCT-C15-L2-02.06 &middot; large-view overlay</span>
+    <span class="ds-req">OMCT-C14-L2-04.01&ndash;04.04 &middot; notifications</span>
+    <span class="ds-req">OMCT-C04-L2-02.07 &middot; save conflict</span>
+    <span class="ds-req">OMCT-C03-L2-02.05 &middot; remove confirmation</span>
+    <span class="ds-req">OMCT-C16-L2-06.01&ndash;06.03 &middot; About &amp; licenses</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="tables.html"><span class="dir">Previous</span>&larr; Tables</a>
+    <a href="indicators.html"><span class="dir">Next</span>Indicators &amp; chips &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

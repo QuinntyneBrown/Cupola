@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plans &amp; timelines — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<style>
+/* ---- page-scoped: plan / gantt / time-strip scaffolding (token-driven) ---- */
+.tl-plan, .tl-gantt, .tl-strip {
+  position: relative;
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-m);
+  background: var(--cp-color-void);
+  overflow: hidden;
+  width: 100%;
+}
+.tl-plan { height: 420px; display: flex; flex-direction: column; }
+.tl-row { display: flex; min-height: 0; }
+.tl-gutter {
+  flex: none; width: 128px;
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 var(--cp-space-4);
+  border-right: 1px solid var(--cp-color-hairline);
+  background: var(--cp-color-surface-1);
+  font: var(--cp-type-pane-head);
+  text-transform: uppercase;
+  letter-spacing: var(--cp-tracking-caps);
+  color: var(--cp-color-ink-2);
+  overflow: hidden; white-space: nowrap;
+}
+.tl-gutter .cp-icon { width: 14px; height: 14px; color: var(--cp-color-ink-3); }
+.tl-axis { flex: none; height: 30px; border-bottom: 1px solid var(--cp-color-hairline); }
+.tl-axis .tl-gutter {
+  font: var(--cp-type-data-s); text-transform: none; letter-spacing: 0;
+  color: var(--cp-color-ink-3); background: var(--cp-color-surface-2);
+}
+.tl-track {
+  flex: 1; position: relative; min-width: 0;
+  display: flex; flex-direction: column;
+  background-image: linear-gradient(90deg, var(--cp-color-hairline) 1px, transparent 1px);
+  background-size: calc(100% / 6) 100%;
+}
+.tl-track--axis { display: block; background-color: var(--cp-color-surface-2); }
+.tl-tick {
+  position: absolute; top: 50%; transform: translate(-50%, -50%);
+  font: var(--cp-type-data-s); color: var(--cp-chart-tick); white-space: nowrap;
+}
+.tl-tick--first { transform: translate(4px, -50%); }
+.tl-tick--last { transform: translate(calc(-100% - 4px), -50%); }
+.tl-lane { flex: 1; border-top: 1px solid var(--cp-color-hairline); }
+.tl-lane:first-of-type { border-top: none; }
+.tl-lane--alt .tl-track { background-color: var(--cp-color-surface-1); }
+.tl-subrow { flex: 1; position: relative; }
+
+/* Activity bar: category color = chart palette slot (fill 35% + 1px slot border) */
+.tl-bar {
+  --slot: var(--cp-chart-1);
+  position: absolute; top: 50%; transform: translateY(-50%);
+  height: 20px; border-radius: 2px;
+  display: flex; align-items: center; gap: 5px;
+  padding: 0 6px;
+  font: var(--cp-type-caption); color: var(--cp-color-ink);
+  white-space: nowrap; overflow: hidden;
+  background: color-mix(in srgb, var(--slot) 35%, transparent);
+  border: 1px solid var(--slot);
+}
+.tl-bar .cp-icon { width: 12px; height: 12px; flex: none; }
+.tl-bar.is-past { opacity: 0.6; }
+.tl-bar.is-future { background: transparent; color: var(--cp-color-ink-2); }
+.tl-bar.is-alarm {
+  background: var(--cp-color-critical-dim);
+  border-color: var(--cp-color-critical-border);
+  color: var(--cp-color-critical);
+}
+.tl-bar.is-selected { outline: 1px solid var(--cp-color-primary); outline-offset: 1px; overflow: visible; }
+.tl-handle {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 5px; height: 12px; border-radius: 1px;
+  background: var(--cp-color-primary);
+}
+.tl-handle--l { left: -3px; } .tl-handle--r { right: -3px; }
+.tl-bar--static { position: static; transform: none; width: 190px; }
+
+/* In-progress arc */
+.tl-arc { width: 12px; height: 12px; flex: none; }
+.tl-arc circle { fill: none; stroke-width: 3; }
+.tl-arc .trk { stroke: color-mix(in srgb, currentColor 30%, transparent); }
+.tl-arc .fil { stroke: currentColor; }
+.tl-pct { font: var(--cp-type-data-s); }
+
+/* Now line + overlays */
+.tl-overlay { position: absolute; top: 0; bottom: 0; left: 128px; right: 0; pointer-events: none; }
+.tl-overlay--full { left: 0; }
+.tl-now { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--cp-color-ok); }
+.tl-now-label {
+  position: absolute; top: 36px; transform: translateX(-50%);
+  font: var(--cp-type-data-s); color: var(--cp-color-ok);
+  background: var(--cp-color-void);
+  border: 1px solid var(--cp-color-ok-border);
+  border-radius: var(--cp-radius-s);
+  padding: 0 5px; line-height: 16px; white-space: nowrap;
+}
+.tl-evline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--cp-color-primary); }
+
+/* Gantt */
+.gnt-axis { position: relative; height: 28px; background: var(--cp-color-surface-2); border-bottom: 1px solid var(--cp-color-hairline); }
+.gnt-group {
+  display: flex; align-items: center; gap: var(--cp-space-3);
+  height: 30px; padding: 0 var(--cp-space-4);
+  background: var(--cp-color-surface-2);
+  border-top: 1px solid var(--cp-color-hairline);
+  border-bottom: 1px solid var(--cp-color-hairline);
+  font: var(--cp-type-label); color: var(--cp-color-ink);
+  position: relative; z-index: 1;
+}
+.gnt-group .cp-icon { width: 14px; height: 14px; color: var(--cp-color-ink-3); }
+.gnt-group .meta { margin-left: auto; font: var(--cp-type-data-s); color: var(--cp-color-ink-3); }
+.gnt-chip {
+  font: var(--cp-type-overline); text-transform: uppercase; letter-spacing: var(--cp-tracking-caps);
+  color: var(--cp-color-ink-3);
+  border: 1px solid var(--cp-color-line);
+  border-radius: var(--cp-radius-pill);
+  padding: 0 8px; line-height: 15px;
+}
+.gnt-chip--active { color: var(--cp-color-ok); border-color: var(--cp-color-ok-border); }
+.gnt-row {
+  position: relative; height: 34px;
+  background-image: linear-gradient(90deg, var(--cp-color-hairline) 1px, transparent 1px);
+  background-size: calc(100% / 6) 100%;
+}
+
+/* Time strip */
+.tl-strip .tl-gutter {
+  font: var(--cp-type-body-s); text-transform: none; letter-spacing: 0;
+  color: var(--cp-color-ink-2);
+}
+.ts-plotrow { height: 64px; }
+.ts-planrow { height: 34px; }
+.ts-imgrow { height: 58px; }
+.ts-evrow { height: 42px; }
+.ts-plotrow .tl-track > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ts-shot {
+  position: absolute; top: 5px; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.ts-shot-img {
+  width: 56px; height: 32px; border-radius: 2px;
+  border: 1px solid var(--cp-color-line);
+  background: linear-gradient(135deg, #1D3A5C 0%, #0C1826 80%);
+}
+.ts-shot span { font: var(--cp-type-data-s); color: var(--cp-color-ink-3); }
+.ts-ev {
+  position: absolute; top: 8px; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font: var(--cp-type-data-s); color: var(--cp-color-ink-3); white-space: nowrap;
+}
+.ts-ev-d { width: 8px; height: 8px; transform: rotate(45deg); border-radius: 1px; background: var(--cp-color-ink-2); }
+.ts-ev.is-selected { color: var(--cp-color-primary); }
+.ts-ev.is-selected .ts-ev-d { background: var(--cp-color-primary); box-shadow: 0 0 0 3px var(--cp-color-primary-dim); }
+.ts-itc {
+  position: absolute; top: 34px; right: 8px;
+  display: inline-flex; align-items: center; gap: 5px;
+  font: var(--cp-type-data-s); color: var(--cp-color-ink-2);
+  background: var(--cp-color-surface-3);
+  border: 1px solid var(--cp-color-line);
+  border-radius: var(--cp-radius-pill);
+  padding: 1px 8px; pointer-events: none;
+}
+.ts-itc .cp-icon { width: 12px; height: 12px; color: var(--cp-color-ink-3); }
+
+/* Time list row states */
+tr.is-currentrow td { background: var(--cp-color-primary-dim); }
+tr.is-pastrow td { color: var(--cp-color-ink-3); }
+.tt-progress { display: inline-flex; align-items: center; gap: 6px; }
+.tt-progress .cp-icon { width: 14px; height: 14px; }
+</style>
+</head>
+<body data-page="patterns/timeline" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Patterns</p>
+  <h1>Plans &amp; timelines</h1>
+  <p class="ds-lead">
+    Plans render scheduled activities against time: the plan view groups activities into swimlanes,
+    gantt charts compose several plans, time strips stack any time-based views on one shared axis,
+    and the time list shows the same activities as a sortable table. Activity category colors come
+    from the chart palette slots; status colors appear only for execution problems.
+  </p>
+
+  <h2 id="plan-view">Plan view<a class="ds-anchor" href="#plan-view">#</a></h2>
+  <p>
+    A time-axis ruler on top, one swimlane per activity group. Bars are positioned by start/end on
+    the shared scale; activities that overlap within a group stack onto separate rows
+    (<em>Suit telemetry watch</em> below). The selected activity gets a primary outline with
+    start/end drag handles — handles adjust times in edit mode only. The vertical
+    <span style="color:var(--cp-color-ok)">ok-green</span> line is current time.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:var(--cp-space-5)">
+      <div class="tl-plan">
+        <div class="tl-row tl-axis">
+          <div class="tl-gutter">UTC</div>
+          <div class="tl-track tl-track--axis">
+            <span class="tl-tick tl-tick--first" style="left:0">12:00</span>
+            <span class="tl-tick" style="left:16.667%">13:00</span>
+            <span class="tl-tick" style="left:33.333%">14:00</span>
+            <span class="tl-tick" style="left:50%">15:00</span>
+            <span class="tl-tick" style="left:66.667%">16:00</span>
+            <span class="tl-tick" style="left:83.333%">17:00</span>
+            <span class="tl-tick tl-tick--last" style="left:100%">18:00</span>
+          </div>
+        </div>
+        <div class="tl-row tl-lane" style="flex:2">
+          <div class="tl-gutter">EVA</div>
+          <div class="tl-track">
+            <div class="tl-subrow">
+              <div class="tl-bar is-past" style="--slot:var(--cp-chart-1);left:2.78%;width:30.56%"><svg class="cp-icon"><use href="#i-check"/></svg>EVA prep &amp; suit-up</div>
+              <div class="tl-bar is-selected" style="--slot:var(--cp-chart-1);left:33.33%;width:58.33%">
+                <span class="tl-handle tl-handle--l"></span>
+                <svg class="tl-arc" viewBox="0 0 16 16" aria-hidden="true"><circle class="trk" cx="8" cy="8" r="6"/><circle class="fil" cx="8" cy="8" r="6" stroke-dasharray="8.3 37.7" transform="rotate(-90 8 8)"/></svg>
+                EVA 71 — P6 battery swap <span class="tl-pct">22%</span>
+                <span class="tl-handle tl-handle--r"></span>
+              </div>
+            </div>
+            <div class="tl-subrow">
+              <div class="tl-bar" style="--slot:var(--cp-chart-1);left:25%;width:33.33%">
+                <svg class="tl-arc" viewBox="0 0 16 16" aria-hidden="true"><circle class="trk" cx="8" cy="8" r="6"/><circle class="fil" cx="8" cy="8" r="6" stroke-dasharray="24.1 37.7" transform="rotate(-90 8 8)"/></svg>
+                Suit telemetry watch <span class="tl-pct">64%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row tl-lane tl-lane--alt">
+          <div class="tl-gutter">Robotics</div>
+          <div class="tl-track">
+            <div class="tl-subrow">
+              <div class="tl-bar is-past" style="--slot:var(--cp-chart-2);left:8.33%;width:19.44%"><svg class="cp-icon"><use href="#i-check"/></svg>SSRMS walk-off to WS-6</div>
+              <div class="tl-bar is-alarm" style="--slot:var(--cp-chart-2);left:30.56%;width:12.5%"><svg class="cp-icon"><use href="#i-alert-triangle"/></svg>MT translate</div>
+              <div class="tl-bar is-future" style="--slot:var(--cp-chart-2);left:63.89%;width:13.89%">LEE checkout</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row tl-lane">
+          <div class="tl-gutter">Comm passes</div>
+          <div class="tl-track">
+            <div class="tl-subrow">
+              <div class="tl-bar is-past" style="--slot:var(--cp-chart-3);left:5.56%;width:12.5%"><svg class="cp-icon"><use href="#i-check"/></svg>TDRS-E</div>
+              <div class="tl-bar" style="--slot:var(--cp-chart-3);left:41.67%;width:12.5%">
+                <svg class="tl-arc" viewBox="0 0 16 16" aria-hidden="true"><circle class="trk" cx="8" cy="8" r="6"/><circle class="fil" cx="8" cy="8" r="6" stroke-dasharray="14.3 37.7" transform="rotate(-90 8 8)"/></svg>
+                TDRS-W <span class="tl-pct">38%</span>
+              </div>
+              <div class="tl-bar is-future" style="--slot:var(--cp-chart-3);left:79.17%;width:13.89%">TDRS-Z</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row tl-lane tl-lane--alt">
+          <div class="tl-gutter">Station keeping</div>
+          <div class="tl-track">
+            <div class="tl-subrow">
+              <div class="tl-bar is-past" style="--slot:var(--cp-chart-5);left:9.72%;width:12.5%"><svg class="cp-icon"><use href="#i-check"/></svg>CMG desat</div>
+              <div class="tl-bar is-future" style="--slot:var(--cp-chart-5);left:59.72%;width:13.89%">Eclipse ingress config</div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-overlay">
+          <div class="tl-now" style="left:46.39%"></div>
+          <span class="tl-now-label" style="left:46.39%">14:47:12</span>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Groups as swimlanes with hourly gridlines; overlapping activities stack rows within their group; selected activity shows the primary outline + resize handles (edit mode); now line in ok green with a mono clock label.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">cupola-plan-view</code> — bars are absolutely positioned elements on a shared <code class="ds-code-inline">TimeScale</code>; row packing is a first-fit interval algorithm per group. No Material counterpart; drag handles activate only in edit mode.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C12-L2-01.01 · plan rendering</span>
+    <span class="ds-req">OMCT-C12-L2-01.02 · swimlane groups</span>
+    <span class="ds-req">OMCT-C12-L2-01.03 · overlap stacking</span>
+  </div>
+
+  <h2 id="states">Activity temporal &amp; execution states<a class="ds-anchor" href="#states">#</a></h2>
+  <p>
+    Time classifies every activity as past, current, or future; execution monitoring adds overdue and
+    aborted. Category color never changes with state — only opacity, fill, and a glyph. Critical red
+    is reserved for execution problems.
+  </p>
+  <div class="ds-variants">
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="tl-bar tl-bar--static is-past" style="--slot:var(--cp-chart-1)"><svg class="cp-icon"><use href="#i-check"/></svg>EVA prep &amp; suit-up</div></div><div class="ds-variant-label">Past — 60% opacity + check</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="tl-bar tl-bar--static" style="--slot:var(--cp-chart-1)"><svg class="tl-arc" viewBox="0 0 16 16" aria-hidden="true"><circle class="trk" cx="8" cy="8" r="6"/><circle class="fil" cx="8" cy="8" r="6" stroke-dasharray="8.3 37.7" transform="rotate(-90 8 8)"/></svg>EVA 71 — battery swap <span class="tl-pct">22%</span></div></div><div class="ds-variant-label">Current — progress arc + %</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="tl-bar tl-bar--static is-future" style="--slot:var(--cp-chart-1)">Airlock repress</div></div><div class="ds-variant-label">Future — outline only</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="tl-bar tl-bar--static is-alarm"><svg class="cp-icon"><use href="#i-alert-triangle"/></svg>MT translate — overdue</div></div><div class="ds-variant-label">Overdue (OMCT-C12-L2-04.01)</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="tl-bar tl-bar--static is-alarm"><svg class="cp-icon"><use href="#i-x-circle"/></svg>Cygnus capture — aborted</div></div><div class="ds-variant-label">Aborted (OMCT-C12-L2-04.02)</div></div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C12-L2-03.04 · temporal states</span>
+    <span class="ds-req">OMCT-C12-L2-04.01/.02 · overdue &amp; aborted</span>
+  </div>
+
+  <h2 id="gantt">Gantt chart — composed plans<a class="ds-anchor" href="#gantt">#</a></h2>
+  <p>
+    A gantt chart composes multiple plans as grouped rows on one axis. Its composition policy accepts
+    <strong>Plan objects only</strong> — dropping any other type is rejected at drop time with the
+    reason shown, never silently ignored.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:var(--cp-space-5)">
+      <div class="tl-gantt">
+        <div class="gnt-axis">
+          <span class="tl-tick tl-tick--first" style="left:0">12:00</span>
+          <span class="tl-tick" style="left:16.667%">13:00</span>
+          <span class="tl-tick" style="left:33.333%">14:00</span>
+          <span class="tl-tick" style="left:50%">15:00</span>
+          <span class="tl-tick" style="left:66.667%">16:00</span>
+          <span class="tl-tick" style="left:83.333%">17:00</span>
+          <span class="tl-tick tl-tick--last" style="left:100%">18:00</span>
+        </div>
+        <div class="gnt-group" style="border-top:none"><svg class="cp-icon"><use href="#i-timeline"/></svg>EVA 71 — P6 battery swap (rev C)<span class="gnt-chip gnt-chip--active">Active</span><span class="meta">3 activities</span></div>
+        <div class="gnt-row">
+          <div class="tl-bar is-past" style="--slot:var(--cp-chart-1);left:2.78%;width:30.56%"><svg class="cp-icon"><use href="#i-check"/></svg>Prep &amp; suit-up</div>
+          <div class="tl-bar" style="--slot:var(--cp-chart-1);left:33.33%;width:58.33%">
+            <svg class="tl-arc" viewBox="0 0 16 16" aria-hidden="true"><circle class="trk" cx="8" cy="8" r="6"/><circle class="fil" cx="8" cy="8" r="6" stroke-dasharray="8.3 37.7" transform="rotate(-90 8 8)"/></svg>
+            EVA 71 <span class="tl-pct">22%</span>
+          </div>
+        </div>
+        <div class="gnt-row">
+          <div class="tl-bar" style="--slot:var(--cp-chart-1);left:25%;width:33.33%">
+            <svg class="tl-arc" viewBox="0 0 16 16" aria-hidden="true"><circle class="trk" cx="8" cy="8" r="6"/><circle class="fil" cx="8" cy="8" r="6" stroke-dasharray="24.1 37.7" transform="rotate(-90 8 8)"/></svg>
+            Suit telemetry watch <span class="tl-pct">64%</span>
+          </div>
+        </div>
+        <div class="gnt-group"><svg class="cp-icon"><use href="#i-timeline"/></svg>Robotics support plan (rev A)<span class="gnt-chip">Draft</span><span class="meta">3 activities</span></div>
+        <div class="gnt-row">
+          <div class="tl-bar is-past" style="--slot:var(--cp-chart-2);left:8.33%;width:19.44%"><svg class="cp-icon"><use href="#i-check"/></svg>SSRMS walk-off</div>
+          <div class="tl-bar is-alarm" style="left:30.56%;width:12.5%"><svg class="cp-icon"><use href="#i-alert-triangle"/></svg>MT translate</div>
+          <div class="tl-bar is-future" style="--slot:var(--cp-chart-2);left:63.89%;width:13.89%">LEE checkout</div>
+        </div>
+        <div class="gnt-group"><svg class="cp-icon"><use href="#i-timeline"/></svg>Comm schedule — TDRS<span class="gnt-chip">Imported</span><span class="meta">3 activities</span></div>
+        <div class="gnt-row">
+          <div class="tl-bar is-past" style="--slot:var(--cp-chart-3);left:5.56%;width:12.5%"><svg class="cp-icon"><use href="#i-check"/></svg>TDRS-E</div>
+          <div class="tl-bar" style="--slot:var(--cp-chart-3);left:41.67%;width:12.5%">
+            <svg class="tl-arc" viewBox="0 0 16 16" aria-hidden="true"><circle class="trk" cx="8" cy="8" r="6"/><circle class="fil" cx="8" cy="8" r="6" stroke-dasharray="14.3 37.7" transform="rotate(-90 8 8)"/></svg>
+            TDRS-W <span class="tl-pct">38%</span>
+          </div>
+          <div class="tl-bar is-future" style="--slot:var(--cp-chart-3);left:79.17%;width:13.89%">TDRS-Z</div>
+        </div>
+        <div class="tl-overlay tl-overlay--full">
+          <div class="tl-now" style="left:46.39%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Each composed plan is a header row (name · status · activity count) followed by its activity rows. Dropping a non-Plan object rejects with “Gantt charts can only contain Plans”.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Same renderer as the plan view; a <code class="ds-code-inline">CompositionPolicy</code> restricts children to <code class="ds-code-inline">type: "plan"</code> and the tree/drop targets disable accordingly.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C12-L2-01.05 · gantt composition</span>
+  </div>
+
+  <h2 id="inspector">Activity inspector<a class="ds-anchor" href="#inspector">#</a></h2>
+  <p>
+    Selecting an activity populates the inspector: formatted start/end/duration in mono, category and
+    plan metadata, and — when execution monitoring is on — an execution-state select plus the plan
+    status controls.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <div class="cp-pane" style="width:320px">
+        <div class="cp-pane-head"><svg class="cp-icon"><use href="#i-eye"/></svg>Inspector — Activity</div>
+        <div class="cp-expand is-open">
+          <button class="cp-expand-head">Activity<svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg></button>
+          <div class="cp-expand-body">
+            <dl class="cp-props">
+              <dt>Name</dt><dd>EVA 71 — P6 battery swap</dd>
+              <dt>Start</dt><dd>2026-07-13 14:00:00</dd>
+              <dt>End</dt><dd>2026-07-13 17:30:00</dd>
+              <dt>Duration</dt><dd>03:30:00</dd>
+              <dt>Category</dt><dd><span class="cp-chip" style="height:20px"><span class="cp-chip-dot" style="background:var(--cp-chart-1)"></span>EVA</span></dd>
+              <dt>Plan</dt><dd>EVA 71 (rev C)</dd>
+              <dt>Group</dt><dd>EVA</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="cp-expand is-open">
+          <button class="cp-expand-head">Execution<svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg></button>
+          <div class="cp-expand-body" style="display:flex;flex-direction:column;gap:12px">
+            <div class="cp-field">
+              <label class="cp-field-label">Execution state</label>
+              <select class="cp-select">
+                <option>Not started</option>
+                <option selected>In progress</option>
+                <option>Completed</option>
+                <option>Aborted</option>
+              </select>
+              <span class="cp-field-help">Persists to the “Activity States” object at the root</span>
+            </div>
+          </div>
+        </div>
+        <div class="cp-expand is-open" style="border-bottom:none">
+          <button class="cp-expand-head">Plan execution monitoring<svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg></button>
+          <div class="cp-expand-body" style="display:flex;flex-direction:column;gap:12px">
+            <div class="cp-field">
+              <label class="cp-field-label">Plan status</label>
+              <select class="cp-select">
+                <option>Draft</option>
+                <option selected>Active</option>
+                <option>Complete</option>
+              </select>
+              <span class="cp-field-help"></span>
+            </div>
+            <div class="cp-field">
+              <label class="cp-field-label">Expected duration</label>
+              <span class="cp-input-wrap">
+                <input class="cp-input cp-input--data" value="03:30:00">
+                <span class="cp-affix">HH:mm:ss</span>
+              </span>
+              <span class="cp-field-help">Overdue when exceeded without completion</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Start / End / Duration format through the active time system in mono. Execution state and plan status write through to the shared “Activity States” root object so every operator sees the same state.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Inspector sections are <code class="ds-code-inline">mat-expansion-panel</code>; selects are <code class="ds-code-inline">mat-select</code> density &minus;2. State changes route through <code class="ds-code-inline">PlanExecutionService</code> → Activity States object.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C12-L2-01.04 · activity inspector</span>
+    <span class="ds-req">OMCT-C12-L2-04.01–.04 · execution monitoring</span>
+  </div>
+
+  <h2 id="time-strip">Time strip &amp; event tracks<a class="ds-anchor" href="#time-strip">#</a></h2>
+  <p>
+    A time strip stacks any time-based views — plots, plans, imagery, events — as tracks sharing one
+    time axis. Event markers are diamonds; selecting an event extends a vertical line across
+    <strong>all</strong> rows so its instant can be read against every track.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:var(--cp-space-5)">
+      <div class="tl-strip">
+        <div class="tl-row tl-axis">
+          <div class="tl-gutter">UTC</div>
+          <div class="tl-track tl-track--axis">
+            <span class="tl-tick tl-tick--first" style="left:0">12:00</span>
+            <span class="tl-tick" style="left:16.667%">13:00</span>
+            <span class="tl-tick" style="left:33.333%">14:00</span>
+            <span class="tl-tick" style="left:50%">15:00</span>
+            <span class="tl-tick" style="left:66.667%">16:00</span>
+            <span class="tl-tick" style="left:83.333%">17:00</span>
+            <span class="tl-tick tl-tick--last" style="left:100%">18:00</span>
+          </div>
+        </div>
+        <div class="tl-row ts-plotrow" style="border-top:1px solid var(--cp-color-hairline)">
+          <div class="tl-gutter"><svg class="cp-icon"><use href="#i-plot"/></svg>Bus voltage</div>
+          <div class="tl-track">
+            <svg viewBox="0 0 720 64" preserveAspectRatio="none" aria-hidden="true">
+              <polyline points="0,22 60,20 120,24 180,21 240,26 300,23 334,25 360,40 420,44 460,42 480,28 540,24 600,26 660,22 720,25"
+                fill="none" stroke="var(--cp-chart-1)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+            </svg>
+          </div>
+        </div>
+        <div class="tl-row ts-planrow" style="border-top:1px solid var(--cp-color-hairline)">
+          <div class="tl-gutter"><svg class="cp-icon"><use href="#i-timeline"/></svg>EVA 71 (plan)</div>
+          <div class="tl-track">
+            <div class="tl-subrow">
+              <div class="tl-bar is-past" style="--slot:var(--cp-chart-1);left:2.78%;width:30.56%"><svg class="cp-icon"><use href="#i-check"/></svg>Prep</div>
+              <div class="tl-bar" style="--slot:var(--cp-chart-1);left:33.33%;width:58.33%">
+                <svg class="tl-arc" viewBox="0 0 16 16" aria-hidden="true"><circle class="trk" cx="8" cy="8" r="6"/><circle class="fil" cx="8" cy="8" r="6" stroke-dasharray="8.3 37.7" transform="rotate(-90 8 8)"/></svg>
+                EVA 71 <span class="tl-pct">22%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tl-row ts-imgrow" style="border-top:1px solid var(--cp-color-hairline)">
+          <div class="tl-gutter"><svg class="cp-icon"><use href="#i-camera"/></svg>SciCam 02</div>
+          <div class="tl-track">
+            <div class="ts-shot" style="left:9.26%"><span class="ts-shot-img"></span><span>12:40:12</span></div>
+            <div class="ts-shot" style="left:36.11%"><span class="ts-shot-img" style="background:linear-gradient(135deg,#24476B 0%,#0C1826 80%)"></span><span>14:10:03</span></div>
+            <div class="ts-shot" style="left:58.33%"><span class="ts-shot-img" style="background:linear-gradient(135deg,#173250 0%,#0A141F 80%)"></span><span>15:30:41</span></div>
+            <div class="ts-shot" style="left:81.94%"><span class="ts-shot-img" style="background:linear-gradient(135deg,#0F2136 0%,#070E16 80%)"></span><span>16:55:28</span></div>
+          </div>
+        </div>
+        <div class="tl-row ts-evrow" style="border-top:1px solid var(--cp-color-hairline)">
+          <div class="tl-gutter"><svg class="cp-icon"><use href="#i-flag"/></svg>Events</div>
+          <div class="tl-track">
+            <div class="ts-ev" style="left:5.56%"><span class="ts-ev-d"></span>AOS TDRS-E</div>
+            <div class="ts-ev" style="left:18.06%"><span class="ts-ev-d"></span>LOS TDRS-E</div>
+            <div class="ts-ev" style="left:41.67%"><span class="ts-ev-d"></span>AOS TDRS-W</div>
+            <div class="ts-ev is-selected" style="left:54.17%"><span class="ts-ev-d"></span>LOS TDRS-W</div>
+            <div class="ts-ev" style="left:72.22%"><span class="ts-ev-d"></span>Eclipse entry</div>
+          </div>
+        </div>
+        <div class="tl-overlay">
+          <div class="tl-evline" style="left:54.17%"></div>
+        </div>
+        <span class="ts-itc"><svg class="cp-icon"><use href="#i-clock"/></svg>Independent time · 12:00–18:00 UTC</span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Plot, plan, imagery, and event tracks on one axis. Selected event “LOS TDRS-W” extends a primary line across all rows. The badge marks an independent time conductor: this strip stays fixed on 12:00–18:00 while the workspace follows real time.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">cupola-time-strip</code> hosts child views through CDK portal outlets bound to one <code class="ds-code-inline">TimeContext</code>; the independent-time toggle swaps in a scoped conductor (OMCT-C12-L2-02.03).</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C12-L2-02.01/.02 · stacked tracks</span>
+    <span class="ds-req">OMCT-C12-L2-02.03 · independent conductor</span>
+    <span class="ds-req">OMCT-C12-L2-02.04 · event track</span>
+    <span class="ds-req">OMCT-C12-L2-02.05 · extended event lines</span>
+  </div>
+
+  <h2 id="time-list">Time list<a class="ds-anchor" href="#time-list">#</a></h2>
+  <p>
+    The same plan as a sortable table. Past rows dim with a check, the current rows highlight with a
+    progress arc, future rows stay normal. Filters narrow by name or time class —
+    <strong>in-progress activities always stay visible</strong>, whatever the filter.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:var(--cp-space-5)">
+      <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+        <span class="cp-input-wrap" style="width:220px">
+          <svg class="cp-icon cp-icon--s cp-icon--lead"><use href="#i-search"/></svg>
+          <input class="cp-input" placeholder="Filter by name" style="height:var(--cp-size-control-s)">
+        </span>
+        <select class="cp-select" style="width:190px;height:var(--cp-size-control-s)">
+          <option selected>All time classes</option>
+          <option>Past only</option>
+          <option>Current &amp; future</option>
+        </select>
+      </div>
+      <div class="cp-table-wrap">
+        <table class="cp-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th><button class="cp-th-sort is-sorted">Start<svg class="cp-icon"><use href="#i-arrow-up"/></svg></button></th>
+              <th>End</th>
+              <th class="num">Duration</th>
+              <th>Progress</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="is-pastrow"><td>EVA prep &amp; suit-up</td><td>12:10:00</td><td>14:00:00</td><td class="num">01:50:00</td><td><span class="tt-progress"><svg class="cp-icon"><use href="#i-check"/></svg>Complete</span></td></tr>
+            <tr class="is-pastrow"><td>SSRMS walk-off to WS-6</td><td>12:30:00</td><td>13:40:00</td><td class="num">01:10:00</td><td><span class="tt-progress"><svg class="cp-icon"><use href="#i-check"/></svg>Complete</span></td></tr>
+            <tr class="is-currentrow"><td>Suit telemetry watch</td><td>13:30:00</td><td>15:30:00</td><td class="num">02:00:00</td><td><span class="tt-progress"><svg class="tl-arc" viewBox="0 0 16 16" aria-hidden="true"><circle class="trk" cx="8" cy="8" r="6"/><circle class="fil" cx="8" cy="8" r="6" stroke-dasharray="24.1 37.7" transform="rotate(-90 8 8)"/></svg>64%</span></td></tr>
+            <tr><td>MT translate to WS-4</td><td>13:50:00</td><td>14:35:00</td><td class="num">00:45:00</td><td><span class="tt-progress" style="color:var(--cp-color-critical)"><svg class="cp-icon"><use href="#i-alert-triangle"/></svg>Overdue</span></td></tr>
+            <tr class="is-currentrow"><td>EVA 71 — P6 battery swap</td><td>14:00:00</td><td>17:30:00</td><td class="num">03:30:00</td><td><span class="tt-progress"><svg class="tl-arc" viewBox="0 0 16 16" aria-hidden="true"><circle class="trk" cx="8" cy="8" r="6"/><circle class="fil" cx="8" cy="8" r="6" stroke-dasharray="8.3 37.7" transform="rotate(-90 8 8)"/></svg>22%</span></td></tr>
+            <tr><td>TDRS-W pass</td><td>14:30:00</td><td>15:15:00</td><td class="num">00:45:00</td><td><span class="tt-progress"><svg class="tl-arc" viewBox="0 0 16 16" aria-hidden="true"><circle class="trk" cx="8" cy="8" r="6"/><circle class="fil" cx="8" cy="8" r="6" stroke-dasharray="14.3 37.7" transform="rotate(-90 8 8)"/></svg>38%</span></td></tr>
+            <tr><td>LEE checkout</td><td>15:50:00</td><td>16:40:00</td><td class="num">00:50:00</td><td style="color:var(--cp-color-ink-3)">Not started</td></tr>
+            <tr><td>TDRS-Z pass</td><td>16:45:00</td><td>17:35:00</td><td class="num">00:50:00</td><td style="color:var(--cp-color-ink-3)">Not started</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Sorted ascending on Start (indicator on the sorted column). Name filter + time-class select; rows in progress are exempt from filtering so a running activity can never disappear.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">mat-table</code> + <code class="ds-code-inline">MatSort</code>, density &minus;2. A duration pipe renders ms as <code class="ds-code-inline">HH:mm:ss</code>; the filter predicate whitelists rows with <code class="ds-code-inline">state === 'in-progress'</code>.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C12-L2-03.01 · time list columns</span>
+    <span class="ds-req">OMCT-C12-L2-03.02 · sorting</span>
+    <span class="ds-req">OMCT-C12-L2-03.03 · filters</span>
+    <span class="ds-req">OMCT-C12-L2-03.04 · temporal states</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="imagery.html"><span class="dir">Previous</span>&larr; Imagery</a>
+    <a href="notebook.html"><span class="dir">Next</span>Notebook &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

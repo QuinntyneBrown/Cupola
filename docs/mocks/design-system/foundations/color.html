@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Color — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body data-page="foundations/color" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Foundations</p>
+  <h1>Color</h1>
+  <p class="ds-lead">
+    One dark theme: blue-black surfaces that step lighter with elevation, a single cyan accent,
+    and a reserved status vocabulary. Every ink token holds &ge;4.5:1 contrast on every surface it
+    may sit on; the chart palette passed the six-check categorical validator against
+    <code class="ds-code-inline">surface-1</code>.
+  </p>
+
+  <h2 id="surfaces">Surfaces<a class="ds-anchor" href="#surfaces">#</a></h2>
+  <p>
+    Four layers. Elevation lightens the surface and adds a hairline &mdash; shadows are reserved for
+    detached layers (<a href="elevation.html">Elevation &amp; shape</a>). Inputs sit on
+    <code class="ds-code-inline">void</code> so filled fields read as wells, not cards.
+  </p>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th></th><th>Token</th><th>Hex</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-void)"></span></td><td><code>--cp-color-void</code></td><td><code>#070A10</code></td><td>App canvas behind panes; status bar; input wells; plot backgrounds</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-surface-1)"></span></td><td><code>--cp-color-surface-1</code></td><td><code>#0E1219</code></td><td>Panes: tree, main view, inspector</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-surface-2)"></span></td><td><code>--cp-color-surface-2</code></td><td><code>#141A24</code></td><td>Pane headers, toolbars, table headers, cards</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-surface-3)"></span></td><td><code>--cp-color-surface-3</code></td><td><code>#1B2230</code></td><td>Menus, dialogs, tooltips, chips</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-surface-hover)"></span></td><td><code>--cp-color-surface-hover</code></td><td><code>#8BA8CC</code> 7%</td><td>Hover wash on rows, menu items, icon buttons</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-scrim)"></span></td><td><code>--cp-color-scrim</code></td><td><code>#04060A</code> 64%</td><td>Modal backdrop</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-hairline)"></span></td><td><code>--cp-color-hairline</code></td><td><code>#232B3A</code></td><td>Pane splits, table rules, card borders</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-line)"></span></td><td><code>--cp-color-line</code></td><td><code>#384357</code></td><td>Input borders, menu borders, emphasized rules</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-line-strong)"></span></td><td><code>--cp-color-line-strong</code></td><td><code>#4E5B74</code></td><td>Hovered input borders, checkbox outlines</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="gap:16px">
+      <div style="background:var(--cp-color-surface-1);border:1px solid var(--cp-color-hairline);border-radius:6px;padding:20px;min-width:160px">
+        <div style="font:var(--cp-type-data-s);color:var(--cp-color-ink-3)">surface-1</div>
+        <div style="background:var(--cp-color-surface-2);border:1px solid var(--cp-color-hairline);border-radius:6px;padding:16px;margin-top:12px">
+          <div style="font:var(--cp-type-data-s);color:var(--cp-color-ink-3)">surface-2</div>
+          <div style="background:var(--cp-color-surface-3);border:1px solid var(--cp-color-line);border-radius:6px;padding:12px;margin-top:12px">
+            <div style="font:var(--cp-type-data-s);color:var(--cp-color-ink-2)">surface-3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Nesting order on the void canvas — each layer lighter, each bounded by a hairline.</div>
+  </div>
+
+  <h2 id="ink">Ink<a class="ds-anchor" href="#ink">#</a></h2>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th></th><th>Token</th><th>Hex</th><th>Contrast (s1 / s3)</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-ink)"></span></td><td><code>--cp-color-ink</code></td><td><code>#E9EDF5</code></td><td>16.0 / 13.6</td><td>Primary text, values, headings</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-ink-2)"></span></td><td><code>--cp-color-ink-2</code></td><td><code>#A7B0C0</code></td><td>8.6 / 7.3</td><td>Secondary text, labels, inactive icons</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-ink-3)"></span></td><td><code>--cp-color-ink-3</code></td><td><code>#8290A9</code></td><td>5.8 / 4.9</td><td>Muted: captions, units, placeholders, axis ticks</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-ink-disabled)"></span></td><td><code>--cp-color-ink-disabled</code></td><td><code>#4A5366</code></td><td>2.4 / 2.1</td><td>Disabled controls only &mdash; exempt from AA by design</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-ink-inverse)"></span></td><td><code>--cp-color-ink-inverse</code></td><td><code>#0B0E14</code></td><td>&ge;5.5 on all fills</td><td>Text on filled status/accent backgrounds</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="accent">Accent &mdash; Earthlight<a class="ds-anchor" href="#accent">#</a></h2>
+  <p>
+    One accent. Cyan-blue marks <strong>interaction and selection</strong>: buttons, links, focus,
+    selected rows, active tabs. It is deliberately distinct from every status hue so a selected row
+    never reads as "healthy" and an alarm never reads as "clickable".
+  </p>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th></th><th>Token</th><th>Hex</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-primary)"></span></td><td><code>--cp-color-primary</code></td><td><code>#58B7EC</code></td><td>Filled buttons, links, active tab, selected glyphs (8.4:1 on s1)</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-primary-hover)"></span></td><td><code>--cp-color-primary-hover</code></td><td><code>#7CC9F5</code></td><td>Hover; also the focus ring (<code>--cp-color-focus-ring</code>)</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-primary-pressed)"></span></td><td><code>--cp-color-primary-pressed</code></td><td><code>#3EA5E0</code></td><td>Pressed</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-primary-dim)"></span></td><td><code>--cp-color-primary-dim</code></td><td>14% alpha</td><td>Selected row/tab fills, tonal buttons</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-edit)"></span></td><td><code>--cp-color-edit</code></td><td><code>#C6A2FF</code></td><td>Edit mode only: editing badge, selection frames, resize handles</td></tr>
+    </tbody>
+  </table></div>
+  <div class="ds-dodont">
+    <div class="ds-do"><div class="head"><svg class="cp-icon cp-icon--s"><use href="#i-check"/></svg>Do</div>
+      <div class="body"><span class="cp-editing-badge">Editing</span></div>
+      <div class="note">Edit mode is violet — a mode, not a warning.</div>
+    </div>
+    <div class="ds-dont"><div class="head"><svg class="cp-icon cp-icon--s"><use href="#i-close"/></svg>Don't</div>
+      <div class="body"><span class="cp-editing-badge" style="background:var(--cp-color-caution-dim);border-color:var(--cp-color-caution-border);color:var(--cp-color-caution)">Editing</span></div>
+      <div class="note">Amber means a limit violation. Never reuse status hues for modes.</div>
+    </div>
+  </div>
+
+  <h2 id="status">Status &amp; limit semantics<a class="ds-anchor" href="#status">#</a></h2>
+  <p>
+    Reserved vocabulary (OMCT-C06-L2-04.03 limit evaluation, C14 notification severities, C04
+    connection states). Filled variants always take <code class="ds-code-inline">ink-inverse</code>
+    text; a status color is never the only signal &mdash; pair with glyph or label
+    (OMCT-C16-L2-03.01).
+  </p>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th></th><th>Token</th><th>Hex</th><th>Meaning</th><th>Fill text contrast</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-ok)"></span></td><td><code>--cp-color-ok</code></td><td><code>#3FB950</code></td><td>Nominal &middot; go &middot; connected &middot; within limits &middot; real-time active</td><td>7.6:1</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-caution)"></span></td><td><code>--cp-color-caution</code></td><td><code>#F0B429</code></td><td>Caution limit (yellow) &middot; watch &middot; degraded</td><td>10.4:1</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-critical)"></span></td><td><code>--cp-color-critical</code></td><td><code>#F0524A</code></td><td>Critical limit (red) &middot; fault &middot; error &middot; no-go</td><td>5.5:1</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-info)"></span></td><td><code>--cp-color-info</code></td><td><code>#58B7EC</code></td><td>Neutral notice (shares the accent hue)</td><td>8.7:1</td></tr>
+      <tr><td><span class="ds-swatch" style="background:var(--cp-color-stale)"></span></td><td><code>--cp-color-stale</code></td><td><code>#8B99B0</code></td><td>Stale telemetry &mdash; always italic + clock glyph, never color alone</td><td>&mdash;</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="ds-demo">
+    <div class="ds-demo-stage">
+      <span class="cp-chip cp-chip--ok"><svg class="cp-icon cp-icon--s"><use href="#i-check"/></svg>GO</span>
+      <span class="cp-chip cp-chip--caution"><svg class="cp-icon cp-icon--s"><use href="#i-alert-triangle"/></svg>CAUTION</span>
+      <span class="cp-chip cp-chip--critical"><svg class="cp-icon cp-icon--s"><use href="#i-alert-circle"/></svg>CRITICAL</span>
+      <span style="font:var(--cp-type-data)" class="is-stale">98.20 kPa <svg class="cp-icon cp-icon--s"><use href="#i-history"/></svg></span>
+      <span style="font:var(--cp-type-data);padding:2px 8px;border-radius:3px" class="is-limit-caution">41.7 &deg;C ▲</span>
+      <span style="font:var(--cp-type-data);padding:2px 8px;border-radius:3px" class="is-limit-critical">55.1 &deg;C ▲</span>
+    </div>
+    <div class="ds-demo-caption">Status chips, stale value, and limit-violation cells. Direction arrows (▲ high / ▼ low) accompany limit fills.</div>
+  </div>
+
+  <h2 id="chart">Chart palette (chart.js)<a class="ds-anchor" href="#chart">#</a></h2>
+  <p>
+    Eight categorical slots in a <strong>fixed order</strong> chosen to maximize color-vision-deficiency
+    separation. Assign in sequence, never cycle, never re-color survivors when series are removed;
+    a ninth series folds into "Other". Series identity is always backed by the legend and direct
+    labels &mdash; the palette sits in the CVD floor band, so labels are mandatory, not decorative.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="gap:8px">
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:center"><span class="ds-swatch" style="background:var(--cp-chart-1);width:56px;height:36px"></span><code class="ds-code-inline">1</code></div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:center"><span class="ds-swatch" style="background:var(--cp-chart-2);width:56px;height:36px"></span><code class="ds-code-inline">2</code></div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:center"><span class="ds-swatch" style="background:var(--cp-chart-3);width:56px;height:36px"></span><code class="ds-code-inline">3</code></div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:center"><span class="ds-swatch" style="background:var(--cp-chart-4);width:56px;height:36px"></span><code class="ds-code-inline">4</code></div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:center"><span class="ds-swatch" style="background:var(--cp-chart-5);width:56px;height:36px"></span><code class="ds-code-inline">5</code></div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:center"><span class="ds-swatch" style="background:var(--cp-chart-6);width:56px;height:36px"></span><code class="ds-code-inline">6</code></div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:center"><span class="ds-swatch" style="background:var(--cp-chart-7);width:56px;height:36px"></span><code class="ds-code-inline">7</code></div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:center"><span class="ds-swatch" style="background:var(--cp-chart-8);width:56px;height:36px"></span><code class="ds-code-inline">8</code></div>
+    </div>
+    <div class="ds-demo-caption">--cp-chart-1…8: #3987E5 · #199E70 · #C98500 · #008300 · #9085E9 · #E66767 · #D55181 · #D95926</div>
+  </div>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Role</th><th>Tokens</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td>Categorical</td><td><code>--cp-chart-1…8</code></td><td>Series identity. Fixed order; color follows the entity, never its rank.</td></tr>
+      <tr><td>Sequential</td><td><code>--cp-chart-seq-1…5</code></td><td>Magnitude (heatmaps): one blue hue, dark&rarr;light. Never rainbow.</td></tr>
+      <tr><td>Diverging</td><td><code>--cp-chart-div-neg/mid/pos</code></td><td>Polarity around a baseline: blue &harr; neutral gray &harr; red.</td></tr>
+      <tr><td>Chrome</td><td><code>--cp-chart-grid/axis/tick</code></td><td>Hairline grid, recessive axis, muted mono tick labels.</td></tr>
+      <tr><td>Limits on plots</td><td>status tokens</td><td>Limit lines and violating points wear status colors — never a series slot, and vice versa.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="angular">Angular mapping<a class="ds-anchor" href="#angular">#</a></h2>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Tokens feed a custom Material 17 dark theme; publish them on <code class="ds-code-inline">:root</code> and reference from component SCSS.</span>
+  </div>
+  <pre class="ds-code"><span class="cmt">// styles/_theme.scss</span>
+<span class="tag">@use</span> <span class="str">'@angular/material'</span> as mat;
+
+$cupola-primary: mat.define-palette((
+  50: #E7F5FD, 100: #C9E9FB, <span class="cmt">/* … */</span> 500: <span class="str">#58B7EC</span>,
+  contrast: (500: <span class="str">#0B0E14</span>)
+), 500);
+
+$cupola-theme: mat.define-dark-theme((
+  color: (primary: $cupola-primary, accent: $cupola-primary, warn: mat.define-palette($warn-palette)),
+  typography: $cupola-typography,  <span class="cmt">// see Typography</span>
+  density: -2,
+));</pre>
+
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C06-L2-04.03 &middot; limit colors</span>
+    <span class="ds-req">OMCT-C06-L2-04.04 &middot; stale styling</span>
+    <span class="ds-req">OMCT-C14-L2-04.01/02 &middot; severities</span>
+    <span class="ds-req">OMCT-C04-L2-02.06 &middot; connection states</span>
+    <span class="ds-req">OMCT-C15-L2-05.02 &middot; theme install</span>
+    <span class="ds-req">OMCT-C16-L2-03.01 &middot; WCAG 2 AA</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="../index.html"><span class="dir">Previous</span>&larr; Introduction</a>
+    <a href="typography.html"><span class="dir">Next</span>Typography &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

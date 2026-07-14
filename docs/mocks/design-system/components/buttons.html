@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buttons — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body data-page="components/buttons" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Components</p>
+  <h1>Buttons</h1>
+  <p class="ds-lead">
+    Five emphasis levels, one height (32px), one radius (3px). A view region gets at most one filled
+    button &mdash; the action the operator came to perform. Everything else steps down.
+  </p>
+
+  <h2 id="variants">Variants<a class="ds-anchor" href="#variants">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage">
+      <button class="cp-btn cp-btn--filled"><svg class="cp-icon"><use href="#i-plus"/></svg>Create</button>
+      <button class="cp-btn cp-btn--tonal"><svg class="cp-icon"><use href="#i-pencil"/></svg>Edit</button>
+      <button class="cp-btn cp-btn--outlined"><svg class="cp-icon"><use href="#i-download"/></svg>Export as JSON</button>
+      <button class="cp-btn cp-btn--text">Cancel</button>
+      <button class="cp-btn cp-btn--danger"><svg class="cp-icon"><use href="#i-trash"/></svg>Remove</button>
+    </div>
+    <div class="ds-demo-caption">Filled · tonal · outlined · text · danger — descending emphasis, left to right.</div>
+  </div>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Variant</th><th>Class</th><th>Use for</th><th>Material</th></tr></thead>
+    <tbody>
+      <tr><td>Filled</td><td><code>.cp-btn--filled</code></td><td>The single primary action: Create, Save, OK in a form dialog</td><td><code>mat-flat-button color="primary"</code></td></tr>
+      <tr><td>Tonal</td><td><code>.cp-btn--tonal</code></td><td>Secondary emphasis: Edit, Apply, snapshot</td><td><code>mat-flat-button</code> + tonal class</td></tr>
+      <tr><td>Outlined</td><td><code>.cp-btn--outlined</code></td><td>Peer actions in content: export, import, add criterion</td><td><code>mat-stroked-button</code></td></tr>
+      <tr><td>Text</td><td><code>.cp-btn--text</code></td><td>Cancel, dialog dismissal, low-stakes inline actions</td><td><code>mat-button</code></td></tr>
+      <tr><td>Danger</td><td><code>.cp-btn--danger</code> / <code>--danger-text</code></td><td>Destructive confirmation only (the Remove in a confirm dialog)</td><td><code>mat-flat-button color="warn"</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="states">States<a class="ds-anchor" href="#states">#</a></h2>
+  <div class="ds-variants">
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-btn cp-btn--filled">Save</button></div><div class="ds-variant-label">Default</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-btn cp-btn--filled" style="background:var(--cp-color-primary-hover)">Save</button></div><div class="ds-variant-label">Hover</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-btn cp-btn--filled" style="background:var(--cp-color-primary-pressed)">Save</button></div><div class="ds-variant-label">Pressed</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-btn cp-btn--filled" style="outline:2px solid var(--cp-color-focus-ring);outline-offset:2px">Save</button></div><div class="ds-variant-label">Focus-visible</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-btn cp-btn--filled" disabled>Save</button></div><div class="ds-variant-label">Disabled</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><button class="cp-btn cp-btn--filled" disabled><span class="cp-spinner" style="width:14px;height:14px;border-width:2px"></span>Saving&hellip;</button></div><div class="ds-variant-label">In progress (OMCT-C04-L2-02.02)</div></div>
+  </div>
+  <p>
+    Disabled buttons stay in place &mdash; an action that exists but doesn't currently apply is
+    disabled with a tooltip explaining why; an action that never applies to the selection is hidden
+    (OMCT-C15-L2-03.02 action collection state).
+  </p>
+
+  <h2 id="icon">Icon buttons<a class="ds-anchor" href="#icon">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage">
+      <button class="cp-icon-btn" aria-label="More actions"><svg class="cp-icon"><use href="#i-kebab"/></svg></button>
+      <button class="cp-icon-btn is-active" aria-pressed="true" aria-label="Pause table"><svg class="cp-icon"><use href="#i-pause"/></svg></button>
+      <button class="cp-icon-btn" disabled aria-label="Zoom out"><svg class="cp-icon"><use href="#i-zoom-out"/></svg></button>
+      <button class="cp-icon-btn cp-icon-btn--s" aria-label="Close"><svg class="cp-icon"><use href="#i-close"/></svg></button>
+    </div>
+    <div class="ds-demo-caption">Default · active/pressed · disabled · small (28px). Every icon button has aria-label + tooltip.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">mat-icon-button</code> density &minus;2; toggling buttons manage <code class="ds-code-inline">aria-pressed</code>.</span>
+  </div>
+
+  <h2 id="toggle">Toggle groups<a class="ds-anchor" href="#toggle">#</a></h2>
+  <p>Mutually exclusive view options: conductor mode, grid/list switch, legend collapse. Exactly one segment is pressed.</p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage">
+      <div class="cp-toggle-group" role="group" aria-label="Time mode">
+        <button class="cp-btn" aria-pressed="true" data-demo-toggle>Fixed</button>
+        <button class="cp-btn" aria-pressed="false" data-demo-toggle>Real-time</button>
+      </div>
+      <div class="cp-toggle-group" role="group" aria-label="Folder view">
+        <button class="cp-btn" aria-pressed="true" data-demo-toggle><svg class="cp-icon"><use href="#i-grid"/></svg></button>
+        <button class="cp-btn" aria-pressed="false" data-demo-toggle><svg class="cp-icon"><use href="#i-list"/></svg></button>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Interactive — click a segment. Material: mat-button-toggle-group.</div>
+  </div>
+
+  <h2 id="anatomy">Anatomy<a class="ds-anchor" href="#anatomy">#</a></h2>
+  <div class="ds-demo"><div class="ds-demo-stage" style="padding:40px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+      <div style="font:var(--cp-type-data-s);color:var(--cp-color-caution)">&larr; 12 &rarr;&nbsp;&nbsp;icon 16&nbsp;&nbsp;gap 6&nbsp;&nbsp;label 13/16 medium&nbsp;&nbsp;&larr; 12 &rarr;</div>
+      <button class="cp-btn cp-btn--filled" style="outline:1px dashed var(--cp-color-caution);outline-offset:0"><svg class="cp-icon"><use href="#i-plus"/></svg>Create</button>
+      <div style="font:var(--cp-type-data-s);color:var(--cp-color-caution)">height 32 &middot; radius 3 &middot; min-width = content</div>
+    </div>
+  </div></div>
+
+  <h2 id="placement">Placement rules<a class="ds-anchor" href="#placement">#</a></h2>
+  <ul>
+    <li><strong>Dialogs:</strong> actions right-aligned in the footer, affirmative last: <em>Cancel &middot; Save</em>. Destructive confirms use danger-filled: <em>Cancel &middot; Remove</em>.</li>
+    <li><strong>Toolbars:</strong> icon buttons and small text buttons only; the filled button lives in content or dialog footers, not toolbars (exception: the tree pane's Create).</li>
+    <li><strong>Verbs, not ceremonies:</strong> buttons say what happens &mdash; "Save", "Remove", "Import" &mdash; never "Submit", "Yes", or "Proceed".</li>
+  </ul>
+
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C15-L2-03.02 &middot; enable/disable/hide</span>
+    <span class="ds-req">OMCT-C03-L2-01.01 &middot; Create</span>
+    <span class="ds-req">OMCT-C03-L2-02.05 &middot; Remove confirm</span>
+    <span class="ds-req">OMCT-C16-L2-03.01 &middot; focus &amp; keyboard</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="../foundations/motion.html"><span class="dir">Previous</span>&larr; Motion</a>
+    <a href="form-controls.html"><span class="dir">Next</span>Form controls &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gauges &amp; widgets — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<style>
+  /* page-scoped: dial SVG text + widget/editor chrome, all token-driven */
+  .dial text {
+    font-family: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
+    font-size: 11px;
+    fill: var(--cp-chart-tick);
+  }
+  .dial .dial-value { font-size: 24px; font-weight: 500; fill: var(--cp-color-ink); }
+  .dial .dial-value--m { font-size: 20px; }
+  .dial .dial-unit { fill: var(--cp-color-ink-3); }
+  .gauge-name {
+    font: var(--cp-type-overline);
+    text-transform: uppercase; letter-spacing: var(--cp-tracking-caps);
+    color: var(--cp-color-ink-3);
+  }
+  .gauge-col { display: flex; flex-direction: column; align-items: center; gap: var(--cp-space-3); }
+  /* equal-height variant cards: pin labels to the bottom edge */
+  .ds-variants .ds-variant { display: flex; flex-direction: column; }
+  .ds-variants .ds-variant-stage { flex: 1; }
+
+  /* condition / summary widget — a stylable box */
+  .condw {
+    position: relative;
+    min-width: 200px; height: 64px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 0 var(--cp-space-5);
+    border-radius: var(--cp-radius-s);
+    border: 1px solid var(--cp-color-line);
+    background: var(--cp-color-surface-2);
+    color: var(--cp-color-ink-2);
+    font: var(--cp-type-label);
+    letter-spacing: 0.04em; text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .condw--ok { background: var(--cp-color-ok-dim); border-color: var(--cp-color-ok-border); color: var(--cp-color-ok); }
+  .condw--caution { background: var(--cp-color-caution-dim); border-color: var(--cp-color-caution-border); color: var(--cp-color-caution); }
+  .condw--critical { background: var(--cp-color-critical-dim); border-color: var(--cp-color-critical-border); color: var(--cp-color-critical); }
+  .condw .condw-link { position: absolute; top: 6px; right: 6px; width: 14px; height: 14px; opacity: .8; }
+  .condw--url { cursor: pointer; }
+
+  /* condition set editor */
+  .cond {
+    border: 1px solid var(--cp-color-hairline);
+    border-radius: var(--cp-radius-m);
+    background: var(--cp-color-surface-2);
+  }
+  .cond + .cond { margin-top: var(--cp-space-3); }
+  .cond.is-active {
+    background: linear-gradient(var(--cp-color-primary-dim), var(--cp-color-primary-dim)) var(--cp-color-surface-2);
+    border-color: var(--cp-color-primary-border);
+  }
+  .cond-head { display: flex; align-items: center; gap: var(--cp-space-3); padding: var(--cp-space-3) var(--cp-space-4); flex-wrap: wrap; }
+  .cond-grip { display: inline-flex; color: var(--cp-color-ink-3); cursor: grab; }
+  .cond-name { font: var(--cp-type-label); color: var(--cp-color-ink); }
+  .cond-when { display: inline-flex; align-items: center; gap: 6px; font: var(--cp-type-body-s); color: var(--cp-color-ink-3); }
+  .cond-out { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font: var(--cp-type-caption); color: var(--cp-color-ink-3); }
+  .cond-out .cp-chip { height: 20px; font: var(--cp-type-data-s); }
+  .active-badge {
+    display: inline-flex; align-items: center; height: 18px; padding: 0 7px;
+    border-radius: var(--cp-radius-s);
+    background: var(--cp-color-primary); color: var(--cp-color-ink-inverse);
+    font: 600 10px/18px var(--cp-font-cond); letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .cond-body { padding: 0 var(--cp-space-4) var(--cp-space-4) 42px; display: flex; flex-direction: column; gap: var(--cp-space-3); align-items: flex-start; }
+  .crit-row { display: flex; align-items: center; gap: var(--cp-space-3); flex-wrap: wrap; font: var(--cp-type-body-s); color: var(--cp-color-ink-3); }
+  .crit-row .cp-select, .crit-row .cp-input { height: var(--cp-size-control-s); width: auto; font: var(--cp-type-body-s); }
+  .crit-row .cp-input--data { font: var(--cp-type-data-s); }
+
+  /* rules editor + conditional styles rows */
+  .rule-row {
+    display: flex; align-items: center; gap: var(--cp-space-3);
+    padding: 6px var(--cp-space-3);
+    border: 1px solid var(--cp-color-hairline); border-radius: var(--cp-radius-s);
+    background: var(--cp-color-surface-2);
+  }
+  .rule-row + .rule-row { margin-top: 6px; }
+  .rule-row .cp-select { height: var(--cp-size-control-s); width: auto; font: var(--cp-type-body-s); }
+  .rule-name { font: var(--cp-type-label); color: var(--cp-color-ink); min-width: 150px; }
+  .mini-sw { width: 18px; height: 18px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.15); flex: none; padding: 0; cursor: pointer; }
+  .styles-grid .mini-sw { justify-self: center; }
+
+  .styles-grid { display: grid; grid-template-columns: 1fr 44px 44px 44px 72px; gap: 6px 10px; align-items: center; }
+  .styles-grid .h {
+    font: var(--cp-type-overline); text-transform: uppercase; letter-spacing: var(--cp-tracking-caps);
+    color: var(--cp-color-ink-3); text-align: center;
+  }
+  .styles-grid .h:first-child { text-align: left; }
+  .styles-grid .n { font: var(--cp-type-body-s); color: var(--cp-color-ink-2); }
+  .style-prev {
+    justify-self: stretch; text-align: center;
+    padding: 3px 0; border-radius: 3px; border: 1px solid;
+    font: var(--cp-type-data-s);
+  }
+</style>
+</head>
+<body data-page="patterns/gauges" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Patterns</p>
+  <h1>Gauges &amp; widgets</h1>
+  <p class="ds-lead">
+    Fixed-position readouts for values that matter at a glance: five gauge forms (OMCT-C08), plus
+    the condition-driven widgets of OMCT-C10 — condition widget, summary widget, and the condition
+    set editor that powers them. Dials are inline SVG; meters are DOM. Gauge fills use the accent
+    primary; caution and critical are <strong>reserved for limit semantics</strong>, never
+    decoration.
+  </p>
+
+  <h2 id="forms">The five gauge forms<a class="ds-anchor" href="#forms">#</a></h2>
+  <p>
+    Every gauge type renders the same data contract — current value, unit, min/max, optional
+    caution/critical bands — in one of five mandated forms (OMCT-C08-L2-03.01). The value is
+    always large mono ink; the unit is muted; limit bands wear status colors at the high (or low)
+    end of the scale.
+  </p>
+  <div class="ds-variants" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">
+    <div class="ds-variant">
+      <div class="ds-variant-stage" style="background:var(--cp-color-void)">
+        <div class="gauge-col">
+          <svg class="dial" width="160" height="140" viewBox="0 0 160 140" role="img" aria-label="Filled dial gauge, array output 2.52 kilowatts">
+            <path d="M29.8,113.0 A58 58 0 1 1 130.2,113.0" fill="none" stroke="var(--cp-color-surface-3)" stroke-width="10" stroke-linecap="round"/>
+            <path d="M144.7,63.0 A68 68 0 0 1 147.6,91.1" fill="none" stroke="var(--cp-color-caution)" stroke-width="4"/>
+            <path d="M147.6,91.1 A68 68 0 0 1 138.9,118.0" fill="none" stroke="var(--cp-color-critical)" stroke-width="4"/>
+            <path d="M29.8,113.0 A58 58 0 0 1 110.0,34.4" fill="none" stroke="var(--cp-color-primary)" stroke-width="10" stroke-linecap="round"/>
+            <text class="dial-value" x="80" y="82" text-anchor="middle">2.52</text>
+            <text class="dial-unit" x="80" y="98" text-anchor="middle">kW</text>
+            <text x="29.8" y="132" text-anchor="middle">0</text>
+            <text x="130.2" y="132" text-anchor="middle">4.0</text>
+          </svg>
+          <span class="gauge-name">Array output</span>
+        </div>
+      </div>
+      <div class="ds-variant-label">Filled dial — 240° sweep, limit arcs</div>
+    </div>
+    <div class="ds-variant">
+      <div class="ds-variant-stage" style="background:var(--cp-color-void)">
+        <div class="gauge-col">
+          <svg class="dial" width="160" height="142" viewBox="0 0 160 142" role="img" aria-label="Needle dial gauge, array output 1.68 kilowatts">
+            <path d="M29.8,113.0 A58 58 0 1 1 130.2,113.0" fill="none" stroke="var(--cp-color-surface-3)" stroke-width="10" stroke-linecap="round"/>
+            <g stroke="var(--cp-color-line-strong)" stroke-width="1.5">
+              <line x1="41.9" y1="106" x2="36.7" y2="109"/>
+              <line x1="41.9" y1="62" x2="36.7" y2="59"/>
+              <line x1="80" y1="40" x2="80" y2="34"/>
+              <line x1="118.1" y1="62" x2="123.3" y2="59"/>
+              <line x1="118.1" y1="106" x2="123.3" y2="109"/>
+            </g>
+            <line x1="80" y1="84" x2="66.2" y2="44.3" stroke="var(--cp-color-ink)" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="80" cy="84" r="5" fill="var(--cp-color-surface-3)" stroke="var(--cp-color-ink-2)" stroke-width="1.5"/>
+            <text class="dial-value dial-value--m" x="80" y="124" text-anchor="middle">1.68</text>
+            <text class="dial-unit" x="80" y="138" text-anchor="middle">kW</text>
+            <text x="29.8" y="132" text-anchor="middle">0</text>
+            <text x="130.2" y="132" text-anchor="middle">4.0</text>
+          </svg>
+          <span class="gauge-name">Array output</span>
+        </div>
+      </div>
+      <div class="ds-variant-label">Needle dial — needle + hub</div>
+    </div>
+    <div class="ds-variant">
+      <div class="ds-variant-stage" style="background:var(--cp-color-void)">
+        <div class="gauge-col">
+          <div class="cp-meter cp-meter--v" style="--pct:63%">
+            <div class="cp-meter-fill"></div>
+            <div class="cp-meter-mark" style="bottom:80%"></div>
+            <div class="cp-meter-mark cp-meter-mark--critical" style="bottom:90%"></div>
+          </div>
+          <div class="cp-gauge-value">2.52 <span class="unit">kW</span></div>
+          <span class="gauge-name">Array output</span>
+        </div>
+      </div>
+      <div class="ds-variant-label">Vertical meter — fills upward</div>
+    </div>
+    <div class="ds-variant">
+      <div class="ds-variant-stage" style="background:var(--cp-color-void)">
+        <div class="gauge-col">
+          <div class="cp-meter cp-meter--v cp-meter--inverted" style="--pct:63%">
+            <div class="cp-meter-fill"></div>
+            <div class="cp-meter-mark" style="top:80%"></div>
+            <div class="cp-meter-mark cp-meter-mark--critical" style="top:90%"></div>
+          </div>
+          <div class="cp-gauge-value">2.52 <span class="unit">kW</span></div>
+          <span class="gauge-name">Array output</span>
+        </div>
+      </div>
+      <div class="ds-variant-label">Inverted vertical meter — fills downward</div>
+    </div>
+    <div class="ds-variant">
+      <div class="ds-variant-stage" style="background:var(--cp-color-void)">
+        <div class="gauge-col">
+          <div class="cp-meter cp-meter--h" style="--pct:63%">
+            <div class="cp-meter-fill"></div>
+            <div class="cp-meter-mark" style="left:80%"></div>
+            <div class="cp-meter-mark cp-meter-mark--critical" style="left:90%"></div>
+          </div>
+          <div class="cp-gauge-value">2.52 <span class="unit">kW</span></div>
+          <span class="gauge-name">Array output</span>
+        </div>
+      </div>
+      <div class="ds-variant-label">Horizontal meter</div>
+    </div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">cp-gauge</code> is one component with a <code class="ds-code-inline">form</code> input selecting the five renderings; dials draw inline SVG (not chart.js), meters are DOM (<code class="ds-code-inline">.cp-meter</code>). Values update via OnPush change detection at telemetry rate.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C08-L2-03.01 &middot; five gauge forms</span>
+  </div>
+
+  <h2 id="states">Gauge states<a class="ds-anchor" href="#states">#</a></h2>
+  <p>
+    When the value enters a limit band the <strong>fill itself</strong> changes to the violated
+    severity, paired with a direction glyph and a label — never color alone (OMCT-C08-L2-03.03,
+    OMCT-C06-L2-04.03). Stale telemetry renders the value italic in stale ink with the history
+    glyph (OMCT-C06-L2-04.04).
+  </p>
+  <div class="ds-variants" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+    <div class="ds-variant">
+      <div class="ds-variant-stage" style="background:var(--cp-color-void)">
+        <div class="gauge-col">
+          <div class="cp-meter cp-meter--h" style="--pct:63%">
+            <div class="cp-meter-fill"></div>
+            <div class="cp-meter-mark" style="left:80%"></div>
+            <div class="cp-meter-mark cp-meter-mark--critical" style="left:90%"></div>
+          </div>
+          <div class="cp-gauge-value">2.52 <span class="unit">kW</span></div>
+        </div>
+      </div>
+      <div class="ds-variant-label">Nominal — primary fill</div>
+    </div>
+    <div class="ds-variant">
+      <div class="ds-variant-stage" style="background:var(--cp-color-void)">
+        <div class="gauge-col">
+          <div class="cp-meter cp-meter--h is-limit-caution-state" style="--pct:86%">
+            <div class="cp-meter-fill"></div>
+            <div class="cp-meter-mark" style="left:80%"></div>
+            <div class="cp-meter-mark cp-meter-mark--critical" style="left:90%"></div>
+          </div>
+          <div class="cp-gauge-value">3.44 <span class="unit">kW</span> <span style="color:var(--cp-color-caution)">▲</span></div>
+          <span class="gauge-name" style="color:var(--cp-color-caution)">Caution high</span>
+        </div>
+      </div>
+      <div class="ds-variant-label">Caution — fill + ▲ + label</div>
+    </div>
+    <div class="ds-variant">
+      <div class="ds-variant-stage" style="background:var(--cp-color-void)">
+        <div class="gauge-col">
+          <div class="cp-meter cp-meter--h is-limit-critical-state" style="--pct:96%">
+            <div class="cp-meter-fill"></div>
+            <div class="cp-meter-mark" style="left:80%"></div>
+            <div class="cp-meter-mark cp-meter-mark--critical" style="left:90%"></div>
+          </div>
+          <div class="cp-gauge-value">3.84 <span class="unit">kW</span> <span style="color:var(--cp-color-critical)">▲</span></div>
+          <span class="gauge-name" style="color:var(--cp-color-critical)">Critical high</span>
+        </div>
+      </div>
+      <div class="ds-variant-label">Critical — fill + ▲ + label</div>
+    </div>
+    <div class="ds-variant">
+      <div class="ds-variant-stage" style="background:var(--cp-color-void)">
+        <div class="gauge-col">
+          <div class="cp-meter cp-meter--h" style="--pct:63%">
+            <div class="cp-meter-fill" style="background:var(--cp-color-stale);opacity:.55"></div>
+            <div class="cp-meter-mark" style="left:80%"></div>
+            <div class="cp-meter-mark cp-meter-mark--critical" style="left:90%"></div>
+          </div>
+          <div class="cp-gauge-value is-stale">2.52 <span class="unit">kW</span> <svg class="cp-icon cp-icon--s" style="width:14px;height:14px"><use href="#i-history"/></svg></div>
+          <span class="gauge-name">Stale — 42 s old</span>
+        </div>
+      </div>
+      <div class="ds-variant-label">Stale — italic + history glyph</div>
+    </div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C08-L2-03.03 &middot; gauge limit states</span>
+    <span class="ds-req">OMCT-C06-L2-04.03 &middot; limit colors</span>
+    <span class="ds-req">OMCT-C06-L2-04.04 &middot; stale styling</span>
+  </div>
+
+  <h2 id="limit-source">Where limits come from<a class="ds-anchor" href="#limit-source">#</a></h2>
+  <p>
+    A gauge's scale and bands are configured one of two ways (OMCT-C08-L2-03.02) — the rendering
+    is identical either way, so the operator never needs to know which is in effect.
+  </p>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Source</th><th>Behavior</th></tr></thead>
+    <tbody>
+      <tr><td>Manual bounds</td><td>Min, max, and caution/critical thresholds entered in the gauge's properties form. Used when telemetry metadata carries no range definitions.</td></tr>
+      <tr><td>Telemetry-derived</td><td>Min/max and limit bands read from the telemetry point's metadata limit definitions; the gauge re-scales automatically when the dictionary updates.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C08-L2-03.02 &middot; manual vs telemetry limits</span>
+  </div>
+
+  <h2 id="condition-widget">Condition widget<a class="ds-anchor" href="#condition-widget">#</a></h2>
+  <p>
+    A condition widget is a stylable box showing the label of its condition set's active output
+    (OMCT-C10-L2-02.02). Background, border, and text restyle per output via
+    <a href="#cond-styles">conditional styles</a>. When a URL is configured the widget becomes a
+    click target, marked with the external-link glyph.
+  </p>
+  <div class="ds-variants" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr))">
+    <div class="ds-variant">
+      <div class="ds-variant-stage" style="background:var(--cp-color-void)">
+        <div class="condw condw--ok">Battery heater on</div>
+      </div>
+      <div class="ds-variant-label">Output "ON" — ok styling</div>
+    </div>
+    <div class="ds-variant">
+      <div class="ds-variant-stage" style="background:var(--cp-color-void)">
+        <div class="condw condw--caution"><svg class="cp-icon cp-icon--s"><use href="#i-alert-triangle"/></svg>Heater duty high</div>
+      </div>
+      <div class="ds-variant-label">Output "DUTY HIGH" — caution styling</div>
+    </div>
+    <div class="ds-variant">
+      <div class="ds-variant-stage" style="background:var(--cp-color-void)">
+        <div class="condw condw--critical"><svg class="cp-icon cp-icon--s"><use href="#i-alert-circle"/></svg>Heater fault</div>
+      </div>
+      <div class="ds-variant-label">Output "FAULT" — critical styling</div>
+    </div>
+    <div class="ds-variant">
+      <div class="ds-variant-stage" style="background:var(--cp-color-void)">
+        <div class="condw condw--ok condw--url" role="link" tabindex="0">Battery heater on<svg class="cp-icon condw-link"><use href="#i-external"/></svg></div>
+      </div>
+      <div class="ds-variant-label">URL set — click opens the procedure</div>
+    </div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C10-L2-02.02 &middot; condition widget</span>
+  </div>
+
+  <h2 id="summary-widget">Summary widget &amp; rules editor<a class="ds-anchor" href="#summary-widget">#</a></h2>
+  <p>
+    A summary widget rolls several telemetry points into one icon + label + color, driven by an
+    ordered rule list (OMCT-C10-L2-02.03). Each rule picks an icon, a color from the status
+    vocabulary, and a scope — whether a <em>single</em> point, <em>any</em>, or <em>all</em> of
+    them must match (OMCT-C10-L2-02.04). Rules evaluate top-down; the first match wins.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start;gap:32px">
+      <div class="gauge-col" style="flex:none">
+        <div class="condw condw--caution"><svg class="cp-icon cp-icon--s"><use href="#i-alert-triangle"/></svg>Power margin low</div>
+        <span class="gauge-name">Live output</span>
+      </div>
+      <div style="flex:1;min-width:420px">
+        <div class="cp-pane">
+          <div class="cp-pane-head"><svg class="cp-icon"><use href="#i-widget"/></svg>Summary widget — rules<span style="margin-left:auto"></span><button class="cp-btn cp-btn--tonal cp-btn--small"><svg class="cp-icon"><use href="#i-plus"/></svg>Add rule</button></div>
+          <div class="cp-pane-body">
+            <div class="rule-row">
+              <svg class="cp-icon cp-icon--s cond-grip"><use href="#i-grip"/></svg>
+              <span class="rule-name">Power margin critical</span>
+              <select class="cp-select" aria-label="Rule icon"><option>alert-circle</option><option>alert-triangle</option><option>check-circle</option></select>
+              <button class="mini-sw" style="background:var(--cp-color-critical)" aria-label="Rule color: critical"></button>
+              <select class="cp-select" aria-label="Rule scope"><option>all telemetry</option><option>any telemetry</option><option>single point</option></select>
+              <button class="cp-icon-btn cp-icon-btn--s" aria-label="Delete rule"><svg class="cp-icon cp-icon--s"><use href="#i-trash"/></svg></button>
+            </div>
+            <div class="rule-row">
+              <svg class="cp-icon cp-icon--s cond-grip"><use href="#i-grip"/></svg>
+              <span class="rule-name">Power margin low</span>
+              <select class="cp-select" aria-label="Rule icon"><option>alert-triangle</option><option>alert-circle</option><option>check-circle</option></select>
+              <button class="mini-sw" style="background:var(--cp-color-caution)" aria-label="Rule color: caution"></button>
+              <select class="cp-select" aria-label="Rule scope"><option>any telemetry</option><option>all telemetry</option><option>single point</option></select>
+              <button class="cp-icon-btn cp-icon-btn--s" aria-label="Delete rule"><svg class="cp-icon cp-icon--s"><use href="#i-trash"/></svg></button>
+            </div>
+            <div class="rule-row">
+              <svg class="cp-icon cp-icon--s cond-grip"><use href="#i-grip"/></svg>
+              <span class="rule-name">Nominal</span>
+              <select class="cp-select" aria-label="Rule icon"><option>check-circle</option><option>alert-triangle</option><option>alert-circle</option></select>
+              <button class="mini-sw" style="background:var(--cp-color-ok)" aria-label="Rule color: ok"></button>
+              <select class="cp-select" aria-label="Rule scope"><option>single point</option><option>any telemetry</option><option>all telemetry</option></select>
+              <button class="cp-icon-btn cp-icon-btn--s" aria-label="Delete rule"><svg class="cp-icon cp-icon--s"><use href="#i-trash"/></svg></button>
+            </div>
+            <hr class="cp-divider">
+            <fieldset class="cp-fieldset" style="max-width:none">
+              <legend>Test data</legend>
+              <label class="cp-switch is-on"><span class="cp-switch-track"></span>Use test values</label>
+              <div style="display:flex;gap:16px;flex-wrap:wrap">
+                <div class="cp-field" style="width:170px">
+                  <label class="cp-field-label">pwr.margin_kw</label>
+                  <span class="cp-input-wrap"><input class="cp-input cp-input--data" value="0.4"><span class="cp-affix">kW</span></span>
+                  <span class="cp-field-help"></span>
+                </div>
+                <div class="cp-field" style="width:170px">
+                  <label class="cp-field-label">pwr.bus_v</label>
+                  <span class="cp-input-wrap"><input class="cp-input cp-input--data" value="29.8"><span class="cp-affix">V</span></span>
+                  <span class="cp-field-help"></span>
+                </div>
+              </div>
+              <span class="cp-field-help"><svg class="cp-icon cp-icon--s"><use href="#i-info"/></svg>Preview only — the widget above re-evaluates live against these values; switching off restores live telemetry.</span>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">With test values applied (margin 0.4 kW) the "Power margin low" rule matches first, so the widget shows the caution icon + label. Rule colors come from the status vocabulary — icons and labels always accompany them.</div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C10-L2-02.03 &middot; summary widget</span>
+    <span class="ds-req">OMCT-C10-L2-02.04 &middot; rule scopes</span>
+    <span class="ds-req">OMCT-C10-L2-02.05 &middot; test data</span>
+  </div>
+
+  <h2 id="condition-set">Condition set editor<a class="ds-anchor" href="#condition-set">#</a></h2>
+  <p>
+    A condition set evaluates an ordered list of conditions against telemetry and emits the output
+    of the <strong>first condition that is true</strong> (OMCT-C10-L2-01.01/01.02). Each condition
+    triggers when ANY or ALL of its criteria match (01.03) and names the output value it produces
+    (01.04). An old-data criterion fires when telemetry exceeds an age interval (01.05); the
+    default condition at the bottom catches everything else (01.06).
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--block" style="padding:20px">
+      <div class="cp-pane">
+        <div class="cp-pane-head"><svg class="cp-icon"><use href="#i-condition"/></svg>Condition set — batt2 heater control<span style="margin-left:auto"></span><span class="cp-editing-badge" style="height:18px;padding:0 8px">Editing</span><button class="cp-btn cp-btn--tonal cp-btn--small" style="margin-left:8px"><svg class="cp-icon"><use href="#i-plus"/></svg>Add condition</button></div>
+        <div class="cp-pane-body">
+
+          <div class="cond">
+            <div class="cond-head">
+              <svg class="cp-icon cp-icon--s cond-grip" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cond-name">Overtemp cutoff</span>
+              <span class="cond-when">when <select class="cp-select" style="height:24px;width:auto;font:var(--cp-type-body-s)"><option>ALL</option><option>ANY</option></select> of:</span>
+              <span class="cond-out">output <span class="cp-chip">OFF</span></span>
+            </div>
+            <div class="cond-body">
+              <div class="crit-row">
+                <select class="cp-select"><option>tcs.batt2_t</option><option>pwr.bus_v</option></select>
+                <select class="cp-select"><option>is greater than</option><option>is less than</option><option>is equal to</option><option>is older than</option></select>
+                <span class="cp-input-wrap" style="width:96px"><input class="cp-input cp-input--data" value="24.0"><span class="cp-affix">°C</span></span>
+              </div>
+              <button class="cp-btn cp-btn--text cp-btn--small"><svg class="cp-icon"><use href="#i-plus"/></svg>Add criterion</button>
+            </div>
+          </div>
+
+          <div class="cond is-active">
+            <div class="cond-head">
+              <svg class="cp-icon cp-icon--s cond-grip" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cond-name">Cold battery — heater on</span>
+              <span class="active-badge">Active</span>
+              <span class="cond-when">when <select class="cp-select" style="height:24px;width:auto;font:var(--cp-type-body-s)"><option>ALL</option><option>ANY</option></select> of:</span>
+              <span class="cond-out">output <span class="cp-chip is-selected">ON</span></span>
+            </div>
+            <div class="cond-body">
+              <div class="crit-row">
+                <select class="cp-select"><option>tcs.batt2_t</option><option>pwr.bus_v</option></select>
+                <select class="cp-select"><option>is less than</option><option>is greater than</option><option>is equal to</option><option>is older than</option></select>
+                <span class="cp-input-wrap" style="width:96px"><input class="cp-input cp-input--data" value="21.0"><span class="cp-affix">°C</span></span>
+              </div>
+              <div class="crit-row">
+                <select class="cp-select"><option>pwr.bus_v</option><option>tcs.batt2_t</option></select>
+                <select class="cp-select"><option>is greater than</option><option>is less than</option><option>is equal to</option><option>is older than</option></select>
+                <span class="cp-input-wrap" style="width:96px"><input class="cp-input cp-input--data" value="29.0"><span class="cp-affix">V</span></span>
+              </div>
+              <button class="cp-btn cp-btn--text cp-btn--small"><svg class="cp-icon"><use href="#i-plus"/></svg>Add criterion</button>
+            </div>
+          </div>
+
+          <div class="cond">
+            <div class="cond-head">
+              <svg class="cp-icon cp-icon--s cond-grip" aria-label="Drag to reorder"><use href="#i-grip"/></svg>
+              <span class="cond-name">Stale telemetry</span>
+              <span class="cond-when">when <select class="cp-select" style="height:24px;width:auto;font:var(--cp-type-body-s)"><option>ANY</option><option>ALL</option></select> of:</span>
+              <span class="cond-out">output <span class="cp-chip">OFF</span></span>
+            </div>
+            <div class="cond-body">
+              <div class="crit-row">
+                <select class="cp-select"><option>tcs.batt2_t</option><option>pwr.bus_v</option></select>
+                <select class="cp-select"><option>is older than</option><option>is greater than</option><option>is less than</option></select>
+                <input class="cp-input cp-input--data" value="30" style="width:64px">
+                <select class="cp-select"><option>seconds</option><option>minutes</option></select>
+              </div>
+            </div>
+          </div>
+
+          <div class="cond" style="background:var(--cp-color-surface-1)">
+            <div class="cond-head">
+              <svg class="cp-icon cp-icon--s" style="color:var(--cp-color-ink-disabled)"><use href="#i-grip"/></svg>
+              <span class="cond-name" style="color:var(--cp-color-ink-2)">Default</span>
+              <span class="cond-when">when no condition above is true</span>
+              <span class="cond-out">output <span class="cp-chip">OFF</span></span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">First-true-wins: battery temp 20.6 °C and bus 29.8 V make "Cold battery" the first true condition — it highlights in primary (a selection, not a status) and the set outputs ON. Rows drag-reorder by the grip; the default condition is fixed at the bottom and cannot be removed.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>CDK drag-drop over a reactive <code class="ds-code-inline">FormArray</code>; criteria evaluate via <code class="ds-code-inline">combineLatest</code> over telemetry observables, and the active-condition index is a signal that drives the badge, the widget label, and conditional styles.</span>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C10-L2-01.01/.02 &middot; ordered conditions</span>
+    <span class="ds-req">OMCT-C10-L2-01.03 &middot; ANY/ALL trigger</span>
+    <span class="ds-req">OMCT-C10-L2-01.04 &middot; output values</span>
+    <span class="ds-req">OMCT-C10-L2-01.05 &middot; old-data criterion</span>
+    <span class="ds-req">OMCT-C10-L2-01.06 &middot; default condition</span>
+  </div>
+
+  <h2 id="cond-styles">Conditional styles panel<a class="ds-anchor" href="#cond-styles">#</a></h2>
+  <p>
+    Any stylable object bound to a condition set gets a style row per output: background, border,
+    and text color, edited in the inspector (OMCT-C10-L2-02.01). The master switch disables all
+    conditional styling without discarding the rows.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <div class="cp-pane" style="width:400px">
+        <div class="cp-pane-head"><svg class="cp-icon"><use href="#i-pencil"/></svg>Inspector — Conditional styles</div>
+        <div class="cp-pane-body" style="display:flex;flex-direction:column;gap:12px">
+          <label class="cp-switch is-on"><span class="cp-switch-track"></span>Use conditional styling</label>
+          <div class="styles-grid">
+            <span class="h">Condition</span><span class="h">BG</span><span class="h">Border</span><span class="h">Text</span><span class="h">Preview</span>
+
+            <span class="n">Cold battery — heater on</span>
+            <button class="mini-sw" style="background:var(--cp-color-ok-dim)" aria-label="Background"></button>
+            <button class="mini-sw" style="background:var(--cp-color-ok)" aria-label="Border"></button>
+            <button class="mini-sw" style="background:var(--cp-color-ok)" aria-label="Text"></button>
+            <span class="style-prev" style="background:var(--cp-color-ok-dim);border-color:var(--cp-color-ok-border);color:var(--cp-color-ok)">ON</span>
+
+            <span class="n">Overtemp cutoff</span>
+            <button class="mini-sw" style="background:var(--cp-color-critical-dim)" aria-label="Background"></button>
+            <button class="mini-sw" style="background:var(--cp-color-critical)" aria-label="Border"></button>
+            <button class="mini-sw" style="background:var(--cp-color-critical)" aria-label="Text"></button>
+            <span class="style-prev" style="background:var(--cp-color-critical-dim);border-color:var(--cp-color-critical-border);color:var(--cp-color-critical)">OFF</span>
+
+            <span class="n">Stale telemetry / Default</span>
+            <button class="mini-sw" style="background:var(--cp-color-surface-2)" aria-label="Background"></button>
+            <button class="mini-sw" style="background:var(--cp-color-line)" aria-label="Border"></button>
+            <button class="mini-sw" style="background:var(--cp-color-ink-2)" aria-label="Text"></button>
+            <span class="style-prev" style="background:var(--cp-color-surface-2);border-color:var(--cp-color-line);color:var(--cp-color-ink-2)">OFF</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Swatches open the palette popup — status dims for backgrounds, status hues for borders, ink tokens for text. The preview cell renders the composed style live.</div>
+  </div>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C10-L2-02.01 &middot; conditional styles</span>
+    <span class="ds-req">OMCT-C08-L2-03.01–03.03 &middot; gauges</span>
+    <span class="ds-req">OMCT-C10-L2-01.01–01.06 &middot; condition sets</span>
+    <span class="ds-req">OMCT-C10-L2-02.01–02.05 &middot; widgets</span>
+    <span class="ds-req">OMCT-C06-L2-04.03/.04 &middot; limit &amp; stale styling</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="dashboard.html"><span class="dir">Previous</span>&larr; Layouts &amp; dashboards</a>
+    <a href="imagery.html"><span class="dir">Next</span>Imagery &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Time conductor — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<style>
+/* patterns/time-conductor — page-scoped composite styles */
+.tc-error-strip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 14px;
+  background: var(--cp-color-surface-2);
+  border-top: 1px solid var(--cp-color-hairline);
+  font: var(--cp-type-caption);
+  color: var(--cp-color-critical);
+}
+.tc-cal {
+  width: 268px;
+  background: var(--cp-color-surface-3);
+  border: 1px solid var(--cp-color-line);
+  border-radius: var(--cp-radius-m);
+  box-shadow: var(--cp-shadow-2);
+  padding: var(--cp-space-4);
+}
+.tc-cal-head { display: flex; align-items: center; margin-bottom: var(--cp-space-3); }
+.tc-cal-title { flex: 1; text-align: center; font: 500 13px/18px var(--cp-font-mono); color: var(--cp-color-ink); }
+.tc-cal-grid { display: grid; grid-template-columns: repeat(7, 32px); gap: 2px; justify-content: center; }
+.tc-dow {
+  font: var(--cp-type-overline); text-transform: uppercase; letter-spacing: var(--cp-tracking-caps);
+  color: var(--cp-color-ink-3);
+  text-align: center; line-height: 22px; font-size: 10px;
+}
+.tc-day {
+  height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  font: var(--cp-type-data-s);
+  color: var(--cp-color-ink-2);
+  border-radius: var(--cp-radius-s);
+  cursor: pointer;
+}
+.tc-day:hover { background: var(--cp-color-surface-hover); color: var(--cp-color-ink); }
+.tc-day.is-muted { color: var(--cp-color-ink-disabled); }
+.tc-day.is-today { box-shadow: inset 0 0 0 1px var(--cp-color-primary-border); color: var(--cp-color-ink); }
+.tc-day.is-selected { background: var(--cp-color-primary); color: var(--cp-color-ink-inverse); font-weight: 500; }
+.tc-time-row { display: flex; align-items: center; gap: 4px; }
+.tc-time-row .cp-input { width: 44px; height: var(--cp-size-control-s); text-align: center; padding: 0 4px; }
+.tc-frame {
+  width: 560px; max-width: 100%;
+  background: var(--cp-color-surface-1);
+  border: 1px solid var(--cp-color-primary-border);
+  box-shadow: 0 0 0 1px var(--cp-color-primary-border);
+  border-radius: var(--cp-radius-m);
+  overflow: hidden;
+}
+.tc-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 22px; padding: 0 var(--cp-space-3);
+  border-radius: var(--cp-radius-s);
+  background: var(--cp-color-primary-dim);
+  border: 1px solid var(--cp-color-primary-border);
+  color: var(--cp-color-primary);
+  font: var(--cp-type-overline); text-transform: uppercase; letter-spacing: var(--cp-tracking-caps);
+}
+.tc-strip {
+  display: flex; align-items: center; gap: var(--cp-space-3);
+  height: 32px; padding: 0 var(--cp-space-4);
+  background: var(--cp-color-surface-2);
+  border-bottom: 1px solid var(--cp-color-hairline);
+  font: var(--cp-type-data-s);
+}
+.tc-bigtime {
+  font: 500 30px/36px var(--cp-font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--cp-color-ink);
+}
+.tc-overline {
+  font: var(--cp-type-overline); text-transform: uppercase;
+  letter-spacing: var(--cp-tracking-caps); color: var(--cp-color-ink-3);
+}
+</style>
+</head>
+<body data-page="patterns/time-conductor" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Patterns</p>
+  <h1>Time conductor</h1>
+  <p class="ds-lead">
+    One bar governs what every telemetry view shows: the active time system, the visible
+    bounds, and the mode — fixed bounds or bounds that follow a clock. The conductor shows
+    the controls for whichever mode is active (OMCT-C05-L2-04.01) and mirrors its state
+    into the URL so a shared link reproduces the same window (OMCT-C05-L2-04.03).
+  </p>
+
+  <h2 id="fixed">Fixed mode<a class="ds-anchor" href="#fixed">#</a></h2>
+  <p>
+    Fixed mode means no active clock (OMCT-C05-L2-03.01): the operator states a start and
+    an end, then submits. The time-system select lists only registered systems
+    (OMCT-C05-L2-01.01/.02); each carries its own format — UTC and Duration
+    (OMCT-C05-L2-05.01), Local and ISO (OMCT-C05-L2-05.02). The gray top edge is the
+    fixed-mode signal.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:0">
+      <div class="cp-conductor cp-conductor--fixed">
+        <span class="cp-toggle-group">
+          <button class="cp-btn cp-btn--small" aria-pressed="true">Fixed</button>
+          <button class="cp-btn cp-btn--small" aria-pressed="false">Real-time</button>
+        </span>
+        <select class="cp-select" aria-label="Time system" style="width:96px">
+          <option>UTC</option><option>Local</option><option>ISO</option><option>Duration</option>
+        </select>
+        <span class="cp-input-wrap" style="width:190px">
+          <input class="cp-input cp-input--data" value="2026-07-12 18:00:00.000" aria-label="Start bound">
+          <span class="cp-input-actions"><button class="cp-icon-btn cp-icon-btn--s" aria-label="Pick start date"><svg class="cp-icon cp-icon--s"><use href="#i-calendar"/></svg></button></span>
+        </span>
+        <span style="color:var(--cp-color-ink-3)">&rarr;</span>
+        <span class="cp-input-wrap" style="width:190px">
+          <input class="cp-input cp-input--data" value="2026-07-13 06:00:00.000" aria-label="End bound">
+          <span class="cp-input-actions"><button class="cp-icon-btn cp-icon-btn--s" aria-label="Pick end date"><svg class="cp-icon cp-icon--s"><use href="#i-calendar"/></svg></button></span>
+        </span>
+        <button class="cp-icon-btn cp-icon-btn--s is-active" aria-label="Apply bounds"><svg class="cp-icon"><use href="#i-check"/></svg></button>
+        <span class="cp-toolbar-spacer"></span>
+        <span style="font:var(--cp-type-data-s);color:var(--cp-color-ink-3)">span 12:00:00</span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Fixed-mode conductor: mode toggle, time system, start &rarr; end in the active format (mono), submit. Bounds apply on submit or Enter — never while typing.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">mat-button-toggle-group</code> for the mode, <code class="ds-code-inline">mat-select</code> for time system and clock, custom datetime control (see <a href="../components/form-controls.html#datetime">Form controls</a>). A <code class="ds-code-inline">TimeService</code> exposes signals for system, bounds, mode, and clock, mirroring the TimeAPI event set (OMCT-C05-L2-01.05).</span>
+  </div>
+
+  <h2 id="realtime">Real-time mode<a class="ds-anchor" href="#realtime">#</a></h2>
+  <p>
+    Real-time mode means a registered clock is active (OMCT-C05-L2-03.01/.02). Bounds derive
+    from each tick plus the configured offsets (OMCT-C05-L2-03.03), and the conductor shows
+    the current clock value, updating on every tick (OMCT-C05-L2-04.02). Three clocks ship:
+    local wall clock (OMCT-C05-L2-03.04), remote telemetry clock (OMCT-C05-L2-03.05), and
+    the latest-available-data clock (OMCT-C05-L2-03.06). The green top edge and green mono
+    clock are the live signals.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:0">
+      <div class="cp-conductor cp-conductor--realtime">
+        <span class="cp-toggle-group">
+          <button class="cp-btn cp-btn--small" aria-pressed="false">Fixed</button>
+          <button class="cp-btn cp-btn--small" aria-pressed="true">Real-time</button>
+        </span>
+        <span class="cp-editing-badge" style="background:var(--cp-color-ok-dim);border-color:var(--cp-color-ok-border);color:var(--cp-color-ok)">Real-time</span>
+        <select class="cp-select" aria-label="Clock" style="width:150px">
+          <option>Local clock</option><option>Remote telemetry clock</option><option>LAD clock</option>
+        </select>
+        <span style="color:var(--cp-color-ink-3)">UTC</span>
+        <button class="cp-btn cp-btn--text cp-btn--small" style="font:var(--cp-type-data-s);color:var(--cp-color-ink-2)">&minus;00:30:00</button>
+        <span style="color:var(--cp-color-ink-3)">&rarr;</span>
+        <span class="cp-conductor-clock"><svg class="cp-icon cp-icon--s"><use href="#i-clock"/></svg>2026-07-13 18:22:04.000</span>
+        <span style="color:var(--cp-color-ink-3)">&rarr;</span>
+        <button class="cp-btn cp-btn--text cp-btn--small" style="font:var(--cp-type-data-s);color:var(--cp-color-ink-2)">+00:00:30</button>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Real-time conductor: clock select, start offset &minus;00:30:00, live clock value (green mono, ticks every second), end offset +00:00:30. Offsets are buttons — clicking opens the duration editor.</div>
+  </div>
+
+  <h2 id="validation">Bounds validation<a class="ds-anchor" href="#validation">#</a></h2>
+  <p>
+    A range where end &le; start is rejected, never clamped (OMCT-C05-L2-01.03). The invalid
+    field takes the error treatment, an error line explains, and the previously applied
+    bounds stay in effect until a valid range is submitted (OMCT-C05-L2-04.01).
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:0">
+      <div>
+        <div class="cp-conductor cp-conductor--fixed" style="border-top-color:var(--cp-color-line)">
+          <span class="cp-toggle-group">
+            <button class="cp-btn cp-btn--small" aria-pressed="true">Fixed</button>
+            <button class="cp-btn cp-btn--small" aria-pressed="false">Real-time</button>
+          </span>
+          <select class="cp-select" aria-label="Time system" style="width:96px"><option>UTC</option></select>
+          <span class="cp-input-wrap" style="width:190px">
+            <input class="cp-input cp-input--data" value="2026-07-13 17:52:04.000" aria-label="Start bound">
+            <span class="cp-input-actions"><button class="cp-icon-btn cp-icon-btn--s" aria-label="Pick start date"><svg class="cp-icon cp-icon--s"><use href="#i-calendar"/></svg></button></span>
+          </span>
+          <span style="color:var(--cp-color-ink-3)">&rarr;</span>
+          <span class="cp-input-wrap" style="width:190px">
+            <input class="cp-input cp-input--data" value="2026-07-13 17:22:04.000" aria-label="End bound" aria-invalid="true" style="border-color:var(--cp-color-critical);box-shadow:0 0 0 1px var(--cp-color-critical)">
+            <span class="cp-input-actions"><button class="cp-icon-btn cp-icon-btn--s" aria-label="Pick end date"><svg class="cp-icon cp-icon--s"><use href="#i-calendar"/></svg></button></span>
+          </span>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Apply bounds" disabled><svg class="cp-icon"><use href="#i-check"/></svg></button>
+        </div>
+        <div class="tc-error-strip" role="alert">
+          <svg class="cp-icon cp-icon--s"><use href="#i-alert-circle"/></svg>
+          End must be after start &mdash; bounds not applied; the previous range 17:52:04 &rarr; 18:22:04 remains in effect.
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Rejected range: the end field errors, submit disables, and views keep rendering the last valid bounds (OMCT-C05-L2-01.03, 04.01).</div>
+  </div>
+
+  <h2 id="picker">Date/time picker<a class="ds-anchor" href="#picker">#</a></h2>
+  <p>The calendar buttons open a level-3 popup: month grid with mono day numbers, plus hour/minute/second fields. Today wears an outline; the selected day fills primary. Days outside the month are dimmed but clickable.</p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="padding:32px">
+      <div class="tc-cal" role="dialog" aria-label="Pick date and time">
+        <div class="tc-cal-head">
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Previous month"><svg class="cp-icon cp-icon--s"><use href="#i-chevron-left"/></svg></button>
+          <span class="tc-cal-title">July 2026</span>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Next month"><svg class="cp-icon cp-icon--s"><use href="#i-chevron-right"/></svg></button>
+        </div>
+        <div class="tc-cal-grid">
+          <span class="tc-dow">Su</span><span class="tc-dow">Mo</span><span class="tc-dow">Tu</span><span class="tc-dow">We</span><span class="tc-dow">Th</span><span class="tc-dow">Fr</span><span class="tc-dow">Sa</span>
+          <span class="tc-day is-muted">28</span><span class="tc-day is-muted">29</span><span class="tc-day is-muted">30</span><span class="tc-day">1</span><span class="tc-day">2</span><span class="tc-day">3</span><span class="tc-day">4</span>
+          <span class="tc-day">5</span><span class="tc-day">6</span><span class="tc-day">7</span><span class="tc-day">8</span><span class="tc-day">9</span><span class="tc-day">10</span><span class="tc-day">11</span>
+          <span class="tc-day is-selected" aria-selected="true">12</span><span class="tc-day is-today" title="Today">13</span><span class="tc-day">14</span><span class="tc-day">15</span><span class="tc-day">16</span><span class="tc-day">17</span><span class="tc-day">18</span>
+          <span class="tc-day">19</span><span class="tc-day">20</span><span class="tc-day">21</span><span class="tc-day">22</span><span class="tc-day">23</span><span class="tc-day">24</span><span class="tc-day">25</span>
+          <span class="tc-day">26</span><span class="tc-day">27</span><span class="tc-day">28</span><span class="tc-day">29</span><span class="tc-day">30</span><span class="tc-day">31</span><span class="tc-day is-muted">1</span>
+        </div>
+        <hr class="cp-divider" style="margin:10px 0">
+        <div class="tc-time-row">
+          <span class="tc-overline" style="margin-right:auto">Time</span>
+          <input class="cp-input cp-input--data" value="18" aria-label="Hours">
+          <span style="color:var(--cp-color-ink-3)">:</span>
+          <input class="cp-input cp-input--data" value="00" aria-label="Minutes">
+          <span style="color:var(--cp-color-ink-3)">:</span>
+          <input class="cp-input cp-input--data" value="00" aria-label="Seconds">
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="cp-btn cp-btn--text cp-btn--small">Now</button>
+          <span style="flex:1"></span>
+          <button class="cp-btn cp-btn--filled cp-btn--small">Set</button>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Selected day 12 filled primary; today (13) outlined. Time fields are mono; Set writes back into the bound field in the active time-system format.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Custom CDK-overlay popup, not <code class="ds-code-inline">mat-datepicker</code> — bounds need seconds precision and time-system-aware formatting/parsing from the registered format (OMCT-C05-L2-05.01/.02).</span>
+  </div>
+
+  <h2 id="independent">Independent time conductor<a class="ds-anchor" href="#independent">#</a></h2>
+  <p>
+    Views use the global time context unless an object in their path owns an independent one
+    (OMCT-C05-L2-02.01/.02). A view running on its own time gets the out-of-sync treatment:
+    a primary-border outline around the whole frame, a clock badge in its header, and a
+    per-view conductor strip. Descendants without their own context follow the nearest
+    ancestor's independent context (OMCT-C05-L2-02.03) — a plot inside this frame ticks with
+    the frame, not with the global conductor.
+  </p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="padding:32px">
+      <div class="tc-frame">
+        <div class="tc-strip" style="font:var(--cp-type-body)">
+          <svg class="cp-icon cp-icon--s" style="color:var(--cp-color-primary)"><use href="#i-plot"/></svg>
+          <strong>Boom camera temps</strong>
+          <span style="flex:1"></span>
+          <span class="tc-badge"><svg class="cp-icon" style="width:12px;height:12px"><use href="#i-clock"/></svg>Independent</span>
+        </div>
+        <div class="tc-strip">
+          <label class="cp-switch is-on" style="font:var(--cp-type-body-s)"><span class="cp-switch-track"></span>Independent time</label>
+          <span class="cp-toolbar-sep"></span>
+          <span class="cp-toggle-group" style="height:24px">
+            <button class="cp-btn cp-btn--small" style="height:22px;font-size:11px" aria-pressed="false">Fixed</button>
+            <button class="cp-btn cp-btn--small" style="height:22px;font-size:11px" aria-pressed="true">Real-time</button>
+          </span>
+          <span style="color:var(--cp-color-ink-2)">&minus;00:05:00</span>
+          <span style="color:var(--cp-color-ink-3)">&rarr;</span>
+          <span style="color:var(--cp-color-ok)">18:22:04</span>
+          <span style="color:var(--cp-color-ink-2)">+00:00:00</span>
+        </div>
+        <div style="height:130px;background:var(--cp-color-void)">
+          <svg width="100%" height="100%" viewBox="0 0 560 130" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 33h560M0 65h560M0 98h560M112 0v130M224 0v130M336 0v130M448 0v130" stroke="var(--cp-chart-grid)" stroke-width="1"/>
+            <polyline points="0,86 56,80 112,84 168,68 224,52 280,44 336,50 392,40 448,55 504,63 560,58" fill="none" stroke="var(--cp-chart-3)" stroke-width="2"/>
+          </svg>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 14px;border-top:1px solid var(--cp-color-hairline);font:var(--cp-type-caption);color:var(--cp-color-ink-3)">
+          <svg class="cp-icon" style="width:12px;height:12px"><use href="#i-info"/></svg>
+          This view ignores global time &mdash; bounds come from its own real-time clock.
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Independent conductor ON: primary-border outline + clock badge (never violet — this is not edit mode). Switching the toggle OFF snaps the view back to the global context.</div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span>Hierarchical DI mirrors the context tree: a frame with independent time provides its own <code class="ds-code-inline">TimeContext</code>; descendants inject the nearest provider, so ancestor inheritance (OMCT-C05-L2-02.03) is the injector walk.</span>
+  </div>
+
+  <h2 id="toi">Time of interest<a class="ds-anchor" href="#toi">#</a></h2>
+  <p>Clicking a plot or table row sets the time of interest: a vertical crosshair with a mono timestamp flag, synchronized across every view on the same context. New bounds that exclude the marked time clear it (OMCT-C05-L2-01.04).</p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:24px">
+      <div style="position:relative;height:170px;border:1px solid var(--cp-color-hairline);border-radius:var(--cp-radius-s);background:var(--cp-color-void);overflow:hidden">
+        <svg width="100%" height="100%" viewBox="0 0 640 170" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 42h640M0 85h640M0 128h640M128 0v170M256 0v170M384 0v170M512 0v170" stroke="var(--cp-chart-grid)" stroke-width="1"/>
+          <polyline points="0,120 64,112 128,116 192,96 256,74 320,60 384,66 448,54 512,78 576,92 640,86" fill="none" stroke="var(--cp-chart-1)" stroke-width="2"/>
+        </svg>
+        <div style="position:absolute;top:0;bottom:0;left:68%;width:1px;background:var(--cp-color-primary)"></div>
+        <div style="position:absolute;top:0;bottom:0;left:calc(68% - 4px);width:9px;cursor:col-resize"></div>
+        <div style="position:absolute;left:68%;top:44%;width:7px;height:7px;border-radius:50%;background:var(--cp-color-primary);transform:translate(-50%,-50%)"></div>
+        <span style="position:absolute;top:6px;left:68%;transform:translateX(-50%);display:inline-flex;align-items:center;gap:5px;padding:2px 8px;background:var(--cp-color-surface-3);border:1px solid var(--cp-color-primary-border);border-radius:var(--cp-radius-s);font:var(--cp-type-data-s);color:var(--cp-color-ink)">
+          <svg class="cp-icon" style="width:11px;height:11px;color:var(--cp-color-primary)"><use href="#i-crosshair"/></svg>2026-07-13 18:12:31.250
+        </span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Time-of-interest crosshair with mono timestamp flag. Panning or re-bounding past it clears the marker (OMCT-C05-L2-01.04); no orphaned flags.</div>
+  </div>
+
+  <h2 id="clock-timer">Clock &amp; Timer objects<a class="ds-anchor" href="#clock-timer">#</a></h2>
+  <p>
+    Clocks and timers are also domain objects with views. A Clock displays per its
+    configuration — timezone, 12/24-hour, format (OMCT-C05-L2-05.03). A Timer counts up or
+    down from a target through started, paused, and stopped states (OMCT-C05-L2-05.04);
+    legacy timer properties migrate on load (OMCT-C05-L2-05.05).
+  </p>
+  <div class="ds-variants" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr))">
+    <div class="ds-variant" style="display:flex;flex-direction:column">
+      <div class="ds-variant-stage" style="flex:1;flex-direction:column;gap:4px">
+        <span class="tc-overline">Station clock &middot; UTC</span>
+        <span class="tc-bigtime">18:22:04</span>
+        <span style="font:var(--cp-type-data-s);color:var(--cp-color-ink-3)">2026-07-13 &middot; 24-hour</span>
+      </div>
+      <div class="ds-variant-label">Clock — timezone + 24-hour config</div>
+    </div>
+    <div class="ds-variant" style="display:flex;flex-direction:column">
+      <div class="ds-variant-stage" style="flex:1;flex-direction:column;gap:6px">
+        <span class="tc-overline">EVA-2 elapsed</span>
+        <span class="tc-bigtime">+02:14:36</span>
+        <span style="display:inline-flex;gap:4px">
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Pause timer"><svg class="cp-icon cp-icon--s"><use href="#i-pause"/></svg></button>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Restart timer"><svg class="cp-icon cp-icon--s"><use href="#i-refresh"/></svg></button>
+          <button class="cp-btn cp-btn--text cp-btn--small">Stop</button>
+        </span>
+      </div>
+      <div class="ds-variant-label">Timer — started (counting up)</div>
+    </div>
+    <div class="ds-variant" style="display:flex;flex-direction:column">
+      <div class="ds-variant-stage" style="flex:1;flex-direction:column;gap:6px">
+        <span class="tc-overline">EVA-2 elapsed</span>
+        <span class="tc-bigtime" style="color:var(--cp-color-ink-2)">+02:14:36</span>
+        <span style="display:inline-flex;gap:4px">
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Resume timer"><svg class="cp-icon cp-icon--s"><use href="#i-play"/></svg></button>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Restart timer"><svg class="cp-icon cp-icon--s"><use href="#i-refresh"/></svg></button>
+          <button class="cp-btn cp-btn--text cp-btn--small">Stop</button>
+        </span>
+      </div>
+      <div class="ds-variant-label">Timer — paused (value frozen, ink-2)</div>
+    </div>
+    <div class="ds-variant" style="display:flex;flex-direction:column">
+      <div class="ds-variant-stage" style="flex:1;flex-direction:column;gap:6px">
+        <span class="tc-overline">EVA-2 elapsed</span>
+        <span class="tc-bigtime" style="color:var(--cp-color-ink-3)">00:00:00</span>
+        <span style="display:inline-flex;gap:4px">
+          <button class="cp-btn cp-btn--tonal cp-btn--small"><svg class="cp-icon"><use href="#i-play"/></svg>Start</button>
+        </span>
+      </div>
+      <div class="ds-variant-label">Timer — stopped (reset to zero)</div>
+    </div>
+  </div>
+  <p style="font:var(--cp-type-caption);color:var(--cp-color-ink-3);max-width:720px">Timer values are large mono with an explicit sign — count-up shows <code class="ds-code-inline">+</code>, countdown to target shows <code class="ds-code-inline">&minus;</code>. Start/Pause/Restart are icon actions; Stop is a labeled text button (no square glyph in the icon set — the word is clearer).</p>
+
+  <h2 id="url">URL reflection<a class="ds-anchor" href="#url">#</a></h2>
+  <p>Global mode, time system, and bounds or offsets synchronize with URL search parameters (OMCT-C05-L2-04.03). Reloading or sharing the link reproduces the exact time window; independent per-view contexts are persisted with their object, not in the URL.</p>
+  <pre class="ds-code"><span class="cmt">// Fixed: absolute bounds travel in the URL</span>
+#/browse/mine/station-displays/solar-array-output
+    ?tc.mode=fixed&amp;tc.timeSystem=utc
+    &amp;tc.startBound=1783879200000&amp;tc.endBound=1783922400000
+
+<span class="cmt">// Real-time: the clock key and offsets travel, not bounds</span>
+#/browse/mine/station-displays/solar-array-output
+    ?tc.mode=local&amp;tc.timeSystem=utc
+    &amp;tc.startDelta=1800000&amp;tc.endDelta=30000</pre>
+
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C05-L2-01.01/.02 &middot; time systems</span>
+    <span class="ds-req">OMCT-C05-L2-01.03 &middot; bounds validation</span>
+    <span class="ds-req">OMCT-C05-L2-01.04 &middot; time of interest</span>
+    <span class="ds-req">OMCT-C05-L2-02.01&ndash;.03 &middot; independent contexts</span>
+    <span class="ds-req">OMCT-C05-L2-03.01&ndash;.03 &middot; modes &amp; offsets</span>
+    <span class="ds-req">OMCT-C05-L2-03.04&ndash;.06 &middot; clocks</span>
+    <span class="ds-req">OMCT-C05-L2-04.01/.02 &middot; conductor controls</span>
+    <span class="ds-req">OMCT-C05-L2-04.03 &middot; URL sync</span>
+    <span class="ds-req">OMCT-C05-L2-05.01/.02 &middot; time formats</span>
+    <span class="ds-req">OMCT-C05-L2-05.03&ndash;.05 &middot; clock &amp; timer objects</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="shell.html"><span class="dir">Previous</span>&larr; Application shell</a>
+    <a href="plots.html"><span class="dir">Next</span>Plots &amp; charts &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

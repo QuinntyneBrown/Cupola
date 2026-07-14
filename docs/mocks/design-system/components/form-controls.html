@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Form controls — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body data-page="components/form-controls" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Components</p>
+  <h1>Form controls</h1>
+  <p class="ds-lead">
+    The form API registers eleven default control types (OMCT-C15-L2-04.01): text, textarea, number,
+    select, autocomplete, datetime, checkbox, toggle switch, file input, locator, and composite.
+    Type-driven Create and Edit Properties dialogs assemble forms from these controls
+    (OMCT-C03-L2-01.01), so each one is specified with every state here.
+  </p>
+
+  <h2 id="anatomy">Field anatomy &amp; states<a class="ds-anchor" href="#anatomy">#</a></h2>
+  <p>Every control sits in the same wrapper: label above (4px gap), control, helper line below (4px gap, 14px reserved). Inputs sit on the <code class="ds-code-inline">void</code> surface so they read as wells.</p>
+  <div class="ds-variants">
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="cp-field" style="width:180px"><label class="cp-field-label">Title</label><input class="cp-input" placeholder="Unnamed object"><span class="cp-field-help"></span></div></div><div class="ds-variant-label">Empty + placeholder</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="cp-field" style="width:180px"><label class="cp-field-label">Title <span class="req">*</span></label><input class="cp-input" style="border-color:var(--cp-color-primary);box-shadow:0 0 0 1px var(--cp-color-primary)" value="Fuel farm"><span class="cp-field-help">Required</span></div></div><div class="ds-variant-label">Focused · required</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="cp-field is-error" style="width:180px"><label class="cp-field-label">Sample size</label><input class="cp-input" value="-3"><span class="cp-field-help"><svg class="cp-icon cp-icon--s"><use href="#i-alert-circle"/></svg>Enter a value of 1 or more</span></div></div><div class="ds-variant-label">Error</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="cp-field" style="width:180px"><label class="cp-field-label">Type</label><input class="cp-input" value="Overlay Plot" disabled><span class="cp-field-help"></span></div></div><div class="ds-variant-label">Disabled</div></div>
+    <div class="ds-variant"><div class="ds-variant-stage"><div class="cp-field" style="width:180px"><label class="cp-field-label">Created by</label><input class="cp-input" value="j.reyes" readonly><span class="cp-field-help">Read-only — object is locked</span></div></div><div class="ds-variant-label">Read-only (OMCT-C03-L2-02.06)</div></div>
+  </div>
+  <div class="ds-ng"><span class="ds-ng-label">Angular</span>
+    <span><code class="ds-code-inline">mat-form-field appearance="outline"</code>, density &minus;2, <code class="ds-code-inline">subscriptSizing="fixed"</code> so error lines don't shift layout. Errors bind to reactive-form validators.</span>
+  </div>
+
+  <h2 id="text">Text, textarea, number<a class="ds-anchor" href="#text">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <div class="cp-field" style="width:220px">
+        <label class="cp-field-label">Name <span class="req">*</span></label>
+        <input class="cp-input" value="Battery temp — bank 2">
+        <span class="cp-field-help">Shown in the tree and headers</span>
+      </div>
+      <div class="cp-field" style="width:220px">
+        <label class="cp-field-label">Notes</label>
+        <textarea class="cp-textarea">Watch after eclipse exit; sensor 4 reads 0.3° high.</textarea>
+        <span class="cp-field-help"></span>
+      </div>
+      <div class="cp-field" style="width:150px">
+        <label class="cp-field-label">Update rate</label>
+        <span class="cp-input-wrap">
+          <input class="cp-input cp-input--data" value="1.0" inputmode="decimal">
+          <span class="cp-affix">Hz</span>
+        </span>
+        <span class="cp-field-help">0.1 – 60</span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Numeric values render in mono with the unit as a trailing affix; min/max in the helper line.</div>
+  </div>
+
+  <h2 id="select">Select &amp; autocomplete<a class="ds-anchor" href="#select">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <div class="cp-field" style="width:200px">
+        <label class="cp-field-label">Time system</label>
+        <select class="cp-select"><option>UTC</option><option>Local</option><option>Mission elapsed</option></select>
+        <span class="cp-field-help"></span>
+      </div>
+      <div class="cp-field" style="width:240px">
+        <label class="cp-field-label">Telemetry source</label>
+        <span class="cp-input-wrap">
+          <svg class="cp-icon cp-icon--s cp-icon--lead"><use href="#i-search"/></svg>
+          <input class="cp-input" value="pwr.">
+        </span>
+        <span class="cp-field-help">Type to search indexed objects</span>
+      </div>
+      <div class="cp-menu" style="width:240px;margin-top:20px">
+        <button class="cp-menu-item"><svg class="cp-icon"><use href="#i-telemetry"/></svg><span><b style="color:var(--cp-color-primary)">pwr.</b>array_out</span></button>
+        <button class="cp-menu-item is-focus"><svg class="cp-icon"><use href="#i-telemetry"/></svg><span><b style="color:var(--cp-color-primary)">pwr.</b>bus_v</span></button>
+        <button class="cp-menu-item"><svg class="cp-icon"><use href="#i-telemetry"/></svg><span><b style="color:var(--cp-color-primary)">pwr.</b>pdu2_current</span></button>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Autocomplete panel is a level-3 menu; matched substring highlights in accent. Material: mat-select / mat-autocomplete.</div>
+  </div>
+
+  <h2 id="datetime">Datetime<a class="ds-anchor" href="#datetime">#</a></h2>
+  <p>Conductor bounds, plan windows, and export ranges share one control: a mono text input in the active time-system format with a calendar trigger. Invalid ranges (end &le; start) reject with an error, never silently clamp (OMCT-C05-L2-04.01).</p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <div class="cp-field" style="width:250px">
+        <label class="cp-field-label">Start (UTC)</label>
+        <span class="cp-input-wrap">
+          <input class="cp-input cp-input--data" value="2026-07-13 17:52:04.000">
+          <span class="cp-input-actions"><button class="cp-icon-btn cp-icon-btn--s" aria-label="Pick date"><svg class="cp-icon cp-icon--s"><use href="#i-calendar"/></svg></button></span>
+        </span>
+        <span class="cp-field-help">YYYY-MM-DD HH:mm:ss.SSS</span>
+      </div>
+      <div class="cp-field is-error" style="width:250px">
+        <label class="cp-field-label">End (UTC)</label>
+        <span class="cp-input-wrap">
+          <input class="cp-input cp-input--data" value="2026-07-13 17:22:04.000">
+          <span class="cp-input-actions"><button class="cp-icon-btn cp-icon-btn--s" aria-label="Pick date"><svg class="cp-icon cp-icon--s"><use href="#i-calendar"/></svg></button></span>
+        </span>
+        <span class="cp-field-help"><svg class="cp-icon cp-icon--s"><use href="#i-alert-circle"/></svg>End must be after start</span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Bounds validation failure — the invalid field errors and the previous bounds stay in effect.</div>
+  </div>
+
+  <h2 id="choice">Checkbox, radio, toggle switch<a class="ds-anchor" href="#choice">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="gap:40px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <label class="cp-check is-checked"><span class="cp-check-box"><svg class="cp-icon"><use href="#i-check"/></svg></span>Show limit lines</label>
+        <label class="cp-check"><span class="cp-check-box"></span>Show minimap</label>
+        <label class="cp-check is-mixed"><span class="cp-check-box"></span>All columns <span style="color:var(--cp-color-ink-3)">(3 of 5)</span></label>
+        <label class="cp-check is-disabled is-checked"><span class="cp-check-box"><svg class="cp-icon"><use href="#i-check"/></svg></span>Inherited from parent</label>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px" role="radiogroup" aria-label="Trigger">
+        <label class="cp-radio is-checked"><span class="cp-radio-dot"></span>Match any criterion</label>
+        <label class="cp-radio"><span class="cp-radio-dot"></span>Match all criteria</label>
+        <label class="cp-radio is-disabled"><span class="cp-radio-dot"></span>Custom expression</label>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <label class="cp-switch is-on"><span class="cp-switch-track"></span>Independent time</label>
+        <label class="cp-switch"><span class="cp-switch-track"></span>Conditional styling</label>
+        <label class="cp-switch is-disabled"><span class="cp-switch-track"></span>Test data (view only)</label>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Checkbox (with indeterminate), radio group (ANY/ALL trigger — OMCT-C10-L2-01.03), toggle switches.</div>
+  </div>
+
+  <h2 id="slider">Slider<a class="ds-anchor" href="#slider">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="gap:40px">
+      <div class="cp-field" style="width:220px">
+        <label class="cp-field-label">Brightness</label>
+        <div class="cp-slider"><div class="cp-slider-track"></div><div class="cp-slider-fill" style="width:62%"></div><div class="cp-slider-thumb" style="left:62%"></div></div>
+        <span class="cp-field-help" style="justify-content:space-between"><span>0%</span><span style="font:var(--cp-type-data-s);color:var(--cp-color-ink)">124%</span><span>300%</span></span>
+      </div>
+      <div class="cp-field" style="width:220px">
+        <label class="cp-field-label">Contrast (disabled)</label>
+        <div class="cp-slider is-disabled"><div class="cp-slider-track"></div><div class="cp-slider-fill" style="width:33%"></div><div class="cp-slider-thumb" style="left:33%"></div></div>
+        <span class="cp-field-help">Reset restores 100%</span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Imagery filter sliders (OMCT-C11-L2-02.03) — current value in mono above the thumb range.</div>
+  </div>
+
+  <h2 id="file">File input<a class="ds-anchor" href="#file">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <div class="cp-field" style="width:280px">
+        <label class="cp-field-label">Import from JSON</label>
+        <div class="cp-file"><svg class="cp-icon"><use href="#i-upload"/></svg><span>Drop a <code class="ds-code-inline">.json</code> export or <span class="cp-link">browse</span></span></div>
+        <span class="cp-field-help"></span>
+      </div>
+      <div class="cp-field" style="width:280px">
+        <label class="cp-field-label">Selected file</label>
+        <div class="cp-file"><svg class="cp-icon" style="color:var(--cp-color-ok)"><use href="#i-check-circle"/></svg><span class="cp-file-name">station-power.json</span><span style="margin-left:auto;font:var(--cp-type-data-s);color:var(--cp-color-ink-3)">18 KB</span></div>
+        <span class="cp-field-help"></span>
+      </div>
+      <div class="cp-field is-error" style="width:280px">
+        <label class="cp-field-label">Selected file</label>
+        <div class="cp-file" style="border-color:var(--cp-color-critical)"><svg class="cp-icon" style="color:var(--cp-color-critical)"><use href="#i-x-circle"/></svg><span class="cp-file-name">payload.json</span></div>
+        <span class="cp-field-help"><svg class="cp-icon cp-icon--s"><use href="#i-alert-circle"/></svg>File is not a valid export and was rejected</span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Import validation: malformed or unsafe payloads reject without side effects (OMCT-C03-L2-03.06).</div>
+  </div>
+
+  <h2 id="locator">Locator — the "Save In" tree picker<a class="ds-anchor" href="#locator">#</a></h2>
+  <p>Create, Duplicate, Move, Link, and Import all end with the same question: <em>where?</em> The locator embeds the object tree; parents that reject the type by composition policy are disabled, not hidden, so the operator sees why a target is unavailable (OMCT-C02-L2-03.04).</p>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <div class="cp-field" style="width:300px">
+        <label class="cp-field-label">Save In <span class="req">*</span></label>
+        <div class="cp-locator cp-scroll">
+          <div class="cp-tree">
+            <div class="cp-tree-row is-expanded"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-folder"/></svg><span class="cp-tree-label">My Items</span></div>
+            <div class="cp-tree-row is-selected" style="--indent:1"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-folder"/></svg><span class="cp-tree-label">Station displays</span></div>
+            <div class="cp-tree-row is-leaf" style="--indent:1;color:var(--cp-color-ink-disabled)"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph" style="color:var(--cp-color-ink-disabled)"><use href="#i-plot"/></svg><span class="cp-tree-label">Bus voltage (can't contain this type)</span></div>
+          </div>
+        </div>
+        <span class="cp-field-help">My Items / Station displays</span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Selected parent highlighted; ineligible parents disabled with the reason inline.</div>
+  </div>
+
+  <h2 id="composite">Composite groups &amp; color swatches<a class="ds-anchor" href="#composite">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage" style="align-items:flex-start">
+      <fieldset class="cp-fieldset" style="width:320px">
+        <legend>No-data criterion</legend>
+        <label class="cp-check is-checked"><span class="cp-check-box"><svg class="cp-icon"><use href="#i-check"/></svg></span>Trigger when telemetry is older than</label>
+        <div style="display:flex;gap:8px">
+          <input class="cp-input cp-input--data" value="30" style="width:80px">
+          <select class="cp-select" style="width:120px"><option>seconds</option><option>minutes</option></select>
+        </div>
+      </fieldset>
+      <div class="cp-field">
+        <label class="cp-field-label">Series color</label>
+        <div class="cp-swatches">
+          <button class="cp-swatch is-selected" style="background:var(--cp-chart-1)" aria-label="Blue"></button>
+          <button class="cp-swatch" style="background:var(--cp-chart-2)" aria-label="Aqua"></button>
+          <button class="cp-swatch" style="background:var(--cp-chart-3)" aria-label="Yellow"></button>
+          <button class="cp-swatch" style="background:var(--cp-chart-4)" aria-label="Green"></button>
+          <button class="cp-swatch" style="background:var(--cp-chart-5)" aria-label="Violet"></button>
+          <button class="cp-swatch" style="background:var(--cp-chart-6)" aria-label="Red"></button>
+          <button class="cp-swatch" style="background:var(--cp-chart-7)" aria-label="Magenta"></button>
+          <button class="cp-swatch" style="background:var(--cp-chart-8)" aria-label="Orange"></button>
+        </div>
+        <span class="cp-field-help">Chart palette slots only — no free color picking</span>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Composite groups collect related controls (OMCT-C10-L2-01.05); swatch pickers stay inside the validated palette.</div>
+  </div>
+
+  <h2 id="dialog">Assembled: the Create dialog<a class="ds-anchor" href="#dialog">#</a></h2>
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void" style="padding:40px">
+      <div class="cp-dialog" style="position:static">
+        <div class="cp-dialog-head">
+          <svg class="cp-icon" style="color:var(--cp-color-primary)"><use href="#i-plot"/></svg>
+          <h2>Create a new Overlay Plot</h2>
+          <button class="cp-icon-btn cp-icon-btn--s" aria-label="Close"><svg class="cp-icon"><use href="#i-close"/></svg></button>
+        </div>
+        <div class="cp-dialog-body" style="display:flex;flex-direction:column;gap:16px">
+          <div class="cp-banner cp-banner--critical" role="alert">
+            <svg class="cp-icon"><use href="#i-alert-circle"/></svg>
+            <span class="cp-banner-msg"><strong>Couldn't save.</strong> This object changed on the server while you edited. Your values are kept — retry or cancel.</span>
+          </div>
+          <div class="cp-field" style="max-width:none">
+            <label class="cp-field-label">Title <span class="req">*</span></label>
+            <input class="cp-input" value="Array output vs. bus voltage">
+            <span class="cp-field-help"></span>
+          </div>
+          <div class="cp-field" style="max-width:none">
+            <label class="cp-field-label">Notes</label>
+            <textarea class="cp-textarea"></textarea>
+            <span class="cp-field-help"></span>
+          </div>
+          <div class="cp-field" style="max-width:none">
+            <label class="cp-field-label">Save In <span class="req">*</span></label>
+            <div class="cp-locator cp-scroll" style="max-height:120px">
+              <div class="cp-tree">
+                <div class="cp-tree-row is-expanded"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-folder"/></svg><span class="cp-tree-label">My Items</span></div>
+                <div class="cp-tree-row is-selected" style="--indent:1"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-folder"/></svg><span class="cp-tree-label">Station displays</span></div>
+              </div>
+            </div>
+            <span class="cp-field-help"></span>
+          </div>
+        </div>
+        <div class="cp-dialog-foot">
+          <button class="cp-btn cp-btn--text">Cancel</button>
+          <button class="cp-btn cp-btn--filled">Save</button>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Failed-save state: the dialog stays open, the error banner explains, values persist for retry (OMCT-C03-L2-01.05, OMCT-C04-L2-02.07).</div>
+  </div>
+
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C15-L2-04.01 &middot; default controls</span>
+    <span class="ds-req">OMCT-C15-L2-04.02 &middot; custom controls</span>
+    <span class="ds-req">OMCT-C15-L2-04.03 &middot; form presentation</span>
+    <span class="ds-req">OMCT-C03-L2-01.01/.03/.05 &middot; create &amp; edit</span>
+    <span class="ds-req">OMCT-C05-L2-04.01 &middot; bounds validation</span>
+    <span class="ds-req">OMCT-C10-L2-01.03/.05 &middot; triggers</span>
+    <span class="ds-req">OMCT-C11-L2-02.03 &middot; filter sliders</span>
+    <span class="ds-req">OMCT-C03-L2-03.04/.06 &middot; import</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="buttons.html"><span class="dir">Previous</span>&larr; Buttons</a>
+    <a href="menus.html"><span class="dir">Next</span>Menus &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>

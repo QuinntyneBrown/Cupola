@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="assets/docs.css">
+</head>
+<body data-page="index" data-root="">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Cupola &middot; Mission operations frontend</p>
+  <h1>Console-dark design system for flight operations</h1>
+  <p class="ds-lead">
+    Cupola re-implements the Open&nbsp;MCT capability set on Angular. This design system
+    defines every visual element the requirements in <code class="ds-code-inline">docs/specs</code>
+    call for &mdash; tokens, typography, spacing, and complete component mocks &mdash; in a single
+    dark theme built for operators who watch telemetry for hours in dim rooms.
+  </p>
+
+  <!-- Hero: a live-feeling status board built entirely from the system -->
+  <div class="ds-demo">
+    <div class="ds-demo-stage ds-demo-stage--void ds-demo-stage--block" style="padding:0">
+      <div style="display:flex;flex-direction:column">
+        <div class="cp-toolbar">
+          <svg class="cp-icon" style="color:var(--cp-color-primary)"><use href="#i-crosshair"/></svg>
+          <strong style="font:var(--cp-type-title-s)">ISS Power Subsystem</strong>
+          <span class="cp-breadcrumb" style="margin-left:8px">
+            <a href="#">My Items</a><span class="sep">/</span><a href="#">Station</a><span class="sep">/</span><span class="current">Power</span>
+          </span>
+          <span class="cp-toolbar-spacer"></span>
+          <button class="cp-btn cp-btn--tonal"><svg class="cp-icon"><use href="#i-pencil"/></svg>Edit</button>
+          <button class="cp-icon-btn" aria-label="More actions"><svg class="cp-icon"><use href="#i-kebab"/></svg></button>
+        </div>
+        <div style="display:flex;gap:1px;background:var(--cp-color-hairline)">
+          <div style="flex:1.4;background:var(--cp-color-surface-1);padding:16px">
+            <div style="display:flex;gap:24px;flex-wrap:wrap">
+              <div>
+                <div style="font:var(--cp-type-overline);text-transform:uppercase;letter-spacing:.06em;color:var(--cp-color-ink-3)">Solar array output</div>
+                <div class="cp-gauge-value">84.2 <span class="unit">kW</span></div>
+                <span style="display:inline-flex;align-items:center;gap:6px;font:var(--cp-type-caption);color:var(--cp-color-ok)"><span class="cp-dot cp-dot--ok"></span>Nominal</span>
+              </div>
+              <div>
+                <div style="font:var(--cp-type-overline);text-transform:uppercase;letter-spacing:.06em;color:var(--cp-color-ink-3)">Battery temp</div>
+                <div class="cp-gauge-value" style="color:var(--cp-color-caution)">41.7 <span class="unit">&deg;C</span></div>
+                <span style="display:inline-flex;align-items:center;gap:6px;font:var(--cp-type-caption);color:var(--cp-color-caution)"><svg class="cp-icon cp-icon--s"><use href="#i-alert-triangle"/></svg>Caution &middot; high</span>
+              </div>
+              <div>
+                <div style="font:var(--cp-type-overline);text-transform:uppercase;letter-spacing:.06em;color:var(--cp-color-ink-3)">Bus voltage</div>
+                <div class="cp-gauge-value is-stale">120.1 <span class="unit">V</span></div>
+                <span style="display:inline-flex;align-items:center;gap:6px;font:var(--cp-type-caption);color:var(--cp-color-stale)"><svg class="cp-icon cp-icon--s"><use href="#i-history"/></svg>Stale &middot; 00:04:12</span>
+              </div>
+            </div>
+          </div>
+          <div style="flex:1;background:var(--cp-color-surface-1);padding:12px 16px">
+            <table class="cp-table" style="font-variant-numeric:tabular-nums">
+              <tbody>
+                <tr><td>PDU-1 Current</td><td class="num">14.20<span class="unit">A</span></td></tr>
+                <tr><td>PDU-2 Current</td><td class="num is-limit-caution">18.94<span class="unit" style="color:inherit">A</span></td></tr>
+                <tr><td>PDU-3 Current</td><td class="num">12.05<span class="unit">A</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="cp-conductor cp-conductor--realtime">
+          <span class="cp-editing-badge" style="background:var(--cp-color-ok-dim);border-color:var(--cp-color-ok-border);color:var(--cp-color-ok)">Real-time</span>
+          <span style="color:var(--cp-color-ink-3)">UTC</span>
+          <span style="color:var(--cp-color-ink-2)">&minus;00:30:00</span>
+          <span style="color:var(--cp-color-ink-3)">&rarr;</span>
+          <span class="cp-conductor-clock"><svg class="cp-icon cp-icon--s"><use href="#i-clock"/></svg>2026-07-13 18:22:04.000</span>
+          <span style="color:var(--cp-color-ink-2)">+00:00:30</span>
+        </div>
+      </div>
+    </div>
+    <div class="ds-demo-caption">Every element above &mdash; toolbar, breadcrumb, readouts, limit states, staleness, time conductor &mdash; is specified in this system.</div>
+  </div>
+
+  <h2 id="principles">Principles<a class="ds-anchor" href="#principles">#</a></h2>
+  <ul>
+    <li><strong>Status colors are vocabulary, not decoration.</strong> Green, amber, and red are reserved for limit and health semantics. Editing is violet. Selection is cyan. A color is never the only signal &mdash; every state pairs with an icon, a label, or a type change.</li>
+    <li><strong>Data wears mono.</strong> Every telemetry value, timestamp, and coordinate renders in IBM&nbsp;Plex&nbsp;Mono with tabular figures so columns of numbers hold still while they update.</li>
+    <li><strong>Dense by default.</strong> Controls use Material density &minus;2 (32px), telemetry rows are 24px. Operators scan walls of data; whitespace is spent between regions, not inside them.</li>
+    <li><strong>Elevation is light, not shadow.</strong> Layers step from void to surface-3 by getting lighter; shadows appear only under detached layers (menus, dialogs, drag ghosts).</li>
+    <li><strong>Motion is mechanical.</strong> 80&ndash;240ms, one standard easing, nothing bounces. <code class="ds-code-inline">prefers-reduced-motion</code> zeroes transitions.</li>
+  </ul>
+
+  <h2 id="stack">Implementation stack<a class="ds-anchor" href="#stack">#</a></h2>
+  <p>These mocks are the visual contract for the Angular implementation:</p>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Layer</th><th>Technology</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td>Framework</td><td><code>Angular 17.2.2</code></td><td>Standalone components, signals</td></tr>
+      <tr><td>Components</td><td><code>@angular/material 17</code>, <code>@angular/cdk 17</code></td><td>Custom dark theme (<code>mat.define-dark-theme</code>), density &minus;2; CDK tree, table, overlay, drag-drop</td></tr>
+      <tr><td>Charts</td><td><code>chart.js</code></td><td>Time-series, bar, scatter plots &mdash; tokens in <a href="foundations/color.html">Color</a> and rules in <a href="patterns/plots.html">Plots</a></td></tr>
+      <tr><td>Dashboards</td><td><code>angular-gridster2</code></td><td>Display layout and flexible layout &mdash; see <a href="patterns/dashboard.html">Layouts</a></td></tr>
+      <tr><td>Tokens</td><td><code>assets/tokens.css</code></td><td>Authoritative CSS custom properties consumed by the Material theme</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="foundations">Foundations<a class="ds-anchor" href="#foundations">#</a></h2>
+  <div class="ds-cards">
+    <a class="ds-card" href="foundations/color.html"><svg class="cp-icon"><use href="#i-layers"/></svg><h3>Color</h3><p>Surfaces, ink, status &amp; limit semantics, chart palette &mdash; every pair contrast-checked.</p></a>
+    <a class="ds-card" href="foundations/typography.html"><svg class="cp-icon"><use href="#i-list"/></svg><h3>Typography</h3><p>IBM Plex Sans, Mono, and Condensed &mdash; the full scale with Material level mapping.</p></a>
+    <a class="ds-card" href="foundations/spacing.html"><svg class="cp-icon"><use href="#i-grid"/></svg><h3>Spacing &amp; density</h3><p>4px unit, component metrics, pane paddings, the 10px layout grid.</p></a>
+    <a class="ds-card" href="foundations/elevation.html"><svg class="cp-icon"><use href="#i-copy"/></svg><h3>Elevation &amp; shape</h3><p>Surface layers, hairlines, shadows, radii, focus treatment.</p></a>
+    <a class="ds-card" href="foundations/iconography.html"><svg class="cp-icon"><use href="#i-star"/></svg><h3>Iconography</h3><p>The stroke icon set: object glyphs, action icons, status glyphs.</p></a>
+    <a class="ds-card" href="foundations/motion.html"><svg class="cp-icon"><use href="#i-activity"/></svg><h3>Motion</h3><p>Durations, easing, and where animation is allowed to exist.</p></a>
+  </div>
+
+  <h2 id="components">Components<a class="ds-anchor" href="#components">#</a></h2>
+  <div class="ds-cards">
+    <a class="ds-card" href="components/buttons.html"><svg class="cp-icon"><use href="#i-plus"/></svg><h3>Buttons</h3><p>Filled, tonal, outlined, text, danger; icon buttons; toggle groups.</p></a>
+    <a class="ds-card" href="components/form-controls.html"><svg class="cp-icon"><use href="#i-pencil"/></svg><h3>Form controls</h3><p>All eleven registered control types with every field state.</p></a>
+    <a class="ds-card" href="components/menus.html"><svg class="cp-icon"><use href="#i-kebab"/></svg><h3>Menus</h3><p>Context menus, the Create super menu, action applicability states.</p></a>
+    <a class="ds-card" href="components/toolbars-tabs.html"><svg class="cp-icon"><use href="#i-tabs"/></svg><h3>Toolbars &amp; tabs</h3><p>App bar, view toolbars, the edit-mode state, tab strips.</p></a>
+    <a class="ds-card" href="components/tree.html"><svg class="cp-icon"><use href="#i-folder"/></svg><h3>Object tree</h3><p>Navigation tree with alias, lock, missing, and drag states.</p></a>
+    <a class="ds-card" href="components/tables.html"><svg class="cp-icon"><use href="#i-table"/></svg><h3>Tables</h3><p>Telemetry table, LAD table, limit and stale cells, filters, export.</p></a>
+    <a class="ds-card" href="components/overlays.html"><svg class="cp-icon"><use href="#i-expand"/></svg><h3>Dialogs &amp; overlays</h3><p>Dialog sizes, progress, confirmation, notifications, tooltips.</p></a>
+    <a class="ds-card" href="components/indicators.html"><svg class="cp-icon"><use href="#i-bell"/></svg><h3>Indicators &amp; chips</h3><p>Status bar, connection states, badges, tags, operator status.</p></a>
+    <a class="ds-card" href="components/cards-panels.html"><svg class="cp-icon"><use href="#i-layout"/></svg><h3>Panes &amp; panels</h3><p>Pane anatomy, inspector sections, property lists, empty states.</p></a>
+  </div>
+
+  <h2 id="patterns">Patterns<a class="ds-anchor" href="#patterns">#</a></h2>
+  <div class="ds-cards">
+    <a class="ds-card" href="patterns/shell.html"><svg class="cp-icon"><use href="#i-columns"/></svg><h3>Application shell</h3><p>Tree pane, main view, inspector, status bar &mdash; the full frame.</p></a>
+    <a class="ds-card" href="patterns/time-conductor.html"><svg class="cp-icon"><use href="#i-clock"/></svg><h3>Time conductor</h3><p>Fixed and real-time modes, bounds editing, independent conductors.</p></a>
+    <a class="ds-card" href="patterns/plots.html"><svg class="cp-icon"><use href="#i-plot"/></svg><h3>Plots &amp; charts</h3><p>Overlay, stacked, bar, scatter; legends, limits, chart.js config.</p></a>
+    <a class="ds-card" href="patterns/dashboard.html"><svg class="cp-icon"><use href="#i-layout"/></svg><h3>Layouts &amp; dashboards</h3><p>Display layout edit mode, flexible layout, tabs view, gridster.</p></a>
+    <a class="ds-card" href="patterns/gauges.html"><svg class="cp-icon"><use href="#i-gauge"/></svg><h3>Gauges &amp; widgets</h3><p>All five gauge forms, condition widget, summary widget.</p></a>
+    <a class="ds-card" href="patterns/imagery.html"><svg class="cp-icon"><use href="#i-image"/></svg><h3>Imagery</h3><p>Focused image, thumbnail strip, layers, compass, annotations.</p></a>
+    <a class="ds-card" href="patterns/timeline.html"><svg class="cp-icon"><use href="#i-timeline"/></svg><h3>Plans &amp; timelines</h3><p>Activity swimlanes, time strip, event tracks, time list.</p></a>
+    <a class="ds-card" href="patterns/notebook.html"><svg class="cp-icon"><use href="#i-notebook"/></svg><h3>Notebook</h3><p>Entries, snapshots, tags, annotations, restricted notebooks.</p></a>
+  </div>
+
+  <h2 id="traceability">Requirement traceability<a class="ds-anchor" href="#traceability">#</a></h2>
+  <p>
+    Each component section lists the <code class="ds-code-inline">OMCT-Cxx-L2-nn.nn</code> requirement
+    identifiers it satisfies, drawn from the sixteen capability specs. Accessibility targets come from
+    C16: WCAG&nbsp;2&nbsp;AA with zero axe violations, full keyboard operability, and no color-only state
+    signaling. Text ink holds &ge;4.5:1 against every surface; status hues hold &ge;3:1 as fills and are
+    always paired with a glyph or label.
+  </p>
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C16-L2-03.01 &middot; WCAG 2 AA</span>
+    <span class="ds-req">OMCT-C16-L2-03.02 &middot; visual a11y coverage</span>
+    <span class="ds-req">OMCT-C16-L2-03.04 &middot; tablet &amp; phone viewports</span>
+    <span class="ds-req">OMCT-C15-L2-05.02 &middot; installable theme</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <span></span>
+    <a href="foundations/color.html"><span class="dir">Next</span>Color &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="assets/docs.js" defer></script>
+</body>
+</html>

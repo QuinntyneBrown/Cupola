@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spacing &amp; density — Cupola Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/tokens.css">
+<link rel="stylesheet" href="../assets/components.css">
+<link rel="stylesheet" href="../assets/docs.css">
+<style>
+  .sp-bar { background: var(--cp-color-primary-dim); border: 1px solid var(--cp-color-primary-border); border-radius: 2px; height: 20px; }
+  .sp-row { display: grid; grid-template-columns: 120px 90px 1fr; gap: 16px; align-items: center; padding: 6px 0; }
+  .sp-row .lbl { font: var(--cp-type-data-s); color: var(--cp-color-primary); }
+  .sp-row .use { font: var(--cp-type-body-s); color: var(--cp-color-ink-3); }
+  .redline-box { position: relative; display: inline-block; padding: 28px 40px; }
+  .redline-note { font: var(--cp-type-data-s); color: var(--cp-color-caution); }
+</style>
+</head>
+<body data-page="foundations/spacing" data-root="../">
+<header class="ds-topbar" id="ds-topbar"></header>
+<div class="ds-shell">
+<nav class="ds-sidenav" id="ds-sidenav" aria-label="Design system sections"></nav>
+<main class="ds-content">
+
+  <p class="ds-eyebrow">Foundations</p>
+  <h1>Spacing &amp; density</h1>
+  <p class="ds-lead">
+    A 4px base unit and Material density &minus;2. Operators scan walls of data, so space lives
+    <em>between</em> regions (panes, sections, dialogs), not inside controls. Telemetry rows compress
+    to 24px; chrome rows hold 32px.
+  </p>
+
+  <h2 id="scale">Spacing scale<a class="ds-anchor" href="#scale">#</a></h2>
+  <div class="ds-demo"><div class="ds-demo-stage ds-demo-stage--block">
+    <div class="sp-row"><span class="lbl">--cp-space-1 &middot; 2px</span><span class="sp-bar" style="width:2px"></span><span class="use">icon-to-badge gaps</span></div>
+    <div class="sp-row"><span class="lbl">--cp-space-2 &middot; 4px</span><span class="sp-bar" style="width:4px"></span><span class="use">chip padding-y, menu padding, tight inline gaps</span></div>
+    <div class="sp-row"><span class="lbl">--cp-space-3 &middot; 8px</span><span class="sp-bar" style="width:8px"></span><span class="use">default inline gap, cell padding-y, control gaps</span></div>
+    <div class="sp-row"><span class="lbl">--cp-space-4 &middot; 12px</span><span class="sp-bar" style="width:12px"></span><span class="use">control padding-x, dense pane padding</span></div>
+    <div class="sp-row"><span class="lbl">--cp-space-5 &middot; 16px</span><span class="sp-bar" style="width:16px"></span><span class="use">pane padding, form row gap</span></div>
+    <div class="sp-row"><span class="lbl">--cp-space-6 &middot; 20px</span><span class="sp-bar" style="width:20px"></span><span class="use">section gap within a card</span></div>
+    <div class="sp-row"><span class="lbl">--cp-space-7 &middot; 24px</span><span class="sp-bar" style="width:24px"></span><span class="use">dialog padding, card padding</span></div>
+    <div class="sp-row"><span class="lbl">--cp-space-8 &middot; 32px</span><span class="sp-bar" style="width:32px"></span><span class="use">block separation</span></div>
+    <div class="sp-row"><span class="lbl">--cp-space-9 &middot; 40px</span><span class="sp-bar" style="width:40px"></span><span class="use">page section separation</span></div>
+    <div class="sp-row"><span class="lbl">--cp-space-10 &middot; 64px</span><span class="sp-bar" style="width:64px"></span><span class="use">page top/bottom padding</span></div>
+  </div></div>
+
+  <h2 id="metrics">Component metrics<a class="ds-anchor" href="#metrics">#</a></h2>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Token</th><th>Value</th><th>Applies to</th></tr></thead>
+    <tbody>
+      <tr><td><code>--cp-size-control</code></td><td>32px</td><td>Buttons, inputs, selects (Material density &minus;2)</td></tr>
+      <tr><td><code>--cp-size-control-s</code></td><td>28px</td><td>Toolbar buttons, conductor inputs, table filter inputs</td></tr>
+      <tr><td><code>--cp-size-row</code></td><td>32px</td><td>Tree rows, menu items, chrome table rows</td></tr>
+      <tr><td><code>--cp-size-row-dense</code></td><td>24px</td><td>Telemetry table rows, autoflow rows, LAD rows</td></tr>
+      <tr><td><code>--cp-size-icon</code> / <code>--cp-size-icon-s</code></td><td>20 / 16px</td><td>Default and inline icons</td></tr>
+      <tr><td><code>--cp-size-toolbar</code></td><td>40px</td><td>App/view toolbar height</td></tr>
+      <tr><td><code>--cp-size-pane-head</code></td><td>32px</td><td>Pane and expansion-panel headers</td></tr>
+      <tr><td><code>--cp-size-statusbar</code></td><td>28px</td><td>Indicator bar</td></tr>
+      <tr><td><code>--cp-size-conductor</code></td><td>48px</td><td>Time conductor bar</td></tr>
+      <tr><td><code>--cp-layout-grid</code></td><td>10px</td><td>Display-layout snap grid (edit mode)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="redline">Control anatomy redlines<a class="ds-anchor" href="#redline">#</a></h2>
+  <div class="ds-demo"><div class="ds-demo-stage" style="gap:64px;padding:48px">
+    <!-- Button redline -->
+    <div style="text-align:center">
+      <div style="display:inline-flex;flex-direction:column;align-items:center;gap:6px">
+        <span class="redline-note">height 32</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="cp-btn cp-btn--filled"><svg class="cp-icon"><use href="#i-plus"/></svg>Create</button>
+        </div>
+        <span class="redline-note">pad-x 12 &middot; gap 6 &middot; icon 16 &middot; radius 3</span>
+      </div>
+    </div>
+    <!-- Field redline -->
+    <div style="text-align:center">
+      <div style="display:inline-flex;flex-direction:column;align-items:center;gap:6px">
+        <span class="redline-note">label &rarr; 4 &rarr; control &rarr; 4 &rarr; helper</span>
+        <div class="cp-field" style="width:220px;text-align:left">
+          <label class="cp-field-label">Title <span class="req">*</span></label>
+          <input class="cp-input" value="Unnamed Display">
+          <span class="cp-field-help">Shown in the object tree</span>
+        </div>
+        <span class="redline-note">height 32 &middot; pad-x 12 &middot; border 1</span>
+      </div>
+    </div>
+    <!-- Row redline -->
+    <div style="text-align:center">
+      <div style="display:inline-flex;flex-direction:column;align-items:center;gap:6px">
+        <span class="redline-note">row 32 &middot; indent 16/level</span>
+        <div style="width:220px;background:var(--cp-color-surface-1);border:1px solid var(--cp-color-hairline);border-radius:6px;padding:4px">
+          <div class="cp-tree">
+            <div class="cp-tree-row is-expanded"><svg class="cp-icon cp-tree-chevron"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-folder"/></svg><span class="cp-tree-label">Station</span></div>
+            <div class="cp-tree-row is-selected" style="--indent:1"><svg class="cp-icon cp-tree-chevron" style="visibility:hidden"><use href="#i-chevron-right"/></svg><svg class="cp-icon cp-tree-glyph"><use href="#i-telemetry"/></svg><span class="cp-tree-label">Power</span></div>
+          </div>
+        </div>
+        <span class="redline-note">chevron 16 &middot; glyph 16 &middot; gap 6</span>
+      </div>
+    </div>
+  </div>
+  <div class="ds-demo-caption">All dimensions in px. Measurements annotate the tokens, not ad-hoc values.</div></div>
+
+  <h2 id="regions">Region padding<a class="ds-anchor" href="#regions">#</a></h2>
+  <div class="ds-table-wrap"><table class="ds-table">
+    <thead><tr><th>Region</th><th>Padding</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Pane body</td><td>12px (dense) / 16px</td><td>Tree pane uses 8px so rows bleed close to the edge</td></tr>
+      <tr><td>Dialog</td><td>24px x, 16&ndash;20px y</td><td>Head/body/foot share the 24px gutter; footer buttons gap 8px</td></tr>
+      <tr><td>Card</td><td>16px</td><td>24px on marketing-free settings surfaces</td></tr>
+      <tr><td>Menu</td><td>4px around items</td><td>Items are full-width 32px rows, radius 3</td></tr>
+      <tr><td>Table cell</td><td>12px x</td><td>Row height carries the y rhythm; no vertical padding tokens in cells</td></tr>
+      <tr><td>Form rows</td><td>16px gap</td><td>Fieldsets group related controls at 12px gap</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="grid">The layout grid<a class="ds-anchor" href="#grid">#</a></h2>
+  <p>
+    Display layouts snap items to a <strong>10px grid</strong> (OMCT-C09-L2-01.03). The grid is only
+    visible in edit mode; it renders as a 6%-alpha line lattice over the void canvas. Gridster panels
+    on dashboards use the same unit for margins (10px gutters).
+  </p>
+  <div class="ds-demo"><div class="ds-demo-stage ds-demo-stage--block" style="padding:0">
+    <div class="cp-editable-canvas" style="height:180px;position:relative">
+      <div class="cp-frame is-selected" style="left:30px;top:30px;width:200px;height:100px">
+        <span class="cp-handle cp-handle--nw"></span><span class="cp-handle cp-handle--n"></span><span class="cp-handle cp-handle--ne"></span>
+        <span class="cp-handle cp-handle--e"></span><span class="cp-handle cp-handle--se"></span><span class="cp-handle cp-handle--s"></span>
+        <span class="cp-handle cp-handle--sw"></span><span class="cp-handle cp-handle--w"></span>
+        <div style="padding:10px;font:var(--cp-type-caption);color:var(--cp-color-ink-3)">Selected frame &middot; snaps at 10px</div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-demo-caption">Edit-mode canvas: 10px snap lattice, violet selection frame with 8px handles.</div></div>
+
+  <div class="ds-reqs">
+    <span class="ds-req">OMCT-C09-L2-01.03 &middot; position/size persistence</span>
+    <span class="ds-req">OMCT-C16-L2-03.04 &middot; mobile viewports</span>
+  </div>
+
+  <div class="ds-pagenav">
+    <a href="typography.html"><span class="dir">Previous</span>&larr; Typography</a>
+    <a href="elevation.html"><span class="dir">Next</span>Elevation &amp; shape &rarr;</a>
+  </div>
+
+</main>
+</div>
+<script src="../assets/docs.js" defer></script>
+</body>
+</html>
