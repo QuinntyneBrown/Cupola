@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.result-row {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-space-3);
+  padding: var(--cp-space-2) var(--cp-space-3);
+  border-radius: var(--cp-radius-s);
+  cursor: pointer;
+}
+
+.result-row:hover,
+.result-row.is-active {
+  background: var(--cp-color-surface-hover);
+}
+
+mark {
+  background: var(--cp-color-primary-dim);
+  color: var(--cp-color-primary);
+  border-radius: 2px;
+}

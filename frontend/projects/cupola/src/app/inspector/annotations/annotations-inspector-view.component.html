@@ -1,0 +1,19 @@
+<div class="inspector-section" data-testid="annotations-inspector">
+  <div class="sh-overline">Annotations</div>
+  @if (annotations().length > 0) {
+    <ul class="annotation-list">
+      @for (annotation of annotations(); track annotation.keyString) {
+        <li class="annotation-row" data-testid="annotation-row">
+          <p class="annotation-text">{{ annotation.text }}</p>
+          <div class="annotation-tags">
+            @for (tag of annotation.tags; track tag) {
+              <span class="cp-chip">{{ tag }}</span>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="empty">No annotations.</p>
+  }
+</div>

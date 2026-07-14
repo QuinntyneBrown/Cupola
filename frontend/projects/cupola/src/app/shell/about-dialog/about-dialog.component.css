@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+.about-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cp-space-5);
+  min-width: 420px;
+}
+
+.tagline {
+  margin: 0;
+  color: var(--cp-color-ink-2);
+}
+
+.about-build {
+  margin: 0;
+}
+
+.about-license {
+  color: var(--cp-color-primary);
+  text-decoration: none;
+}

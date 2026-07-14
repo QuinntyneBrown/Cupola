@@ -1,0 +1,20 @@
+<div class="cp-pane-head">Inspect</div>
+
+<div class="cp-tabs inspector-tabs" role="tablist" aria-label="Inspector views" data-testid="inspector-tabs">
+  @for (view of views(); track view.key) {
+    <button
+      class="cp-tab"
+      role="tab"
+      type="button"
+      [attr.aria-selected]="view.key === activeProvider()?.key"
+      [attr.title]="view.name"
+      [attr.data-key]="view.key"
+      data-testid="inspector-tab"
+      (click)="select(view.key)"
+    >
+      <svg class="cp-icon cp-icon--s"><use [attr.href]="'#' + view.glyph" /></svg>
+    </button>
+  }
+</div>
+
+<div class="cp-scroll inspector-content" #content data-testid="inspector-content"></div>

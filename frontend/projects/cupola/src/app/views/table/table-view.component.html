@@ -1,0 +1,22 @@
+<div class="cp-table-wrap" data-testid="table-view">
+  <table class="cp-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Value</th>
+        <th>Unit</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.keyString) {
+        <tr [attr.data-key]="row.keyString" data-testid="table-row">
+          <td>{{ row.name }}</td>
+          <td class="value">{{ formatValue(row) }}</td>
+          <td>{{ row.unit }}</td>
+          <td>{{ row.timestamp || '—' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

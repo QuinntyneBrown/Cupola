@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.children-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--cp-space-4);
+}
+
+.child-card {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-space-3);
+  padding: var(--cp-space-4);
+  cursor: pointer;
+}
+
+.child-card[s-selected] {
+  outline: 2px solid var(--cp-color-primary);
+  outline-offset: -2px;
+  background: var(--cp-color-primary-dim);
+}
+
+.empty-folder {
+  font: var(--cp-type-body-s);
+  color: var(--cp-color-ink-3);
+}

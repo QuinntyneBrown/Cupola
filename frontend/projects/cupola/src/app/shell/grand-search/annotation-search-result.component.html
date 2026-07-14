@@ -1,0 +1,12 @@
+<span class="result-row" [class.is-active]="active()" data-testid="annotation-result">
+  <svg class="cp-icon cp-icon--s"><use href="#i-flag" /></svg>
+  <span class="result-label">
+    @for (segment of segments(); track $index) {
+      @if (segment.mark) {
+        <mark>{{ segment.text }}</mark>
+      } @else {
+        <span>{{ segment.text }}</span>
+      }
+    }
+  </span>
+</span>

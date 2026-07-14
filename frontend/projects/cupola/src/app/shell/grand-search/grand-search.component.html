@@ -1,0 +1,45 @@
+<div class="grand-search" data-testid="grand-search">
+  <span class="cp-input-wrap search-input-wrap">
+    <svg class="cp-icon cp-icon--s cp-icon--lead"><use href="#i-search" /></svg>
+    <input
+      class="cp-input search-input"
+      type="search"
+      placeholder="Search objects & annotations"
+      data-testid="search-input"
+      [value]="term()"
+      (input)="onInput($event)"
+      (focus)="focused.set(true)"
+      (blur)="onBlur()"
+      (keydown)="onKeydown($event)"
+    />
+  </span>
+
+  @if (open()) {
+    <div class="cp-menu search-results" data-testid="search-results">
+      @if (results().objects.length > 0) {
+        <div class="cp-menu-head">Objects</div>
+        @for (object of results().objects; track object.keyString; let i = $index) {
+          <div (mousedown)="activateAt(i)">
+            <cp-object-search-result
+              [object]="object"
+              [term]="term()"
+              [active]="activeIndex() === i"
+            />
+          </div>
+        }
+      }
+      @if (results().annotations.length > 0) {
+        <div class="cp-menu-head">Annotations</div>
+        @for (annotation of results().annotations; track annotation.keyString; let i = $index) {
+          <div (mousedown)="activateAt(results().objects.length + i)">
+            <cp-annotation-search-result
+              [annotation]="annotation"
+              [term]="term()"
+              [active]="activeIndex() === results().objects.length + i"
+            />
+          </div>
+        }
+      }
+    </div>
+  }
+</div>

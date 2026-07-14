@@ -1,0 +1,16 @@
+[
+  {
+    "keyString": "ann-1",
+    "text": "Observed solar pointing offset during eclipse exit",
+    "targets": ["ops-notebook"],
+    "tags": ["power"],
+    "modified": "2026-07-13T09:12:44Z"
+  },
+  {
+    "keyString": "ann-2",
+    "text": "Bus voltage sag during pass 12",
+    "targets": ["solar-array-output"],
+    "tags": ["power"],
+    "modified": "2026-07-13T09:12:44Z"
+  }
+]

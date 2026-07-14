@@ -1,0 +1,30 @@
+<div class="about" data-testid="about-dialog">
+  <div class="cp-dialog-head">
+    <h2 data-testid="about-title">{{ info()?.appTitle ?? 'Cupola' }}</h2>
+  </div>
+  <div class="cp-dialog-body about-body">
+    @if (info()?.tagline) {
+      <p class="tagline">{{ info()?.tagline }}</p>
+    }
+    @if (info()?.aboutHtml) {
+      <div class="about-html" [innerHTML]="info()!.aboutHtml"></div>
+    }
+    @if (build(); as build) {
+      <dl class="cp-props about-build">
+        <dt>Version</dt>
+        <dd data-testid="about-version">{{ build.version }}</dd>
+        <dt>Build date</dt>
+        <dd>{{ build.buildDate }}</dd>
+        <dt>Revision</dt>
+        <dd data-testid="about-revision">{{ build.revision }}</dd>
+        <dt>Branch</dt>
+        <dd>{{ build.branch }}</dd>
+      </dl>
+    }
+    @if (info()?.licenseUrl) {
+      <a class="about-license" [attr.href]="info()!.licenseUrl" data-testid="about-license">
+        Open-source licenses
+      </a>
+    }
+  </div>
+</div>

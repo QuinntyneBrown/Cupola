@@ -1,0 +1,9 @@
+<textarea
+  class="cp-textarea"
+  rows="3"
+  [attr.placeholder]="control().placeholder"
+  [value]="value() ?? ''"
+  [attr.data-key]="control().key"
+  data-testid="form-control"
+  (input)="onInput($event)"
+></textarea>

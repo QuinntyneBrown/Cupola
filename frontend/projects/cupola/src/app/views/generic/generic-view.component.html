@@ -1,0 +1,10 @@
+<dl class="cp-props generic-view" data-testid="generic-view">
+  <dt>Title</dt>
+  <dd>{{ object().name }}</dd>
+  <dt>Type</dt>
+  <dd>{{ object().type }}</dd>
+  @if (object().createdBy) {
+    <dt>Created by</dt>
+    <dd>{{ object().createdBy }}</dd>
+  }
+</dl>

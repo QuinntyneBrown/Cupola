@@ -1,0 +1,16 @@
+<span class="toolbar-controls" data-testid="toolbar-controls">
+  @for (control of controls(); track control.key) {
+    <button
+      class="cp-icon-btn cp-icon-btn--s"
+      type="button"
+      [attr.aria-pressed]="control.pressed"
+      [attr.aria-label]="control.label"
+      [attr.title]="control.label"
+      [attr.data-key]="control.key"
+      data-testid="toolbar-control"
+      (click)="control.onActivate()"
+    >
+      <svg class="cp-icon"><use [attr.href]="'#' + control.glyph" /></svg>
+    </button>
+  }
+</span>

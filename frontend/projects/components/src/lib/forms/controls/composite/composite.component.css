@@ -1,0 +1,15 @@
+:host {
+  display: block;
+}
+
+.composite {
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-s);
+  padding: var(--cp-space-3);
+}
+
+.composite legend {
+  font: var(--cp-type-caption);
+  color: var(--cp-color-ink-3);
+  padding: 0 var(--cp-space-2);
+}

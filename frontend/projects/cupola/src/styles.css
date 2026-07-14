@@ -1,0 +1,31 @@
+/* Cupola global styles.
+   Design tokens (--cp-*) are provided by the active theme stylesheet, which
+   ThemeService installs as <link data-cp-theme> in the document head. */
+
+@import '@angular/cdk/overlay-prebuilt.css';
+@import './styles/cp-components.css';
+@import './styles/shell.css';
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font: var(--cp-type-body, 400 14px/20px 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif);
+  color: var(--cp-color-ink, #e9edf5);
+  background: var(--cp-color-void, #070a10);
+  -webkit-font-smoothing: antialiased;
+}
+
+cp-root {
+  display: block;
+  height: 100%;
+}
+
+/* Tooltips must never intercept pointer events from the elements below. */
+.cp-tooltip-overlay,
+.cp-tooltip-overlay * {
+  pointer-events: none !important;
+}

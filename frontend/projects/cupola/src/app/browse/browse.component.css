@@ -1,0 +1,48 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.object-toolbar {
+  height: 36px;
+  flex: none;
+  overflow: hidden;
+}
+
+.object-title {
+  font: var(--cp-type-title-s);
+  white-space: nowrap;
+}
+
+.view-host {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--cp-space-4) var(--cp-space-5);
+}
+
+.children-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--cp-space-4);
+}
+
+.child-card {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-space-3);
+  padding: var(--cp-space-4);
+  cursor: pointer;
+}
+
+.child-card[s-selected] {
+  outline: 2px solid var(--cp-color-primary);
+  outline-offset: -2px;
+  background: var(--cp-color-primary-dim);
+}
+
+.object-props {
+  max-width: 480px;
+}

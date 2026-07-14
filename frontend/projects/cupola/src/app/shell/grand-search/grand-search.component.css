@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.grand-search {
+  position: relative;
+}
+
+.search-input-wrap {
+  width: 280px;
+}
+
+.search-input {
+  height: var(--cp-size-control-s);
+}
+
+.search-results {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 320px;
+  max-height: 60vh;
+  overflow-y: auto;
+  z-index: var(--cp-z-menu);
+}

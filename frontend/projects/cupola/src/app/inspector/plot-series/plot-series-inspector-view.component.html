@@ -1,0 +1,10 @@
+<div class="inspector-section" data-testid="plot-series-inspector">
+  <div class="sh-overline">Plot series</div>
+  <div class="series-list">
+    @for (s of series(); track s.keyString) {
+      <span class="series-row">
+        <span class="sh-series-swatch" [style.background]="s.swatch"></span>{{ s.keyString }}
+      </span>
+    }
+  </div>
+</div>

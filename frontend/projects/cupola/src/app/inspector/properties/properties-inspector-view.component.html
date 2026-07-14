@@ -1,0 +1,28 @@
+<div class="inspector-section" data-testid="properties-inspector">
+  <div class="sh-overline">Properties</div>
+  @if (object(); as obj) {
+    <dl class="cp-props">
+      <dt>Title</dt>
+      <dd data-testid="prop-title">{{ obj.name }}</dd>
+      <dt>Type</dt>
+      <dd>{{ obj.type }}</dd>
+      @if (obj.created) {
+        <dt>Created</dt>
+        <dd>{{ obj.created }}</dd>
+      }
+      @if (obj.modified) {
+        <dt>Modified</dt>
+        <dd>{{ obj.modified }}</dd>
+      }
+      @if (obj.createdBy) {
+        <dt>Created by</dt>
+        <dd>{{ obj.createdBy }}</dd>
+      }
+    </dl>
+  } @else {
+    <dl class="cp-props">
+      <dt>Name</dt>
+      <dd>{{ context()!.label }}</dd>
+    </dl>
+  }
+</div>

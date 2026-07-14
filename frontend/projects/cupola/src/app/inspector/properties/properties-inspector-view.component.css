@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+.inspector-section {
+  padding: var(--cp-space-4);
+}
+
+.sh-overline {
+  margin-bottom: var(--cp-space-3);
+}

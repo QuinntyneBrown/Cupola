@@ -1,0 +1,18 @@
+<div class="cp-menu" role="menu" data-testid="menu">
+  @for (item of items(); track item.name) {
+    <button
+      class="cp-menu-item"
+      role="menuitem"
+      type="button"
+      [class.is-disabled]="item.disabled"
+      [attr.aria-disabled]="item.disabled ? 'true' : null"
+      data-testid="menu-item"
+      (click)="select(item)"
+    >
+      @if (item.glyph) {
+        <svg class="cp-icon cp-icon--s"><use [attr.href]="'#' + item.glyph" /></svg>
+      }
+      <span>{{ item.name }}</span>
+    </button>
+  }
+</div>

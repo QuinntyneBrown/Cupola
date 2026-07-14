@@ -1,0 +1,10 @@
+<button
+  class="cp-switch"
+  type="button"
+  role="switch"
+  [attr.aria-checked]="!!value()"
+  [class.is-on]="!!value()"
+  [attr.data-key]="control().key"
+  data-testid="form-control"
+  (click)="toggle()"
+></button>

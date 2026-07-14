@@ -1,0 +1,10 @@
+<div class="inspector-section" data-testid="data-visualization-inspector">
+  <div class="sh-overline">Data visualization</div>
+  @if (object(); as obj) {
+    @if (isImagery()) {
+      <cp-imagery-inspector-view [object]="obj" />
+    } @else {
+      <cp-numeric-inspector-view [object]="obj" />
+    }
+  }
+</div>

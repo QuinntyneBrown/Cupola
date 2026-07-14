@@ -1,0 +1,11 @@
+<div class="inspector-section" data-testid="elements-inspector">
+  <div class="sh-overline">Elements</div>
+  <ul class="element-list">
+    @for (element of elements(); track element.object.keyString) {
+      <li class="element-row">
+        <svg class="cp-icon cp-icon--s"><use [attr.href]="'#' + element.glyph" /></svg>
+        <span>{{ element.object.name }}</span>
+      </li>
+    }
+  </ul>
+</div>

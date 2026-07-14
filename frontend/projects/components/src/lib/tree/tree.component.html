@@ -1,0 +1,9 @@
+@for (entry of rootEntries(); track entry.object.keyString) {
+  <cp-tree-node
+    [object]="entry.object"
+    [path]="entry.path"
+    [selectedPath]="selectedPath()"
+    (activated)="nodeActivated.emit($event)"
+    (contextMenu)="nodeContextMenu.emit($event)"
+  />
+}

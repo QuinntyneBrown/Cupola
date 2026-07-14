@@ -1,0 +1,7 @@
+:host {
+  display: block;
+}
+
+.generic-view {
+  max-width: 480px;
+}

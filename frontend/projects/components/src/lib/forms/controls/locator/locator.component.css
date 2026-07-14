@@ -1,0 +1,9 @@
+:host {
+  display: block;
+}
+
+.locator {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-space-2);
+}

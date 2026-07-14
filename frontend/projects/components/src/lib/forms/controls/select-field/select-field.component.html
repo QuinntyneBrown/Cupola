@@ -1,0 +1,10 @@
+<select
+  class="cp-select"
+  [attr.data-key]="control().key"
+  data-testid="form-control"
+  (change)="onChange($event)"
+>
+  @for (option of control().options ?? []; track option.name) {
+    <option [selected]="isSelected(option.value)">{{ option.name }}</option>
+  }
+</select>

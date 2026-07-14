@@ -1,0 +1,37 @@
+<div
+  class="cp-tree-row"
+  [class.is-selected]="isSelected()"
+  [class.is-expanded]="expanded()"
+  [class.is-leaf]="!hasChildren()"
+  [style.--indent]="depth()"
+  [attr.aria-current]="isSelected() ? 'true' : null"
+  [attr.data-key]="current().keyString"
+  [cpTooltip]="current().name"
+  [cpTooltipData]="current().keyString"
+  data-testid="tree-row"
+  (click)="activate()"
+  (contextmenu)="onContextMenu($event)"
+  tabindex="0"
+>
+  @if (hasChildren()) {
+    <svg class="cp-icon cp-tree-chevron" data-testid="tree-chevron" (click)="toggle($event)">
+      <use href="#i-chevron-right" />
+    </svg>
+  } @else {
+    <span class="cp-tree-chevron"></span>
+  }
+  <svg class="cp-icon cp-tree-glyph"><use [attr.href]="'#' + glyph()" /></svg>
+  <span class="cp-tree-label">{{ current().name }}</span>
+</div>
+
+@if (expanded()) {
+  @for (entry of childEntries(); track entry.object.keyString) {
+    <cp-tree-node
+      [object]="entry.object"
+      [path]="entry.path"
+      [selectedPath]="selectedPath()"
+      (activated)="activated.emit($event)"
+      (contextMenu)="contextMenu.emit($event)"
+    />
+  }
+}

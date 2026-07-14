@@ -1,0 +1,35 @@
+/* ==========================================================================
+   Cupola theme — Espresso (warm dark variant)
+   Overrides the darkmatter token baseline: warm brown-black surfaces and
+   warm ink. All non-overridden tokens fall back to the values declared
+   here; this file is a complete stylesheet (one theme link at a time).
+   ========================================================================== */
+
+@import url('theme-darkmatter.css');
+
+:root {
+  --cp-color-void: #100B08;
+  --cp-color-surface-1: #191210;
+  --cp-color-surface-2: #241A16;
+  --cp-color-surface-3: #30221C;
+  --cp-color-surface-hover: rgba(204, 168, 139, 0.07);
+  --cp-color-surface-active: rgba(204, 168, 139, 0.11);
+  --cp-color-scrim: rgba(10, 6, 4, 0.64);
+
+  --cp-color-hairline: #3a2b23;
+  --cp-color-line: #57402f;
+  --cp-color-line-strong: #745a44;
+
+  --cp-color-ink: #f5efe9;
+  --cp-color-ink-2: #c0b3a7;
+  --cp-color-ink-3: #a99682;
+  --cp-color-ink-disabled: #66584a;
+  --cp-color-ink-inverse: #140e0b;
+
+  --cp-color-primary: #ecb758;
+  --cp-color-primary-hover: #f5c97c;
+  --cp-color-primary-pressed: #e0a53e;
+  --cp-color-primary-dim: rgba(236, 183, 88, 0.14);
+  --cp-color-primary-border: rgba(236, 183, 88, 0.45);
+  --cp-color-focus-ring: #f5c97c;
+}

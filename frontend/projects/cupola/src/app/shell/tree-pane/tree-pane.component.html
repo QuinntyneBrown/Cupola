@@ -1,0 +1,8 @@
+<div class="cp-pane-head">Browse</div>
+<div class="cp-tree cp-scroll tree-body" data-testid="tree">
+  <cp-tree
+    [selectedPath]="selectedPath()"
+    (nodeActivated)="onActivated($event)"
+    (nodeContextMenu)="onContextMenu($event)"
+  />
+</div>

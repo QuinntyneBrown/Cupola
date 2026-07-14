@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.inspector-section {
+  padding: var(--cp-space-4);
+}
+
+.sh-overline {
+  margin-bottom: var(--cp-space-3);
+}
+
+.element-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cp-space-2);
+}
+
+.element-row {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-space-3);
+  font: var(--cp-type-data);
+}

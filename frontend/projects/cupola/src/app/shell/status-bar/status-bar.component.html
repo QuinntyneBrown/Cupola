@@ -1,0 +1,16 @@
+<div class="cp-statusbar" data-testid="status-bar">
+  <span class="cp-indicator cp-indicator--mono">
+    <svg class="cp-icon"><use href="#i-clock" /></svg>
+    {{ clock() }} UTC
+  </span>
+  <button class="cp-indicator" type="button" data-testid="connection-indicator">
+    <span
+      class="cp-dot"
+      [class.cp-dot--ok]="connectionState() === 'connected'"
+      [class.cp-dot--caution]="connectionState() === 'connecting'"
+      [class.cp-dot--critical]="connectionState() === 'disconnected'"
+    ></span>
+    {{ connectionLabel() }}
+  </button>
+  <span class="cp-toolbar-spacer"></span>
+</div>

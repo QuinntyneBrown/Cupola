@@ -1,0 +1,43 @@
+/* ==========================================================================
+   Cupola theme — Snow (light variant)
+   Overrides the darkmatter token baseline with light surfaces and dark ink.
+   ========================================================================== */
+
+@import url('theme-darkmatter.css');
+
+:root {
+  color-scheme: light;
+
+  --cp-color-void: #e8ebf0;
+  --cp-color-surface-1: #f7f8fa;
+  --cp-color-surface-2: #eef1f5;
+  --cp-color-surface-3: #ffffff;
+  --cp-color-surface-hover: rgba(41, 62, 92, 0.06);
+  --cp-color-surface-active: rgba(41, 62, 92, 0.1);
+  --cp-color-scrim: rgba(28, 34, 44, 0.4);
+
+  --cp-color-hairline: #d5dae2;
+  --cp-color-line: #b3bccb;
+  --cp-color-line-strong: #8d99ad;
+
+  --cp-color-ink: #1a202b;
+  --cp-color-ink-2: #4a5568;
+  --cp-color-ink-3: #64748b;
+  --cp-color-ink-disabled: #a8b2c1;
+  --cp-color-ink-inverse: #f7f8fa;
+
+  --cp-color-primary: #1d7fc4;
+  --cp-color-primary-hover: #3593d6;
+  --cp-color-primary-pressed: #166ba8;
+  --cp-color-primary-dim: rgba(29, 127, 196, 0.12);
+  --cp-color-primary-border: rgba(29, 127, 196, 0.45);
+  --cp-color-focus-ring: #1d7fc4;
+
+  --cp-chart-grid: #d5dae2;
+  --cp-chart-axis: #b3bccb;
+  --cp-chart-tick: #64748b;
+
+  --cp-shadow-1: 0 1px 2px rgba(28, 34, 44, 0.14);
+  --cp-shadow-2: 0 4px 12px rgba(28, 34, 44, 0.18);
+  --cp-shadow-3: 0 12px 32px rgba(28, 34, 44, 0.22);
+}

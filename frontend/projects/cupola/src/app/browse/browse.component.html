@@ -1,0 +1,34 @@
+@if (object(); as obj) {
+  <div class="cp-toolbar object-toolbar" data-testid="object-toolbar">
+    <svg class="cp-icon" style="color: var(--cp-color-primary)">
+      <use [attr.href]="'#' + glyph()" />
+    </svg>
+    <strong class="object-title" data-testid="object-title">{{ obj.name }}</strong>
+    <span class="cp-breadcrumb" data-testid="breadcrumb">
+      @for (ancestor of ancestors(); track ancestor.keyString) {
+        <a>{{ ancestor.name }}</a>
+      }
+    </span>
+    <span class="cp-toolbar-spacer"></span>
+    <cp-toolbar-container />
+    <button
+      class="cp-btn cp-btn--tonal cp-btn--small"
+      type="button"
+      data-testid="edit-properties"
+      (click)="editProperties()"
+    >
+      <svg class="cp-icon"><use href="#i-pencil" /></svg>Edit
+    </button>
+    <button
+      class="cp-icon-btn cp-icon-btn--s"
+      type="button"
+      aria-label="Large view"
+      data-testid="expand-view"
+      (click)="expandView()"
+    >
+      <svg class="cp-icon"><use href="#i-expand" /></svg>
+    </button>
+  </div>
+
+  <cp-view-host #viewHost [object]="obj" [objectPath]="objectPath()" />
+}

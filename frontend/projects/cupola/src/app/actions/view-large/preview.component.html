@@ -1,0 +1,13 @@
+@if (object(); as obj) {
+  <div class="preview" data-testid="preview">
+    <div class="cp-dialog-head">
+      <svg class="cp-icon" style="color: var(--cp-color-primary)">
+        <use [attr.href]="'#' + glyph()" />
+      </svg>
+      <h2>{{ obj.name }}</h2>
+    </div>
+    <div class="cp-dialog-body preview-body">
+      <cp-view-host [object]="obj" [objectPath]="objectPath()" />
+    </div>
+  </div>
+}

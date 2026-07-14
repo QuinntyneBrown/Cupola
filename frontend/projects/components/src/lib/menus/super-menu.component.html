@@ -1,0 +1,30 @@
+<div class="cp-supermenu" role="menu" data-testid="super-menu">
+  <div class="cp-menu">
+    @for (item of items(); track item.name) {
+      <button
+        class="cp-menu-item"
+        role="menuitem"
+        type="button"
+        data-testid="super-menu-item"
+        [attr.data-name]="item.name"
+        (pointerenter)="focusItem(item)"
+        (focus)="focusItem(item)"
+        (click)="select(item)"
+      >
+        @if (item.glyph) {
+          <svg class="cp-icon cp-icon--s"><use [attr.href]="'#' + item.glyph" /></svg>
+        }
+        <span>{{ item.name }}</span>
+      </button>
+    }
+  </div>
+  <div class="cp-supermenu-desc" data-testid="super-menu-desc">
+    @if (active(); as item) {
+      @if (item.glyph) {
+        <svg class="cp-icon"><use [attr.href]="'#' + item.glyph" /></svg>
+      }
+      <h4>{{ item.name }}</h4>
+      <p>{{ item.description }}</p>
+    }
+  </div>
+</div>

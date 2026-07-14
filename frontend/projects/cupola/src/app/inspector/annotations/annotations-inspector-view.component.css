@@ -1,0 +1,37 @@
+:host {
+  display: block;
+}
+
+.inspector-section {
+  padding: var(--cp-space-4);
+}
+
+.sh-overline {
+  margin-bottom: var(--cp-space-3);
+}
+
+.annotation-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cp-space-4);
+}
+
+.annotation-text {
+  margin: 0 0 var(--cp-space-2);
+  font: var(--cp-type-body-s);
+  color: var(--cp-color-ink);
+}
+
+.annotation-tags {
+  display: flex;
+  gap: var(--cp-space-2);
+  flex-wrap: wrap;
+}
+
+.empty {
+  font: var(--cp-type-body-s);
+  color: var(--cp-color-ink-3);
+}

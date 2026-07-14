@@ -1,0 +1,10 @@
+<div class="cp-locator locator" [attr.data-key]="control().key" data-testid="form-control">
+  <svg class="cp-icon cp-icon--s"><use href="#i-folder" /></svg>
+  <input
+    class="cp-input"
+    type="text"
+    [attr.placeholder]="control().placeholder ?? 'Location'"
+    [value]="value() ?? ''"
+    (input)="onInput($event)"
+  />
+</div>

@@ -1,0 +1,26 @@
+<form class="cp-form" data-testid="form" (submit)="$event.preventDefault(); save()">
+  <div class="cp-dialog-head">
+    <h2>{{ structure().title }}</h2>
+  </div>
+  <div class="cp-dialog-body form-body">
+    @for (row of structure().rows; track row.key) {
+      <div class="cp-field">
+        <label class="cp-field-label">{{ row.name }}</label>
+        <div class="cp-field-control" #cell [attr.data-row]="row.key"></div>
+      </div>
+    }
+  </div>
+  <div class="cp-dialog-foot">
+    <button class="cp-btn cp-btn--text" type="button" data-testid="form-cancel" (click)="cancel()">
+      Cancel
+    </button>
+    <button
+      class="cp-btn cp-btn--filled"
+      type="submit"
+      data-testid="form-save"
+      [disabled]="!valid()"
+    >
+      Save
+    </button>
+  </div>
+</form>

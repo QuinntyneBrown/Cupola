@@ -1,0 +1,41 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { RealtimeGateway } from '@cupola/core';
+
+@Component({
+  selector: 'cp-status-bar',
+  templateUrl: './status-bar.component.html',
+  styleUrl: './status-bar.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class StatusBarComponent {
+  private readonly realtime = inject(RealtimeGateway);
+
+  protected readonly clock = signal(formatUtc(new Date()));
+  protected readonly connectionState = this.realtime.connectionState;
+  protected readonly connectionLabel = computed(() => {
+    switch (this.connectionState()) {
+      case 'connected':
+        return 'Connected';
+      case 'connecting':
+        return 'Connecting';
+      default:
+        return 'Disconnected';
+    }
+  });
+
+  constructor() {
+    const timer = setInterval(() => this.clock.set(formatUtc(new Date())), 1000);
+    inject(DestroyRef).onDestroy(() => clearInterval(timer));
+  }
+}
+
+function formatUtc(date: Date): string {
+  return date.toISOString().slice(0, 19).replace('T', ' ');
+}

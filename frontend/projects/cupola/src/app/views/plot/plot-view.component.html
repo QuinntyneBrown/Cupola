@@ -1,0 +1,35 @@
+<div class="plot" data-testid="plot-view">
+  <div class="gauges">
+    @for (s of series(); track s.keyString) {
+      <div class="gauge" [attr.data-key]="s.keyString">
+        <div class="sh-overline">{{ s.name }}</div>
+        <div class="cp-gauge-value" data-testid="gauge-value">
+          {{ formatValue(s.latest) }} <span class="unit">{{ s.unit }}</span>
+        </div>
+      </div>
+    }
+    <div class="legend">
+      @for (s of series(); track s.keyString) {
+        <span class="legend-item">
+          <span class="sh-series-swatch" [style.background]="s.swatch"></span>{{ s.keyString }}
+        </span>
+      }
+    </div>
+  </div>
+
+  <div class="chart">
+    <svg width="100%" height="100%" viewBox="0 0 600 240" preserveAspectRatio="none" aria-hidden="true">
+      <path
+        d="M0 48h600M0 96h600M0 144h600M0 192h600M100 0v240M200 0v240M300 0v240M400 0v240M500 0v240"
+        stroke="var(--cp-chart-grid)"
+        stroke-width="1"
+      />
+      <path d="M0 239h600" stroke="var(--cp-chart-axis)" stroke-width="1.5" />
+      @for (line of polylines(); track $index) {
+        @if (line.points) {
+          <polyline [attr.points]="line.points" fill="none" [attr.stroke]="line.swatch" stroke-width="2" />
+        }
+      }
+    </svg>
+  </div>
+</div>

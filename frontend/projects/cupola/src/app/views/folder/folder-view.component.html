@@ -1,0 +1,17 @@
+@if (childEntries().length > 0) {
+  <div class="children-grid" data-testid="children-grid">
+    @for (entry of childEntries(); track entry.object.keyString) {
+      <div
+        class="cp-card child-card"
+        [cpSelectable]="entry.context"
+        [attr.data-key]="entry.object.keyString"
+        data-testid="child-card"
+      >
+        <svg class="cp-icon"><use [attr.href]="'#' + entry.glyph" /></svg>
+        <span>{{ entry.object.name }}</span>
+      </div>
+    }
+  </div>
+} @else {
+  <p class="empty-folder" data-testid="empty-folder">This folder is empty.</p>
+}

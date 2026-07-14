@@ -1,0 +1,15 @@
+<input
+  class="cp-input"
+  type="text"
+  [attr.list]="listId"
+  [attr.placeholder]="control().placeholder"
+  [value]="value() ?? ''"
+  [attr.data-key]="control().key"
+  data-testid="form-control"
+  (input)="onInput($event)"
+/>
+<datalist [id]="listId">
+  @for (option of control().options ?? []; track option.name) {
+    <option [value]="option.name"></option>
+  }
+</datalist>

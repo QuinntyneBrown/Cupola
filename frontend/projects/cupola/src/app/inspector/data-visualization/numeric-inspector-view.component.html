@@ -1,0 +1,10 @@
+<div class="numeric" data-testid="numeric-inspector">
+  <div class="cp-gauge-value" data-testid="numeric-value">
+    {{ formatValue(latest()) }} <span class="unit">{{ unit() }}</span>
+  </div>
+  <svg class="spark" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+    @if (sparkline()) {
+      <polyline [attr.points]="sparkline()" fill="none" stroke="var(--cp-chart-1)" stroke-width="2" />
+    }
+  </svg>
+</div>

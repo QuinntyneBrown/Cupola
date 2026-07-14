@@ -1,0 +1,55 @@
+/* Shell frame composite styles (from docs/mocks/design-system/patterns/shell.html). */
+
+.sh-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--cp-color-void);
+  font: var(--cp-type-body);
+  color: var(--cp-color-ink);
+}
+
+.sh-brand {
+  font: 700 15px/1 var(--cp-font-cond);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cp-color-ink);
+  margin-right: var(--cp-space-3);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.sh-brand .o {
+  color: var(--cp-color-primary);
+}
+
+.sh-main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.sh-pane {
+  background: var(--cp-color-surface-1);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.sh-overline {
+  font: var(--cp-type-overline);
+  text-transform: uppercase;
+  letter-spacing: var(--cp-tracking-caps);
+  color: var(--cp-color-ink-3);
+}
+
+.sh-series-swatch {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: 2px;
+  display: inline-block;
+}

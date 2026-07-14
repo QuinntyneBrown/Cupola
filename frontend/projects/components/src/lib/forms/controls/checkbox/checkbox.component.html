@@ -1,0 +1,8 @@
+<input
+  class="cp-check"
+  type="checkbox"
+  [checked]="!!value()"
+  [attr.data-key]="control().key"
+  data-testid="form-control"
+  (change)="onChange($event)"
+/>

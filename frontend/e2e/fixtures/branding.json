@@ -1,0 +1,7 @@
+{
+  "appTitle": "Cupola",
+  "tagline": "Mission operations frontend",
+  "smallLogoImage": "assets/cupola-logo.svg",
+  "aboutHtml": "<p>Cupola — an Open MCT-inspired mission control shell.</p>",
+  "licenseUrl": "/licenses"
+}

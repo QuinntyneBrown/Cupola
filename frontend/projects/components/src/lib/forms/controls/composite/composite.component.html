@@ -1,0 +1,4 @@
+<fieldset class="composite" [attr.data-key]="control().key" data-testid="form-control">
+  <legend>{{ control().name }}</legend>
+  <input class="cp-input" type="text" [value]="value() ?? ''" (input)="onInput($event)" />
+</fieldset>

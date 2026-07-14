@@ -1,0 +1,14 @@
+<div class="cp-toolbar" data-testid="app-bar">
+  <cp-app-logo />
+  <cp-grand-search />
+  <span class="cp-toolbar-spacer"></span>
+  <button
+    class="cp-btn cp-btn--filled cp-btn--small"
+    type="button"
+    #createButton
+    data-testid="create-button"
+    (click)="openCreateMenu()"
+  >
+    <svg class="cp-icon"><use href="#i-plus" /></svg>Create
+  </button>
+</div>

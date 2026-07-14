@@ -1,0 +1,7 @@
+:host {
+  display: block;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--cp-space-4) var(--cp-space-5);
+}

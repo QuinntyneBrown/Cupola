@@ -1,0 +1,29 @@
+<div class="sh-app">
+  <cp-app-bar />
+
+  <div class="sh-main">
+    <div class="sh-pane" [style.width.px]="treeWidth()" style="flex: none" data-testid="tree-pane">
+      <cp-tree-pane />
+    </div>
+
+    <cp-splitter aria-label="Resize tree pane" (dragDelta)="resizeTree($event)" />
+
+    <div class="sh-pane" style="flex: 1" data-testid="main-pane">
+      <router-outlet />
+    </div>
+
+    <cp-splitter aria-label="Resize inspector" (dragDelta)="resizeInspector($event)" />
+
+    <div
+      class="sh-pane"
+      [style.width.px]="inspectorWidth()"
+      style="flex: none"
+      data-testid="inspector-pane"
+    >
+      <cp-inspector-pane />
+    </div>
+  </div>
+
+  <cp-conductor />
+  <cp-status-bar />
+</div>

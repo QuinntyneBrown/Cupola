@@ -1,0 +1,10 @@
+<div class="imagery" data-testid="imagery-view">
+  <div class="frame">
+    <svg class="cp-icon" viewBox="0 0 24 24" width="48" height="48"><use href="#i-camera" /></svg>
+    <span class="frame-label">{{ object().name }}</span>
+  </div>
+  <div class="frame-meta">
+    <span class="sh-overline">Latest frame</span>
+    <span class="frame-time" data-testid="frame-time">{{ timestamp() || 'awaiting telemetry' }}</span>
+  </div>
+</div>
