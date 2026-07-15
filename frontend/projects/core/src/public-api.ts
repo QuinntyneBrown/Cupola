@@ -13,6 +13,7 @@ export * from './lib/models/telemetry-value';
 export * from './lib/models/branding-info';
 export * from './lib/models/build-info';
 export * from './lib/models/connection-state';
+export * from './lib/models/object-save-result';
 export * from './lib/models/search-results';
 export * from './lib/models/object-glyph';
 export * from './lib/models/time';

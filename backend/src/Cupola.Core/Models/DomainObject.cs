@@ -16,4 +16,14 @@ public record DomainObject
     public DateTimeOffset Created { get; init; }
     public DateTimeOffset Modified { get; init; }
     public required string CreatedBy { get; init; }
+
+    /// <summary>
+    /// Optimistic-concurrency version (B04). The store bumps it on every
+    /// accepted save; a save whose version does not match the stored version
+    /// is a conflict.
+    /// </summary>
+    public int Version { get; init; }
+
+    /// <summary>Save provenance (open contract item #1, resolved for B04).</summary>
+    public string? ModifiedBy { get; init; }
 }

@@ -12,4 +12,8 @@ export interface DomainObject {
   created?: string;
   modified?: string;
   createdBy?: string;
+  /** Optimistic-concurrency version; the store bumps it on every accepted save (B04). */
+  version?: number;
+  /** Save provenance (open contract item #1, resolved for B04). */
+  modifiedBy?: string;
 }

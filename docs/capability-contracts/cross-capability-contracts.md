@@ -21,7 +21,7 @@ repository are reproduced exactly; shapes the specifications leave open are mark
 | B01 | C02 Domain objects | C03–C15 (all) | Shared data | `Identifier`, key string, `DomainObject`, composition list | OMCT-C02-L2-01.01, 03.01 |
 | B02 | C02 Domain objects | C03, C09, C13, C15 | Module API + transport | Object get/composition/update/observe: `ObjectsGateway`, `/api/objects/*`, `ObjectUpdated` hub event | OMCT-C02-L2-01.03–02.06 |
 | B03 | C02 Domain objects | C13, C15 | Module API + transport | Federated search: `SearchGateway`, `/api/search`, `SearchResults` envelope (annotation hits supplied by C13) | OMCT-C02-L2-04.01–04.03 |
-| B04 | C04 Persistence | C02 | Module API | Object store provider `IObjectStore`; `ConnectionState` | OMCT-C04-L2-01.02, 02.05, 02.06 |
+| B04 | C04 Persistence | C02 | Module API | Object store provider `IObjectStore`; `ObjectSaveResult`; `ConnectionState` | OMCT-C04-L2-01.02, 02.01–02.03, 02.05–02.07 |
 | B05 | C05 Time | C06, C07, C08, C11, C12 | Module API | Time systems, bounds, clocks, mode, tick, time-change events | OMCT-C05-L2-01.01–01.05, 03.02 |
 | B06 | C06 Telemetry | C07, C08, C10, C11, C12 | Module API + transport | Telemetry request/subscription, datum, metadata, value formatting: `TelemetryService`, `RealtimeGateway.telemetry`, `/hubs/realtime` | OMCT-C06-L2-01.01–03.04 |
 | B07 | C06 Telemetry | C07, C08 | Module API | Limit and staleness evaluation | OMCT-C06-L2-04.03, 04.04 |
@@ -84,13 +84,16 @@ export interface DomainObject {
   created?: string;                   // ISO 8601
   modified?: string;                  // ISO 8601
   createdBy?: string;
+  version?: number;                   // optimistic-concurrency version, bumped per accepted save (B04)
+  modifiedBy?: string;                // save provenance (open item 1, resolved for B04)
 }
 ```
 
 The C# records in `backend/src/Cupola.Core/Models/` mirror these shapes field for field and
-serialize to camelCase JSON. Open: `modifiedBy` provenance and the `persisted` timestamp
-named by OMCT-C02-L2-02.02/02.03 are absent from the current shape —
-`<TO SUPPLY: whether save provenance fields join the shared shape in this baseline>`.
+serialize to camelCase JSON. `modifiedBy` and `version` join the shared shape for B04
+conflict detection and save provenance. Open: the `persisted` timestamp named by
+OMCT-C02-L2-02.02/02.03 is absent from the current shape —
+`<TO SUPPLY: whether the persisted timestamp joins the shared shape in this baseline>`.
 
 ### B02 — Object retrieval, mutation, and observation
 
@@ -104,12 +107,16 @@ Owner: C02 · Consumers: C03, C09, C13, C15 · Stability: high
 import { Observable } from 'rxjs';
 import { Annotation } from '../models/annotation';
 import { DomainObject } from '../models/domain-object';
+import { ObjectSaveResult } from '../models/object-save-result';
 
 export abstract class ObjectsGateway {
   abstract getObject(keyString: string): Observable<DomainObject>;
   abstract getComposition(keyString: string): Observable<DomainObject[]>;
   abstract getAnnotations(keyString: string): Observable<Annotation[]>;
   abstract updateObject(keyString: string, changes: { name: string }): Observable<DomainObject>;
+  abstract saveObject(object: DomainObject): Observable<ObjectSaveResult>;        // B04
+  abstract getObjects(keyStrings: string[]): Observable<DomainObject[]>;          // B04
+  abstract saveObjects(objects: DomainObject[]): Observable<ObjectSaveResult[]>;  // B04
 }
 ```
 
@@ -120,9 +127,15 @@ GET  /api/objects/{keyString}/composition   -> 200 DomainObject[] | 404
 GET  /api/objects/{keyString}/annotations   -> 200 Annotation[] | 404
 PUT  /api/objects/{keyString}               body { "name": string } -> 200 DomainObject | 400 | 404
 
+Persistence routes serving B04 (OMCT-C04-L2-02.01–02.03; owner C02, shapes owned by B04):
+POST /api/objects                           body DomainObject -> 200 ObjectSaveResult | 409 ObjectSaveResult (conflict)
+POST /api/objects/batch-get                 body { "keyStrings": string[] } -> 200 DomainObject[]
+POST /api/objects/batch                     body DomainObject[] -> 200 ObjectSaveResult[]
+
 Realtime (hub /hubs/realtime, method names owned by the contract skeleton):
 client -> SubscribeToObject(keyString) / UnsubscribeFromObject(keyString)
 server -> "ObjectUpdated"(DomainObject)   broadcast to group `object:{keyString}` after PUT
+          and after every accepted POST save
 ```
 
 Open: transaction commit/cancel semantics (OMCT-C02-L2-02.07) and composition mutation
@@ -164,6 +177,8 @@ GET /api/search?q={query} -> 200 { objects: DomainObject[], annotations: Annotat
 ### B04 — Persistence provider
 
 Path: `backend/src/Cupola.Core/Services/IObjectStore.cs`;
+`backend/src/Cupola.Core/Services/ObjectSaveResult.cs`;
+`frontend/projects/core/src/lib/models/object-save-result.ts`;
 `frontend/projects/core/src/lib/models/connection-state.ts`
 Owner: C04 · Consumers: C02 · Stability: medium
 
@@ -175,19 +190,33 @@ public interface IObjectStore
     IReadOnlyList<DomainObject>? GetComposition(string keyString);
     IReadOnlyList<Annotation>? GetAnnotationsFor(string keyString);
     DomainObject? UpdateName(string keyString, string name);
+    IReadOnlyList<DomainObject> GetMany(IReadOnlyList<string> keyStrings);        // OMCT-C04-L2-02.02
+    ObjectSaveResult Save(DomainObject domainObject);                             // OMCT-C04-L2-02.01
+    IReadOnlyList<ObjectSaveResult> SaveMany(IReadOnlyList<DomainObject> domainObjects); // OMCT-C04-L2-02.03
     SearchResult Search(string? query);
 }
 ```
 
-```ts
-// frontend/projects/core/src/lib/models/connection-state.ts
-export type ConnectionState = 'connected' | 'connecting' | 'disconnected';
+```csharp
+// backend/src/Cupola.Core/Services/ObjectSaveResult.cs — per-object save outcome
+// Outcome is one of "created", "updated", "conflict"; on conflict, Object carries
+// the current stored state (OMCT-C04-L2-02.03, OMCT-C04-L2-02.07).
+public record ObjectSaveResult(string KeyString, string Outcome, DomainObject? Object);
 ```
 
-Open: OMCT-C04-L2-02.06 names four indicator states (pending/connected/disconnected/unknown)
-while the committed type carries three — `<TO SUPPLY: reconciliation of connection-state
-vocabulary>`. Change-feed payload to observers (OMCT-C04-L2-02.05) —
-`<TO SUPPLY: change-feed event shape>`.
+```ts
+// frontend/projects/core/src/lib/models/connection-state.ts (OMCT-C04-L2-02.06)
+export type ConnectionState = 'pending' | 'connected' | 'disconnected' | 'unknown';
+```
+
+Save semantics: an unknown key string creates the object at version 1; a known key string
+updates the object when the submitted `version` matches the stored `version`, and yields a
+`conflict` outcome otherwise. The stored `version` increases by one per accepted save.
+
+Change feed (OMCT-C04-L2-02.05, open item 4 resolved): the change-feed event is the
+`ObjectUpdated`(`DomainObject`) hub broadcast defined under B02; consumers observe it
+through `RealtimeGateway.objectUpdates(keyString)`. Connection-state vocabulary (open item
+3 resolved): the four states above match OMCT-C04-L2-02.06.
 
 ### B05 — Time coordination
 
@@ -588,6 +617,7 @@ and tests before the provider finishes.
 | `frontend/projects/core/src/lib/models/telemetry-metadata.ts` | existing | B06 | seeded fixtures |
 | `frontend/projects/core/src/lib/models/search-results.ts` | existing | B03 | `frontend/e2e/support/fake-backend.ts` |
 | `frontend/projects/core/src/lib/models/connection-state.ts` | existing | B04 | `FakeRealtimeGateway` |
+| `frontend/projects/core/src/lib/models/object-save-result.ts` | existing | B04 | `frontend/e2e/support/fake-backend.ts` |
 | `frontend/projects/core/src/lib/models/build-info.ts` | existing | B18 | `frontend/e2e/fixtures/build-info.json` |
 | `frontend/projects/core/src/lib/models/branding-info.ts` | existing | B19 | `frontend/e2e/fixtures/branding.json` |
 | `frontend/projects/core/src/lib/models/time.ts` | new | B05 | `FakeTimeContext` (below) |
@@ -610,7 +640,7 @@ and tests before the provider finishes.
 | `frontend/projects/core/src/lib/actions/action.ts` | existing | B14 | same |
 | `frontend/projects/core/src/lib/toolbars/toolbar-provider.ts` | existing | B14 | same |
 | `backend/src/Cupola.Core/Models/*.cs` | existing | B01/B06/B10/B18/B19 | `SeedData.cs` |
-| `backend/src/Cupola.Core/Services/IObjectStore.cs` | existing | B04 | `InMemoryObjectStore.cs` (C04) |
+| `backend/src/Cupola.Core/Services/IObjectStore.cs`, `ObjectSaveResult.cs` | existing | B04 | `InMemoryObjectStore.cs` (C04) |
 | `backend/src/Cupola.Api/Contracts/*.cs` | existing | B02/B03 | integration-test fixtures |
 | `backend/src/Cupola.Api/Hubs/RealtimeHub.cs` | existing | B02/B06 method names | `TelemetrySimulator.cs` (C06) |
 | `docs/capability-contracts/time-strip-children.md` | new | B11 | n/a (spec) |
@@ -736,7 +766,7 @@ ancestor.
 | `frontend/projects/cupola/src/app/views/generic/**` | C15 |
 | New feature directories, one per capability (e.g. `app/plans/**` C12, `app/notebook/**` C13, `app/conditions/**` C10, `app/faults/**` C14, `app/layouts/**` C09) | The named capability |
 | `backend/src/Cupola.Core/Models/**` | Skeleton |
-| `backend/src/Cupola.Core/Services/IObjectStore.cs`, `SearchResult.cs` | Skeleton |
+| `backend/src/Cupola.Core/Services/IObjectStore.cs`, `SearchResult.cs`, `ObjectSaveResult.cs` | Skeleton |
 | `backend/src/Cupola.Core/Services/InMemoryObjectStore.cs`, `SeedData.cs` | C04 |
 | `backend/src/Cupola.Api/Contracts/**` | Skeleton |
 | `backend/src/Cupola.Api/Hubs/RealtimeHub.cs` | Skeleton |
@@ -795,10 +825,8 @@ has been invented here.
 
 | # | Surface | Boundary | Blocking |
 | --- | --- | --- | --- |
-| 1 | Save provenance fields (`modifiedBy`, `persisted`) in the shared object shape | B01 | C02/C04 |
+| 1 | Save provenance `persisted` timestamp in the shared object shape (`modifiedBy` and `version` resolved under B01/B04) | B01 | C02 |
 | 2 | Authoring transaction and composition-mutation routes | B02 | C03 |
-| 3 | Connection-state vocabulary (three committed states vs. four in OMCT-C04-L2-02.06) | B04 | C04/C15 |
-| 4 | Persistence change-feed event shape | B04 | C02 |
 | 5 | Time-of-interest and telemetry-derived clock surfaces | B05 | C05/C06 |
 | 6 | Historical telemetry request route and datum/collection envelope | B06 | C07, C08 |
 | 7 | Limit-evaluation and staleness shapes | B07 | C07, C08 |
@@ -808,3 +836,7 @@ has been invented here.
 | 11 | Fault object shape and fault-provider interface | B13 | C14 |
 | 12 | Route schema for non-browse views | B16 | C09, C15 |
 | 13 | Plugin-install abstraction beyond Angular DI | B18 | C01 |
+
+Items 3 (connection-state vocabulary) and 4 (persistence change-feed event shape) are
+resolved in the B04 contract; item numbering is stable, so the resolved rows are removed
+without renumbering the rest.
