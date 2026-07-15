@@ -13,7 +13,7 @@ import {
 @Injectable()
 export class SignalRRealtimeGateway extends RealtimeGateway {
   private readonly config = inject(CUPOLA_CONFIG);
-  private readonly state = signal<ConnectionState>('disconnected');
+  private readonly state = signal<ConnectionState>('unknown');
   private readonly objectUpdated$ = new Subject<DomainObject>();
   private readonly telemetry$ = new Subject<TelemetryValue>();
   private connection: HubConnection | null = null;
@@ -36,11 +36,11 @@ export class SignalRRealtimeGateway extends RealtimeGateway {
     this.connection.on('TelemetryReceived', (value: TelemetryValue) =>
       this.telemetry$.next(value),
     );
-    this.connection.onreconnecting(() => this.state.set('connecting'));
+    this.connection.onreconnecting(() => this.state.set('pending'));
     this.connection.onreconnected(() => this.state.set('connected'));
     this.connection.onclose(() => this.state.set('disconnected'));
 
-    this.state.set('connecting');
+    this.state.set('pending');
     this.started = this.connection
       .start()
       .then(() => this.state.set('connected'))

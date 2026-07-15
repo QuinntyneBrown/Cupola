@@ -23,10 +23,12 @@ export class StatusBarComponent {
     switch (this.connectionState()) {
       case 'connected':
         return 'Connected';
-      case 'connecting':
-        return 'Connecting';
-      default:
+      case 'pending':
+        return 'Pending';
+      case 'disconnected':
         return 'Disconnected';
+      default:
+        return 'Unknown';
     }
   });
 

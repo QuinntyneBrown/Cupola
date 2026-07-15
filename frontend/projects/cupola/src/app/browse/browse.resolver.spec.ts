@@ -12,6 +12,7 @@ import {
   Annotation,
   ConnectionState,
   DomainObject,
+  ObjectSaveResult,
   ObjectsGateway,
   RealtimeGateway,
   TelemetryValue,
@@ -49,6 +50,21 @@ class ObjectsGatewayStub extends ObjectsGateway {
   }
   override updateObject(): Observable<DomainObject> {
     return EMPTY;
+  }
+  override saveObject(object: DomainObject): Observable<ObjectSaveResult> {
+    return of({ keyString: object.keyString, outcome: 'updated', object });
+  }
+  override getObjects(keyStrings: string[]): Observable<DomainObject[]> {
+    return of(keyStrings.map((key) => OBJECTS[key]).filter(Boolean));
+  }
+  override saveObjects(objects: DomainObject[]): Observable<ObjectSaveResult[]> {
+    return of(
+      objects.map((object) => ({
+        keyString: object.keyString,
+        outcome: 'updated' as const,
+        object,
+      })),
+    );
   }
 }
 
