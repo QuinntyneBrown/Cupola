@@ -309,7 +309,10 @@ export interface TelemetryRequestOptions {
 ```text
 Realtime transport (hub /hubs/realtime):
 client -> SubscribeToTelemetry(keyString) / UnsubscribeFromTelemetry(keyString)
-server -> "telemetry"(TelemetryValue)  to group `telemetry:{keyString}`
+server -> "TelemetryReceived"(TelemetryValue)  to group `telemetry:{keyString}`
+
+Historical transport (resolves open item #6):
+GET /api/telemetry/{keyString}?start={ms}&end={ms} -> 200 TelemetryValue[] | 404
 ```
 
 `RealtimeGateway` (existing, `frontend/projects/core/src/lib/gateways/realtime-gateway.ts`)
@@ -325,8 +328,11 @@ export abstract class RealtimeGateway {
 }
 ```
 
-Open: historical-request route, datum shape beyond the scalar `value`, and collection
-envelope (OMCT-C06-L2-02.03/04.01) — `<TO SUPPLY: historical telemetry request surface>`.
+Resolved (open item #6): the historical route is `GET /api/telemetry/{keyString}` above; the
+datum stays the scalar `TelemetryValue` (one domain field `timestamp`, one range field
+`value`) with no envelope — a telemetry collection is an ordered `TelemetryValue[]` bounded by
+the time context. The realtime event name is `"TelemetryReceived"` (aligns the doc to the
+committed hub/gateway/simulator code).
 
 ### B07 — Limits and staleness
 
@@ -334,10 +340,16 @@ Path: `frontend/projects/core/src/lib/telemetry/limits.ts` (new)
 Owner: C06 · Consumers: C07, C08 · Stability: medium
 
 The specifications require limit evaluation (plot limit lines, gauge low/high limits, table
-limit styling) without fixing a shape (OMCT-C06-L2-04.03, OMCT-C07-L2-02.07,
-OMCT-C08-L2-03.03). This is an **open contract**:
-`<TO SUPPLY: limit-evaluation result shape and staleness event shape>`. The file shall be
-committed as a typed placeholder before C07/C08 consume it.
+limit styling) (OMCT-C06-L2-04.03, OMCT-C07-L2-02.07, OMCT-C08-L2-03.03). Resolved (open item
+#7): `limits.ts` exports the result shapes crossing the boundary —
+
+```ts
+export interface LimitEvaluation { level: string; name?: string; cssClass?: string; low?: number; high?: number; }
+export interface StalenessEvent { keyString: string; isStale: boolean; timestamp: string; }
+```
+
+plus `LimitRange`/`LimitDefinition`. The `LimitProvider`/`StalenessProvider` interfaces and
+their registries are C06-owned engine (`core/src/lib/telemetry/**`), not part of the boundary.
 
 ### B08 — Telemetry filters
 
@@ -828,8 +840,6 @@ has been invented here.
 | 1 | Save provenance `persisted` timestamp in the shared object shape (`modifiedBy` and `version` resolved under B01/B04) | B01 | C02 |
 | 2 | Authoring transaction and composition-mutation routes | B02 | C03 |
 | 5 | Time-of-interest and telemetry-derived clock surfaces | B05 | C05/C06 |
-| 6 | Historical telemetry request route and datum/collection envelope | B06 | C07, C08 |
-| 7 | Limit-evaluation and staleness shapes | B07 | C07, C08 |
 | 8 | Telemetry filter definition schema | B08 | C10 |
 | 9 | Conditional style schema | B09 | C09, C10 |
 | 10 | Typed annotation target schema (including image pixel coordinates) | B10 | C11, C13 |
@@ -838,5 +848,6 @@ has been invented here.
 | 13 | Plugin-install abstraction beyond Angular DI | B18 | C01 |
 
 Items 3 (connection-state vocabulary) and 4 (persistence change-feed event shape) are
-resolved in the B04 contract; item numbering is stable, so the resolved rows are removed
-without renumbering the rest.
+resolved in the B04 contract; items 6 (historical telemetry route + datum/collection envelope)
+and 7 (limit/staleness shapes) are resolved in the B06/B07 contracts by C06. Item numbering is
+stable, so the resolved rows are removed without renumbering the rest.
