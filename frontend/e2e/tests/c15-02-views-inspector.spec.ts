@@ -60,7 +60,7 @@ test.describe('C15 L1-02 — View and inspector composition', () => {
   test(
     'OMCT-C15-L2-02.05 — numeric and imagery data visualizations render by telemetry hint',
     { annotation: [{ type: 'requirement', description: 'OMCT-C15-L2-02.05' }] },
-    async ({ shell, tree, inspector, realtime, page }) => {
+    async ({ shell, inspector, realtime, page }) => {
       // Range telemetry → numeric data visualization.
       await shell.goto('browse/station/power/pwr.bus_v');
       await inspector.openTab('data-visualization');

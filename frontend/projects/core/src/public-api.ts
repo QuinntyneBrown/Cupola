@@ -47,6 +47,8 @@ export * from './lib/notifications/notification.service';
 export * from './lib/notifications/indicator';
 
 export * from './lib/security/sanitizers';
+export * from './lib/security/image-url';
+export * from './lib/security/safe-object';
 
 export * from './lib/routing/abort-registry';
 export * from './lib/routing/route-events.service';

@@ -1,0 +1,134 @@
+# OMCT-C16-L2-02.04 — Pull-request quality workflow.
+# Cupola translation of Open MCT's pr.yml onto the Angular + .NET stack: the
+# unit gate runs Jest and dotnet test; the "sharded e2e" gate runs Playwright;
+# and the visual-accessibility, performance, and memory gates run their
+# dedicated Playwright configurations.
+name: pr
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  install:
+    name: Build and cache dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet restore ../backend/Cupola.sln
+
+  lint:
+    name: Lint
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+
+  unit:
+    name: Unit tests
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run test
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet test ../backend/Cupola.sln
+
+  e2e:
+    name: End-to-end (sharded)
+    needs: install
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+
+  visual-a11y:
+    name: Visual and accessibility
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run e2e:a11y
+      - run: npm run e2e:mobile
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-report
+          path: frontend/test-results
+
+  performance:
+    name: Performance
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e:perf:dev
+
+  memory:
+    name: Memory
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e:perf

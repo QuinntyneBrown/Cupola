@@ -1,23 +1,28 @@
 import { defineConfig, devices } from '@playwright/test';
 
+/**
+ * Mobile viewport Playwright configuration (OMCT-C16-L2-03.04). Runs the mobile
+ * smoke scenarios against iPad landscape and iPhone 14 Pro WebKit projects.
+ */
 export default defineConfig({
-  testDir: 'e2e/tests',
-  // The visual-accessibility, mobile, and performance suites run under their
-  // own configs (npm run e2e:a11y / e2e:mobile / e2e:perf); keep the default
-  // functional run from picking them up.
-  testIgnore: ['**/visual-a11y/**', '**/mobile/**', '**/performance/**'],
+  testDir: 'e2e/tests/mobile',
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,
   reporter: [['list']],
+  outputDir: 'test-results/mobile',
   use: {
     baseURL: 'http://localhost:4300',
     trace: 'on-first-retry',
   },
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'ipad-landscape',
+      use: { ...devices['iPad (gen 7) landscape'] },
+    },
+    {
+      name: 'iphone-14-pro',
+      use: { ...devices['iPhone 14 Pro'] },
     },
   ],
   webServer: {

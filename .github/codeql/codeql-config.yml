@@ -1,0 +1,16 @@
+# OMCT-C16-L2-02.05 — CodeQL configuration.
+name: Cupola CodeQL config
+
+queries:
+  - uses: security-and-quality
+
+paths:
+  - frontend/projects
+  - backend/src
+
+paths-ignore:
+  - frontend/projects/**/*.spec.ts
+  - frontend/e2e
+  - backend/tests
+  - '**/node_modules'
+  - '**/dist'

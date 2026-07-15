@@ -50,6 +50,17 @@ export class FakeBackend {
     return object;
   }
 
+  /** Upserts a domain object, returning a B04 ObjectSaveResult-shaped payload. */
+  save(object: DomainObjectFixture): {
+    keyString: string;
+    outcome: string;
+    object: DomainObjectFixture;
+  } {
+    const outcome = this.objects.has(object.keyString) ? 'updated' : 'created';
+    this.objects.set(object.keyString, structuredClone(object));
+    return { keyString: object.keyString, outcome, object };
+  }
+
   async install(page: Page): Promise<void> {
     await page.route('**/api/**', (route) => {
       const request = route.request();
@@ -78,6 +89,23 @@ export class FakeBackend {
             a.tags.some((tag) => tag.toLowerCase().includes(query)),
         );
         return json({ objects, annotations });
+      }
+
+      // B04 persistence routes (the app binds CouchObjectsGateway, which batches
+      // same-tick gets to /batch-get and saves through /objects and /batch).
+      if (path === '/api/objects/batch-get' && request.method() === 'POST') {
+        const body = request.postDataJSON() as { keyStrings?: string[] };
+        const objects = (body?.keyStrings ?? [])
+          .map((key) => this.objects.get(key))
+          .filter((object): object is DomainObjectFixture => object !== undefined);
+        return json(objects);
+      }
+      if (path === '/api/objects/batch' && request.method() === 'POST') {
+        const body = request.postDataJSON() as DomainObjectFixture[];
+        return json(body.map((object) => this.save(object)));
+      }
+      if (path === '/api/objects' && request.method() === 'POST') {
+        return json(this.save(request.postDataJSON() as DomainObjectFixture));
       }
 
       const objectPath = path.match(/^\/api\/objects\/([^/]+)(?:\/(composition|annotations))?$/);

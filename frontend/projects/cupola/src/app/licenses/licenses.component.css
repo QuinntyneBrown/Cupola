@@ -1,0 +1,57 @@
+:host {
+  display: contents;
+}
+
+/* Cover the whole viewport (the design-system scrim is absolute). */
+.licenses-scrim {
+  position: fixed;
+  inset: 0;
+}
+
+.licenses-dialog {
+  width: min(820px, calc(100% - 48px));
+  max-height: 88vh;
+}
+
+.licenses-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cp-space-6, 24px);
+}
+
+.licenses-project h3,
+.licenses-third-party h3 {
+  margin: 0 0 var(--cp-space-3, 8px);
+  color: var(--cp-color-ink, #fff);
+}
+
+.licenses-text {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--cp-color-ink-2);
+  background: var(--cp-color-surface-2, rgba(0, 0, 0, 0.2));
+  border: 1px solid var(--cp-color-line);
+  border-radius: var(--cp-radius-m, 6px);
+  padding: var(--cp-space-4, 12px);
+  max-height: 40vh;
+  overflow: auto;
+}
+
+.licenses-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.licenses-table th,
+.licenses-table td {
+  text-align: left;
+  padding: var(--cp-space-2, 4px) var(--cp-space-3, 8px);
+  border-bottom: 1px solid var(--cp-color-line);
+}
+
+.licenses-table th {
+  color: var(--cp-color-ink, #fff);
+}

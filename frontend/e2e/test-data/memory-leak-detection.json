@@ -1,0 +1,4 @@
+{
+  "description": "Browse routes exercised by the navigation memory-leak test. Each is opened and then navigated away from; the view is expected to be garbage collected. OMCT-C16-L2-05.03.",
+  "routes": ["browse/mine", "browse/station", "browse/solar-array-output"]
+}
