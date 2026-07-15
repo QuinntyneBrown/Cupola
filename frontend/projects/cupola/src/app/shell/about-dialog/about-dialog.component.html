@@ -21,6 +21,9 @@
         <dd>{{ build.branch }}</dd>
       </dl>
     }
+    <p class="about-license-text" data-testid="about-license-text">
+      Licensed under the MIT License.
+    </p>
     @if (info()?.licenseUrl) {
       <a class="about-license" [attr.href]="info()!.licenseUrl" data-testid="about-license">
         Open-source licenses

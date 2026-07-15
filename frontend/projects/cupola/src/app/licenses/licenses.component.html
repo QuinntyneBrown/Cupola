@@ -1,0 +1,35 @@
+<div class="cp-scrim licenses-scrim" data-testid="licenses-overlay">
+  <div class="cp-dialog cp-dialog--l licenses-dialog">
+    <div class="cp-dialog-head">
+      <h2 data-testid="licenses-title">Open-source licenses</h2>
+    </div>
+    <div class="cp-dialog-body licenses-body">
+      <section class="licenses-project">
+        <h3>Cupola</h3>
+        <pre class="licenses-text" data-testid="licenses-project-text">{{ licenseText }}</pre>
+      </section>
+
+      <section class="licenses-third-party">
+        <h3>Third-party dependencies</h3>
+        <table class="licenses-table" data-testid="licenses-third-party">
+          <thead>
+            <tr>
+              <th scope="col">Package</th>
+              <th scope="col">Version</th>
+              <th scope="col">License</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entry of thirdParty; track entry.name) {
+              <tr data-testid="licenses-entry">
+                <td>{{ entry.name }}</td>
+                <td>{{ entry.version }}</td>
+                <td>{{ entry.license }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </div>
+</div>

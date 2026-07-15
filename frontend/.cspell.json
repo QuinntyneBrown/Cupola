@@ -1,0 +1,40 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "Cupola",
+    "cupola",
+    "openmct",
+    "telemetry",
+    "datum",
+    "signalr",
+    "noopener",
+    "noreferrer",
+    "browserslist",
+    "webkit",
+    "wcag",
+    "vbscript",
+    "srcdoc",
+    "formaction",
+    "proto",
+    "tslib",
+    "rxjs",
+    "tsconfig",
+    "zoneless",
+    "conductor",
+    "OMCT",
+    "xlink",
+    "msgbox",
+    "ascript",
+    "nondismissible"
+  ],
+  "ignorePaths": [
+    "node_modules/**",
+    "dist/**",
+    "out-tsc/**",
+    "coverage/**",
+    "test-results/**",
+    "projects/cupola/src/app/licenses/mit-license.ts"
+  ],
+  "ignoreRegExpList": ["/[A-Za-z0-9+/]{16,}={0,2}/"]
+}

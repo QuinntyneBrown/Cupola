@@ -1,0 +1,9 @@
+# OMCT-C16-L2-01.02 — supported browser targets.
+# Angular reads this file to set build/differential targets. Mirrors the
+# upstream Open MCT support matrix, translated to browserslist query syntax.
+Firefox ESR
+not IE 11
+last 2 Chrome versions
+unreleased Chrome versions
+iOS >= 16
+Safari >= 16

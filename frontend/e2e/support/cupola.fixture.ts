@@ -6,6 +6,7 @@ import { ContextMenuPage } from '../pages/context-menu.page';
 import { FormDialogPage } from '../pages/form-dialog.page';
 import { GrandSearchPage } from '../pages/grand-search.page';
 import { InspectorPage } from '../pages/inspector.page';
+import { LicensesPage } from '../pages/licenses.page';
 import { ObjectViewPage } from '../pages/object-view.page';
 import { OverlayPage } from '../pages/overlay.page';
 import { TreePage } from '../pages/tree.page';
@@ -24,6 +25,7 @@ interface CupolaFixtures {
   formDialog: FormDialogPage;
   grandSearch: GrandSearchPage;
   aboutDialog: AboutDialogPage;
+  licenses: LicensesPage;
 }
 
 /**
@@ -69,6 +71,9 @@ export const test = base.extend<CupolaFixtures>({
   },
   aboutDialog: async ({ page }, use) => {
     await use(new AboutDialogPage(page));
+  },
+  licenses: async ({ page }, use) => {
+    await use(new LicensesPage(page));
   },
 });
 
