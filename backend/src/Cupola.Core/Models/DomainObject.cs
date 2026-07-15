@@ -12,8 +12,20 @@ public record DomainObject
     public required string Type { get; init; }
     public string? Location { get; init; }
     public IReadOnlyList<string> Composition { get; init; } = Array.Empty<string>();
+    /// <summary>Configured query for a database-backed search folder.</summary>
+    public string? Query { get; init; }
     public TelemetryMetadata? Telemetry { get; init; }
     public DateTimeOffset Created { get; init; }
     public DateTimeOffset Modified { get; init; }
     public required string CreatedBy { get; init; }
+
+    /// <summary>
+    /// Optimistic-concurrency version (B04). The store bumps it on every
+    /// accepted save; a save whose version does not match the stored version
+    /// is a conflict.
+    /// </summary>
+    public int Version { get; init; }
+
+    /// <summary>Save provenance (open contract item #1, resolved for B04).</summary>
+    public string? ModifiedBy { get; init; }
 }

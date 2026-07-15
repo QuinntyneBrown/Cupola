@@ -1,6 +1,6 @@
 import { EnvironmentInjector, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { ActionRegistry, ObjectUpdatesService, ObjectsGateway } from '@cupola/core';
+import { ActionRegistry, ObjectPersistenceService } from '@cupola/core';
 import { FormsService, OverlayService } from '@cupola/components';
 
 import { EditPropertiesAction } from './edit-properties/edit-properties-action';
@@ -15,13 +15,12 @@ export function registerDefaultActions(): void {
   const overlays = inject(OverlayService);
   const forms = inject(FormsService);
   const preview = inject(PreviewService);
-  const objects = inject(ObjectsGateway);
-  const objectUpdates = inject(ObjectUpdatesService);
+  const persistence = inject(ObjectPersistenceService);
   const router = inject(Router);
   const injector = inject(EnvironmentInjector);
 
   registry.register(new OpenAction(router));
   registry.register(new ViewAsTableAction(router));
-  registry.register(new EditPropertiesAction(forms, objects, objectUpdates));
+  registry.register(new EditPropertiesAction(forms, persistence));
   registry.register(new ViewLargeAction(overlays, preview, injector));
 }

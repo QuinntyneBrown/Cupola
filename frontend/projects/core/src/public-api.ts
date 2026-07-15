@@ -13,6 +13,7 @@ export * from './lib/models/telemetry-value';
 export * from './lib/models/branding-info';
 export * from './lib/models/build-info';
 export * from './lib/models/connection-state';
+export * from './lib/models/object-save-result';
 export * from './lib/models/search-results';
 export * from './lib/models/object-glyph';
 export * from './lib/models/time';
@@ -59,6 +60,15 @@ export * from './lib/gateways/branding-gateway';
 export * from './lib/gateways/realtime-gateway';
 
 export * from './lib/objects/object-updates.service';
+
+export * from './lib/persistence/safe-json';
+export * from './lib/persistence/object-utils';
+export * from './lib/persistence/object-migration.service';
+export * from './lib/persistence/local-storage-object-provider';
+export * from './lib/persistence/persistence-status.service';
+export * from './lib/persistence/object-persistence.service';
+export * from './lib/persistence/couch-search-folder-provider';
+export * from './lib/persistence/static-model-provider';
 
 export * from './lib/adaptive/device-agent';
 export * from './lib/adaptive/device-agent.service';

@@ -1,5 +1,6 @@
 using Cupola.Api.Contracts;
 using Cupola.Api.Hubs;
+using Cupola.Core.Models;
 using Cupola.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -58,5 +59,53 @@ public class ObjectsController : ControllerBase
             .SendAsync("ObjectUpdated", updated);
 
         return Ok(updated);
+    }
+
+    /// <summary>Creates or updates an object (B04, OMCT-C04-L2-02.01/02.07).</summary>
+    [HttpPost]
+    public async Task<IActionResult> Save([FromBody] DomainObject domainObject)
+    {
+        if (string.IsNullOrWhiteSpace(domainObject.KeyString))
+        {
+            return BadRequest();
+        }
+
+        var result = _store.Save(domainObject);
+        if (result.Outcome == ObjectSaveOutcome.Conflict)
+        {
+            return Conflict(result);
+        }
+
+        await BroadcastUpdate(result);
+        return Ok(result);
+    }
+
+    /// <summary>Batched retrieval (B04, OMCT-C04-L2-02.02).</summary>
+    [HttpPost("batch-get")]
+    public IActionResult BatchGet([FromBody] BatchGetRequest request)
+    {
+        return Ok(_store.GetMany(request.KeyStrings ?? []));
+    }
+
+    /// <summary>Batched save with per-object results (B04, OMCT-C04-L2-02.03).</summary>
+    [HttpPost("batch")]
+    public async Task<IActionResult> BatchSave([FromBody] IReadOnlyList<DomainObject> domainObjects)
+    {
+        var results = _store.SaveMany(domainObjects);
+        foreach (var result in results)
+        {
+            await BroadcastUpdate(result);
+        }
+
+        return Ok(results);
+    }
+
+    private async Task BroadcastUpdate(ObjectSaveResult result)
+    {
+        if (result.Outcome != ObjectSaveOutcome.Conflict && result.Object is not null)
+        {
+            await _hub.Clients.Group(RealtimeHub.ObjectGroup(result.KeyString))
+                .SendAsync("ObjectUpdated", result.Object);
+        }
     }
 }

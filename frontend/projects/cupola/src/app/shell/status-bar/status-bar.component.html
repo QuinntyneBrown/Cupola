@@ -7,7 +7,7 @@
     <span
       class="cp-dot"
       [class.cp-dot--ok]="connectionState() === 'connected'"
-      [class.cp-dot--caution]="connectionState() === 'connecting'"
+      [class.cp-dot--caution]="connectionState() === 'pending'"
       [class.cp-dot--critical]="connectionState() === 'disconnected'"
     ></span>
     {{ connectionLabel() }}

@@ -58,10 +58,72 @@ public class InMemoryObjectStore : IObjectStore
             return null;
         }
 
-        var updated = existing with { Name = name, Modified = DateTimeOffset.UtcNow };
+        var updated = existing with
+        {
+            Name = name,
+            Modified = DateTimeOffset.UtcNow,
+            Version = existing.Version + 1,
+        };
         _objects[keyString] = updated;
         return updated;
     }
+
+    public IReadOnlyList<DomainObject> GetMany(IReadOnlyList<string> keyStrings)
+    {
+        var found = new List<DomainObject>();
+        foreach (var keyString in keyStrings)
+        {
+            if (_objects.TryGetValue(keyString, out var domainObject))
+            {
+                found.Add(domainObject);
+            }
+        }
+
+        return found;
+    }
+
+    public ObjectSaveResult Save(DomainObject domainObject)
+    {
+        while (true)
+        {
+            if (!_objects.TryGetValue(domainObject.KeyString, out var existing))
+            {
+                var now = DateTimeOffset.UtcNow;
+                var created = domainObject with
+                {
+                    Created = domainObject.Created == default ? now : domainObject.Created,
+                    Modified = now,
+                    Version = 1,
+                };
+                if (_objects.TryAdd(domainObject.KeyString, created))
+                {
+                    return new ObjectSaveResult(domainObject.KeyString, ObjectSaveOutcome.Created, created);
+                }
+
+                continue;
+            }
+
+            if (domainObject.Version != existing.Version)
+            {
+                return new ObjectSaveResult(domainObject.KeyString, ObjectSaveOutcome.Conflict, existing);
+            }
+
+            var updated = domainObject with
+            {
+                Created = existing.Created,
+                CreatedBy = existing.CreatedBy,
+                Version = existing.Version + 1,
+                Modified = DateTimeOffset.UtcNow,
+            };
+            if (_objects.TryUpdate(domainObject.KeyString, updated, existing))
+            {
+                return new ObjectSaveResult(domainObject.KeyString, ObjectSaveOutcome.Updated, updated);
+            }
+        }
+    }
+
+    public IReadOnlyList<ObjectSaveResult> SaveMany(IReadOnlyList<DomainObject> domainObjects) =>
+        domainObjects.Select(Save).ToList();
 
     public SearchResult Search(string? query)
     {

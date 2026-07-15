@@ -32,6 +32,25 @@ public interface IObjectStore
     DomainObject? UpdateName(string keyString, string name);
 
     /// <summary>
+    /// Returns the objects for the known key strings, in request order,
+    /// omitting unknown key strings (B04 batched retrieval).
+    /// </summary>
+    IReadOnlyList<DomainObject> GetMany(IReadOnlyList<string> keyStrings);
+
+    /// <summary>
+    /// Creates or updates an object. An unknown key string creates the object
+    /// at version 1; a known key string updates it when the submitted version
+    /// matches the stored version, and reports a conflict otherwise.
+    /// </summary>
+    ObjectSaveResult Save(DomainObject domainObject);
+
+    /// <summary>
+    /// Saves a batch of objects, returning one independent result per
+    /// submitted object, in submission order (B04 batched save).
+    /// </summary>
+    IReadOnlyList<ObjectSaveResult> SaveMany(IReadOnlyList<DomainObject> domainObjects);
+
+    /// <summary>
     /// Case-insensitive search of object names and annotation text/tags. A blank
     /// query returns empty results.
     /// </summary>
