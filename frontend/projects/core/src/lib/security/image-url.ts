@@ -20,7 +20,7 @@ function stripControlCharacters(url: string): string {
   let result = '';
   for (const character of url) {
     const code = character.charCodeAt(0);
-    if (code > 0x20 && code !== 0x7f) {
+    if (code >= 0x20 && code !== 0x7f) {
       result += character;
     }
   }
