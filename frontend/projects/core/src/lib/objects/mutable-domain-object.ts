@@ -43,7 +43,7 @@ export class MutableDomainObject {
   private readonly cleanups: (() => void)[] = [];
 
   constructor(object: DomainObject) {
-    this.object = { ...object };
+    this.object = JSON.parse(JSON.stringify(object));
   }
 
   /** The current object state. */
