@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.cp-timer-view {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.cp-timer-duration {
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cp-timer-status {
+  color: var(--cp-color-ink-3);
+  text-transform: capitalize;
+}
+
+.cp-timer-controls {
+  display: flex;
+  gap: 4px;
+}

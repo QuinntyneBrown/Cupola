@@ -21,6 +21,21 @@ export * from './lib/models/telemetry-filter';
 export * from './lib/models/conditional-style';
 
 export * from './lib/time/time-context';
+export * from './lib/time/time-format';
+export * from './lib/time/clock';
+export * from './lib/time/format-registry';
+export * from './lib/time/clock-registry';
+export * from './lib/time/time-system-registry';
+export * from './lib/time/clocks/local-clock';
+export * from './lib/time/formats/utc-time-format';
+export * from './lib/time/formats/duration-format';
+export * from './lib/time/formats/iso-time-format';
+export * from './lib/time/formats/local-time-format';
+export * from './lib/time/time-context-base';
+export * from './lib/time/global-time-context';
+export * from './lib/time/independent-time-context';
+export * from './lib/time/time-api.service';
+export * from './lib/time/url-time-sync.service';
 
 export * from './lib/telemetry/telemetry-request';
 export * from './lib/telemetry/limits';

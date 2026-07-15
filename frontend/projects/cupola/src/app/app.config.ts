@@ -11,12 +11,15 @@ import {
   BrandingService,
   CUPOLA_CONFIG,
   DeviceClassifierService,
+  GlobalTimeContext,
   ObjectsGateway,
   RealtimeGateway,
   RouteEventsService,
   SearchGateway,
   ThemeService,
+  TimeContext,
   UrlParamsService,
+  UrlTimeSyncService,
 } from '@cupola/core';
 import {
   FakeRealtimeGateway,
@@ -31,6 +34,8 @@ import { environment } from '../environments/environment';
 import { routes } from './app.routes';
 import { registerDefaultActions } from './actions/register-default-actions';
 import { registerStandardInspectorViews } from './inspector/register-standard-inspector-views';
+import { registerDefaultTime } from './time/register-default-time';
+import { registerTimeViews } from './time/register-time-views';
 import { registerDefaultToolbars } from './toolbars/register-default-toolbars';
 import { registerDefaultViews } from './views/register-default-views';
 
@@ -47,6 +52,7 @@ export const appConfig: ApplicationConfig = {
       provide: RealtimeGateway,
       useClass: environment.e2e ? FakeRealtimeGateway : SignalRRealtimeGateway,
     },
+    { provide: TimeContext, useExisting: GlobalTimeContext },
     { provide: FORMS_CONTROL_SOURCE, useExisting: FormsService },
     provideAppInitializer(() => {
       inject(ThemeService).installTheme('darkmatter');
@@ -59,6 +65,11 @@ export const appConfig: ApplicationConfig = {
       registerStandardInspectorViews();
       registerDefaultActions();
       registerDefaultToolbars();
+      // C05 time coordination: register defaults, then start URL sync last so
+      // startup defaults are not written back over existing URL state.
+      registerDefaultTime();
+      registerTimeViews();
+      inject(UrlTimeSyncService).start();
     }),
   ],
 };

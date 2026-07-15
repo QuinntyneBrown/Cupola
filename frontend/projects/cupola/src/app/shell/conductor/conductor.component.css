@@ -2,3 +2,53 @@
   display: block;
   flex: none;
 }
+
+.cp-conductor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 12px;
+}
+
+.cp-conductor-badge {
+  padding: 1px 8px;
+  border: 1px solid var(--cp-color-ink-4, #444);
+  border-radius: 3px;
+  color: var(--cp-color-ink-2);
+  font-size: 11px;
+}
+
+.cp-conductor-badge--realtime {
+  background: var(--cp-color-ok-dim);
+  border-color: var(--cp-color-ok-border);
+  color: var(--cp-color-ok);
+}
+
+.cp-conductor-system {
+  color: var(--cp-color-ink-3);
+}
+
+.cp-conductor-clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cp-conductor-bounds {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cp-conductor-bounds-sep {
+  color: var(--cp-color-ink-3);
+}
+
+.cp-conductor-current-time {
+  font-variant-numeric: tabular-nums;
+}
+
+.cp-toolbar-spacer {
+  flex: 1 1 auto;
+}
