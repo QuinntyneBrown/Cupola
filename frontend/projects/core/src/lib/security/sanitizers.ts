@@ -42,7 +42,7 @@ export function sanitizeUrl(url: string): string | null {
 
 /** Markup that can execute script or navigate is removed outright. */
 const DISALLOWED_ELEMENTS =
-  'script, style, iframe, object, embed, link, meta, base, form, svg, math';
+  'script, style, iframe, object, embed, link, meta, base, form, svg, math, template';
 
 /** Strips markup that can execute script from a rich-text fragment. OMCT-C16-L2-04.02 */
 export function sanitizeRichText(html: string): string {
