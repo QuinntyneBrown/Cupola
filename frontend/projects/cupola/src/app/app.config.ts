@@ -37,6 +37,7 @@ import { environment } from '../environments/environment';
 import { routes } from './app.routes';
 import { registerDefaultActions } from './actions/register-default-actions';
 import { registerStandardInspectorViews } from './inspector/register-standard-inspector-views';
+import { registerDefaultObjects } from './objects/register-default-objects';
 import { registerDefaultTime } from './time/register-default-time';
 import { registerTimeViews } from './time/register-time-views';
 import { registerDefaultToolbars } from './toolbars/register-default-toolbars';
@@ -69,6 +70,8 @@ export const appConfig: ApplicationConfig = {
       inject(DeviceClassifierService).start();
       inject(RouteEventsService);
       inject(UrlParamsService);
+      // C02 domain objects: register types, interceptors, composition, and search providers.
+      registerDefaultObjects();
       registerDefaultViews();
       registerStandardInspectorViews();
       registerDefaultActions();

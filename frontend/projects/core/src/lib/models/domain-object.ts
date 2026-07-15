@@ -13,6 +13,8 @@ export interface DomainObject {
   telemetry?: TelemetryMetadata | null;
   created?: string;
   modified?: string;
+  /** Timestamp of the last successful persistence; never earlier than `modified` (OMCT-C02-L2-02.02). */
+  persisted?: string;
   createdBy?: string;
   /** Optimistic-concurrency version; the store bumps it on every accepted save (B04). */
   version?: number;

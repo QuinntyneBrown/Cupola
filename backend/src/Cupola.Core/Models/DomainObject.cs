@@ -17,6 +17,12 @@ public record DomainObject
     public TelemetryMetadata? Telemetry { get; init; }
     public DateTimeOffset Created { get; init; }
     public DateTimeOffset Modified { get; init; }
+
+    /// <summary>
+    /// Timestamp of the last successful persistence (OMCT-C02-L2-02.02). Client-stamped and
+    /// preserved across save round-trips; never earlier than <see cref="Modified"/>.
+    /// </summary>
+    public DateTimeOffset? Persisted { get; init; }
     public required string CreatedBy { get; init; }
 
     /// <summary>
