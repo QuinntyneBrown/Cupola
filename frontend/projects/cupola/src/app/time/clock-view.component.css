@@ -1,0 +1,15 @@
+:host {
+  display: block;
+}
+
+.cp-clock-view {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+}
+
+.cp-clock-time {
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}

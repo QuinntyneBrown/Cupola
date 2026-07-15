@@ -1,0 +1,10 @@
+<div class="cp-timer-view" data-testid="timer-view">
+  <span class="cp-timer-duration" data-testid="timer-duration">{{ durationText() }}</span>
+  <span class="cp-timer-status" data-testid="timer-status">{{ status() }}</span>
+  <div class="cp-timer-controls">
+    <button type="button" data-testid="timer-start" (click)="act('start')">Start</button>
+    <button type="button" data-testid="timer-pause" (click)="act('pause')">Pause</button>
+    <button type="button" data-testid="timer-stop" (click)="act('stop')">Stop</button>
+    <button type="button" data-testid="timer-restart" (click)="act('restart')">Restart</button>
+  </div>
+</div>

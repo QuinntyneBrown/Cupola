@@ -1,17 +1,28 @@
-<div class="cp-conductor cp-conductor--realtime" data-testid="conductor">
-  <span
-    class="cp-editing-badge"
-    style="
-      background: var(--cp-color-ok-dim);
-      border-color: var(--cp-color-ok-border);
-      color: var(--cp-color-ok);
-    "
-    >Real-time</span
-  >
-  <span style="color: var(--cp-color-ink-3)">UTC</span>
-  <span class="cp-conductor-clock">
-    <svg class="cp-icon cp-icon--s"><use href="#i-clock" /></svg>
-    Local clock
-  </span>
+<div
+  class="cp-conductor"
+  [class.cp-conductor--realtime]="isRealtime()"
+  data-testid="conductor"
+>
+  @if (isRealtime()) {
+    <span class="cp-conductor-badge cp-conductor-badge--realtime" data-testid="conductor-mode">
+      Real-time
+    </span>
+    <span class="cp-conductor-system" data-testid="conductor-system">{{ timeSystem().name }}</span>
+    <span class="cp-conductor-clock" data-testid="conductor-clock">
+      <svg class="cp-icon cp-icon--s"><use href="#i-clock" /></svg>
+      {{ clockKey() ?? 'Clock' }}
+    </span>
+    <span class="cp-conductor-current-time" data-testid="conductor-current-time">
+      {{ currentTime() }}
+    </span>
+  } @else {
+    <span class="cp-conductor-badge" data-testid="conductor-mode">Fixed</span>
+    <span class="cp-conductor-system" data-testid="conductor-system">{{ timeSystem().name }}</span>
+    <span class="cp-conductor-bounds" data-testid="conductor-bounds">
+      <span data-testid="conductor-start">{{ startText() }}</span>
+      <span class="cp-conductor-bounds-sep">—</span>
+      <span data-testid="conductor-end">{{ endText() }}</span>
+    </span>
+  }
   <span class="cp-toolbar-spacer"></span>
 </div>
