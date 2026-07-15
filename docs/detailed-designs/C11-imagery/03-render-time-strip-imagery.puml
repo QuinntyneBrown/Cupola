@@ -1,0 +1,27 @@
+@startuml
+title Time-strip imagery bounds rendering
+' Traces: OMCT-C11-L2-01.05
+participant "Time Strip View" as TimeStrip
+participant "Imagery Time View" as Imagery
+participant "Telemetry Gateway" as Telemetry
+participant "Image Strip" as Strip
+
+TimeStrip -> Imagery: loadOrBoundsChanged(bounds)
+activate Imagery
+Imagery -> Telemetry: requestImages(bounds)
+activate Telemetry
+Telemetry --> Imagery: images within bounds
+deactivate Telemetry
+Imagery -> Strip: removeImagesOutside(bounds)
+activate Strip
+Strip --> Imagery: outside images removed
+deactivate Strip
+loop each image within bounds
+    Imagery -> Strip: renderThumbnail(image)
+    activate Strip
+    Strip --> Imagery: thumbnail rendered
+    deactivate Strip
+end
+Imagery --> TimeStrip: strip images refreshed
+deactivate Imagery
+@enduml

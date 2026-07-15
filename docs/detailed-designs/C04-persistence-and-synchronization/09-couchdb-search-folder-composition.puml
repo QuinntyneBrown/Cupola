@@ -1,0 +1,21 @@
+@startuml
+title C04 CouchDB search-folder composition
+' Traces: OMCT-C04-L2-03.03
+actor Consumer
+participant "Composition Service" as Composition
+participant "CouchDB Search Folder Provider" as SearchFolder
+participant "@cupola/api HttpSearchGateway" as Gateway
+participant "Cupola.Api SearchController" as Controller
+participant "IObjectStore" as Store
+
+Consumer -> Composition ++: load(search-folder root)
+Composition -> SearchFolder ++: load(root)
+SearchFolder -> Gateway ++: GET /api/search?q=configuredQuery
+Gateway -> Controller ++: GET /api/search?q=configuredQuery
+Controller -> Store ++: query matching objects
+Store --> Controller --: matching objects
+Controller --> Gateway --: search results
+Gateway --> SearchFolder --: database objects
+SearchFolder --> Composition --: folder children
+Composition --> Consumer --: matching children
+@enduml

@@ -1,0 +1,15 @@
+@startuml
+title C01 plugin installation
+' Traces: OMCT-C01-L2-01.01
+actor Integrator
+participant "cupola Shell" as Shell
+participant "Plugin Function" as Plugin
+participant "@cupola/core Registries" as Registries
+
+Integrator -> Shell ++: install(plugin)
+Shell -> Plugin ++: invoke(application)
+Plugin -> Registries ++: register extensions
+Registries --> Plugin --: registrations accepted
+Plugin --> Shell --: plugin completed
+Shell --> Integrator --: installation completed
+@enduml

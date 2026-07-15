@@ -1,6 +1,8 @@
 # Cupola
 
-Cupola is an Open MCT-inspired mission operations shell with an Angular frontend and an ASP.NET Core backend. It demonstrates object browsing, telemetry visualization, search, and real-time updates over SignalR.
+Cupola is an Open MCT-inspired mission operations shell with an Angular frontend and an
+ASP.NET Core backend. It provides object browsing, telemetry visualization, search, and
+frontend support for real-time updates over SignalR.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-107C10.svg)](LICENSE)
 [![Angular](https://img.shields.io/badge/Angular-21-DD0031?logo=angular&logoColor=white)](https://angular.dev/)
@@ -21,7 +23,7 @@ The repository also includes a reverse-engineered Open MCT requirements baseline
 - View telemetry through plot, table, imagery, and generic views
 - Inspect properties, annotations, elements, and visualization settings
 - Search across both objects and annotations
-- Receive real-time telemetry updates over SignalR
+- Subscribe to real-time telemetry updates over SignalR
 - Update object names and propagate updates to connected clients
 - Run deterministic frontend e2e journeys with a fake realtime gateway
 
@@ -47,6 +49,10 @@ cd backend
 dotnet restore
 dotnet run --project src/Cupola.Api/Cupola.Api.csproj
 ```
+
+The production `Cupola.Api` host starts without a telemetry generator. The simulator in
+`backend/nonproduction/Cupola.Simulators` is registered only by simulator-dependent
+integration tests.
 
 Start frontend (`http://localhost:4200`) in a second terminal:
 
@@ -94,6 +100,7 @@ npm run e2e
 
 ```text
 backend/                     .NET solution, API, core models, and integration/unit tests
+backend/nonproduction/       Opt-in .NET simulators excluded from the production API
 frontend/                    Angular workspace and e2e suite
 frontend/projects/cupola/    Main Angular application
 frontend/projects/core/      Core frontend domain and infrastructure library

@@ -1,0 +1,40 @@
+@startuml
+title C14 fault provider root and subscription
+' Traces: OMCT-C14-L2-03.01, OMCT-C14-L2-03.02
+actor Operator
+participant "FaultManagementPlugin" as Plugin
+participant "@cupola/core ObjectRegistry" as ObjectRegistry
+participant "ViewRegistry" as ViewRegistry
+participant "FaultManagementService" as FaultService
+participant "FaultProvider" as FaultProvider
+participant "FaultListView" as FaultList
+participant "FaultInspectorView" as Inspector
+
+Plugin -> ObjectRegistry: register fault-management root
+activate ObjectRegistry
+ObjectRegistry --> Plugin: root registered
+deactivate ObjectRegistry
+Plugin -> ViewRegistry: register fault list and inspector views
+activate ViewRegistry
+ViewRegistry --> Plugin: views registered
+deactivate ViewRegistry
+
+Operator -> FaultList: open fault root
+activate FaultList
+FaultList -> FaultService: requestFaults()
+activate FaultService
+FaultService -> FaultProvider: getFaults()
+activate FaultProvider
+FaultProvider --> FaultService: current faults
+FaultService -> FaultProvider: subscribeFaultChanges()
+FaultProvider --> FaultService: subscription
+FaultService --> FaultList: current faults and subscription
+deactivate FaultProvider
+deactivate FaultService
+FaultList -> Inspector: show selected fault details
+activate Inspector
+Inspector --> FaultList: inspector rendered
+deactivate Inspector
+FaultList --> Operator: display faults
+deactivate FaultList
+@enduml

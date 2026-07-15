@@ -1,0 +1,38 @@
+@startuml
+title C15 menu rendering and execution
+' Traces: OMCT-C15-L2-03.03, OMCT-C15-L2-03.04
+actor Operator
+participant "MenuService" as MenuService
+participant "MenuComponent" as Menu
+participant "SuperMenuComponent" as SuperMenu
+participant "Action callback" as Callback
+
+Operator -> MenuService: show menu at screen coordinate
+activate MenuService
+MenuService -> Menu: render actions at coordinate
+activate Menu
+Menu --> MenuService: menu rendered
+deactivate Menu
+MenuService --> Operator: display menu
+deactivate MenuService
+
+Operator -> SuperMenu: pointer focus on menu item
+activate SuperMenu
+SuperMenu -> SuperMenu: calculate configured placement
+SuperMenu -> SuperMenu: display item description
+SuperMenu --> Operator: show description and placed menu
+deactivate SuperMenu
+
+Operator -> Menu: click menu item
+activate Menu
+Menu -> Callback: invoke selected action
+activate Callback
+Callback --> Menu: callback complete
+deactivate Callback
+Menu -> MenuService: dismiss menu
+activate MenuService
+MenuService --> Menu: dismissed
+deactivate MenuService
+Menu --> Operator: menu closed
+deactivate Menu
+@enduml

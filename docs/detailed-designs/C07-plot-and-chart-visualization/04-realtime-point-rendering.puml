@@ -1,0 +1,42 @@
+@startuml
+title C07 Realtime point rendering
+' Traces: OMCT-C07-L2-02.02
+
+participant "@cupola/components Plot View" as PlotView
+participant "@cupola/core Telemetry API" as TelemetryApi
+participant "@cupola/api Realtime Gateway" as RealtimeGateway
+participant "Cupola.Api RealtimeHub" as RealtimeHub
+participant "Telemetry Simulator Hosted Service" as Simulator
+participant "@cupola/components Plot Canvas" as PlotCanvas
+
+PlotView -> TelemetryApi: subscribe(object, latest)
+activate TelemetryApi
+TelemetryApi -> RealtimeGateway: connect /hubs/realtime
+activate RealtimeGateway
+RealtimeGateway -> RealtimeHub: SubscribeToTelemetry(keyString)
+activate RealtimeHub
+RealtimeHub --> RealtimeGateway: subscribed
+deactivate RealtimeHub
+RealtimeGateway --> TelemetryApi: subscription handle
+deactivate RealtimeGateway
+TelemetryApi --> PlotView: unsubscribe handle
+deactivate TelemetryApi
+
+Simulator -> RealtimeHub: TelemetryReceived(datum)
+activate RealtimeHub
+RealtimeHub -> RealtimeGateway: push datum
+deactivate RealtimeHub
+activate RealtimeGateway
+RealtimeGateway -> TelemetryApi: emit datum
+deactivate RealtimeGateway
+activate TelemetryApi
+TelemetryApi -> PlotView: callback(datum)
+deactivate TelemetryApi
+activate PlotView
+PlotView -> PlotCanvas: renderPoint(domain, range)
+activate PlotCanvas
+PlotCanvas --> PlotView: point rendered
+deactivate PlotCanvas
+PlotView --> PlotView: datum displayed
+deactivate PlotView
+@enduml

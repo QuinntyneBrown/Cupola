@@ -1,5 +1,4 @@
 using Cupola.Api.Hubs;
-using Cupola.Api.Services;
 using Cupola.Core.Models;
 using Cupola.Core.Services;
 
@@ -22,7 +21,6 @@ builder.Services.AddSingleton(
     builder.Configuration.GetSection("Branding").Get<BrandingOptions>() ?? new BrandingOptions());
 builder.Services.AddSingleton(
     builder.Configuration.GetSection("BuildInfo").Get<BuildInfo>() ?? new BuildInfo());
-builder.Services.AddHostedService<TelemetrySimulator>();
 
 var app = builder.Build();
 

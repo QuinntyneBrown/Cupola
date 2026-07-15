@@ -1,0 +1,36 @@
+@startuml
+title C02 object save selection, provenance, timestamps, and broadcast
+' Traces: OMCT-C02-L2-02.01, OMCT-C02-L2-02.02, OMCT-C02-L2-02.03, OMCT-C02-L2-02.04
+actor Consumer
+participant "@cupola/core Object Service" as Objects
+participant "User Service" as Users
+participant "@cupola/api HttpObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+participant "RealtimeHub" as Hub
+
+Consumer -> Objects ++: save(domain object)
+Objects -> Objects: compare serializable state
+alt state unchanged
+    Objects --> Consumer --: save suppressed
+else state changed
+    Objects -> Users ++: active user
+    Users --> Objects --: user identity
+    Objects -> Objects: set created, persisted, createdBy or modifiedBy
+    alt no persisted timestamp
+        Objects -> Gateway ++: POST /api/objects
+        Gateway -> Controller ++: POST /api/objects
+        Controller -> Store ++: create(domain object)
+    else persisted timestamp exists
+        Objects -> Gateway ++: PUT /api/objects/{id}
+        Gateway -> Controller ++: PUT /api/objects/{id}
+        Controller -> Store ++: update(domain object)
+    end
+    Store --> Controller --: saved object
+    Controller -> Hub ++: broadcast objectChanged
+    Hub --> Controller --: broadcast accepted
+    Controller --> Gateway --: saved object
+    Gateway --> Objects --: saved object
+    Objects --> Consumer --: saved object
+end
+@enduml

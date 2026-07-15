@@ -1,0 +1,53 @@
+@startuml
+title C08 Autoflow rows, telemetry, and composition
+' Traces: OMCT-C08-L2-04.01, OMCT-C08-L2-04.02, OMCT-C08-L2-04.03
+
+participant "Autoflow Tabular View" as AutoflowView
+participant "Autoflow Controller" as Controller
+participant "Autoflow Row Controller" as RowController
+participant "@cupola/core Composition Service" as CompositionService
+participant "@cupola/core Telemetry API" as TelemetryApi
+participant "@cupola/core Limit Evaluation" as LimitEvaluation
+
+AutoflowView -> CompositionService: getComposedChildren()
+activate CompositionService
+CompositionService --> AutoflowView: child objects
+deactivate CompositionService
+AutoflowView -> Controller: createRows(children)
+activate Controller
+loop each child
+    Controller -> RowController: create row(child)
+    activate RowController
+    RowController --> Controller: row ready
+    deactivate RowController
+end
+Controller --> AutoflowView: rows ready
+deactivate Controller
+AutoflowView -> AutoflowView: distribute rows across available columns
+
+AutoflowView -> TelemetryApi: request and subscribe child telemetry
+activate TelemetryApi
+TelemetryApi --> AutoflowView: historical or realtime telemetry
+deactivate TelemetryApi
+loop processed telemetry datum
+    AutoflowView -> RowController: updateValue(datum)
+    activate RowController
+    RowController -> LimitEvaluation: evaluate(datum)
+    activate LimitEvaluation
+    LimitEvaluation --> RowController: limit state
+    deactivate LimitEvaluation
+    RowController -> RowController: update value and limit class
+    RowController --> AutoflowView: row updated
+    deactivate RowController
+end
+
+CompositionService -> Controller: compositionChanged(change)
+activate Controller
+alt child enters composition
+    Controller -> RowController: add row and telemetry subscription
+else child leaves composition
+    Controller -> RowController: remove row and telemetry subscription
+end
+Controller --> CompositionService: row set updated
+deactivate Controller
+@enduml

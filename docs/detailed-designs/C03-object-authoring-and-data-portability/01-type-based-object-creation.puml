@@ -1,0 +1,35 @@
+@startuml
+title C03 type-based object creation
+' Traces: OMCT-C03-L2-01.01
+actor Operator
+participant "Create Action" as Create
+participant "Type Registry" as Types
+participant "Composition Service" as Composition
+participant "Form Service" as Form
+participant "@cupola/core Object Service" as Objects
+participant "@cupola/api HttpObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+participant "RealtimeHub" as Hub
+
+Operator -> Create ++: invoke(parent, typeKey)
+Create -> Types ++: get(typeKey)
+Types --> Create --: creatable type definition
+Create -> Composition ++: allow(parent, type)
+Composition --> Create --: parent accepts type
+Create -> Form ++: collect values
+Form --> Create --: valid form values
+Create -> Objects ++: save(new object)
+Objects -> Gateway ++: POST /api/objects
+Gateway -> Controller ++: POST /api/objects
+Controller -> Store ++: create(new object)
+Store --> Controller --: created object
+Controller -> Hub ++: broadcast objectChanged
+Hub --> Controller --: broadcast accepted
+Controller --> Gateway --: created object
+Gateway --> Objects --: created object
+Objects --> Create --: created object
+Create -> Composition ++: add(parent, created identifier)
+Composition --> Create --: parent composition updated
+Create --> Operator --: creation completed
+@enduml

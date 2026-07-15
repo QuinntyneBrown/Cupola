@@ -1,0 +1,38 @@
+@startuml
+title C15 inspector view resolution and rendering
+' Traces: OMCT-C15-L2-02.03, OMCT-C15-L2-02.04, OMCT-C15-L2-02.05
+actor Operator
+participant "InspectorPaneComponent" as InspectorPane
+participant "SelectionService" as Selection
+participant "InspectorViewRegistryService" as InspectorRegistry
+participant "StandardInspectorViews" as StandardViews
+participant "InspectorDataVisualizationProvider" as DataVizProvider
+participant "InspectorViewComponent" as InspectorView
+
+StandardViews -> InspectorRegistry: register properties, elements, plot elements, styles, annotations
+activate InspectorRegistry
+InspectorRegistry --> StandardViews: providers registered
+deactivate InspectorRegistry
+DataVizProvider -> InspectorRegistry: register numeric, imagery, telemetry frame views
+activate InspectorRegistry
+InspectorRegistry --> DataVizProvider: providers registered
+deactivate InspectorRegistry
+
+Operator -> Selection: select object or element
+activate Selection
+Selection --> InspectorPane: current selection
+deactivate Selection
+InspectorPane -> InspectorRegistry: getApplicableViews(selection)
+activate InspectorRegistry
+loop each inspector provider
+  InspectorRegistry -> InspectorRegistry: evaluate applicability
+end
+InspectorRegistry -> InspectorRegistry: populate key, name, and glyph metadata
+InspectorRegistry --> InspectorPane: applicable inspector views
+deactivate InspectorRegistry
+InspectorPane -> InspectorView: render selected inspector view
+activate InspectorView
+InspectorView --> InspectorPane: view rendered
+deactivate InspectorView
+InspectorPane --> Operator: display inspector content
+@enduml

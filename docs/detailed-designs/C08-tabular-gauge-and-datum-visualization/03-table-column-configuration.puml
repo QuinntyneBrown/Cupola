@@ -1,0 +1,42 @@
+@startuml
+title C08 Table column configuration
+' Traces: OMCT-C08-L2-01.04
+
+actor "Operator" as Operator
+participant "Table Configuration View" as ConfigView
+participant "Telemetry Table Configuration" as TableConfig
+participant "Table Component" as TableComponent
+participant "@cupola/api Object Gateway" as ObjectGateway
+participant "Cupola.Api ObjectsController" as ObjectsController
+participant "Cupola.Core IObjectStore" as ObjectStore
+participant "Cupola.Api RealtimeHub" as RealtimeHub
+
+Operator -> ConfigView: change column setting
+activate ConfigView
+ConfigView -> TableConfig: update visibility, order, width, or sorting
+activate TableConfig
+TableConfig -> TableComponent: apply column configuration
+activate TableComponent
+TableComponent --> TableConfig: table updated
+deactivate TableComponent
+TableConfig -> ObjectGateway: save configuration
+activate ObjectGateway
+ObjectGateway -> ObjectsController: PUT /api/objects/{keyString}
+activate ObjectsController
+ObjectsController -> ObjectStore: mutate domain object
+activate ObjectStore
+ObjectStore --> ObjectsController: updated domain object
+deactivate ObjectStore
+ObjectsController -> RealtimeHub: ObjectUpdated(updated)
+activate RealtimeHub
+RealtimeHub --> ObjectsController: broadcast accepted
+deactivate RealtimeHub
+ObjectsController --> ObjectGateway: updated domain object
+deactivate ObjectsController
+ObjectGateway --> TableConfig: configuration saved
+deactivate ObjectGateway
+TableConfig --> ConfigView: saved
+deactivate TableConfig
+ConfigView --> Operator: column setting persisted
+deactivate ConfigView
+@enduml

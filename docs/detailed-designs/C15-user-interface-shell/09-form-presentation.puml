@@ -1,0 +1,49 @@
+@startuml
+title C15 form control registration and presentation
+' Traces: OMCT-C15-L2-04.01, OMCT-C15-L2-04.02, OMCT-C15-L2-04.03
+actor Operator
+participant "FormsService" as FormsService
+participant "FormControlSource" as ControlSource
+participant "FormComponent" as Form
+participant "OverlayService" as OverlayService
+
+FormsService -> ControlSource: register default controls
+activate ControlSource
+ControlSource --> FormsService: autocomplete, checkbox, composite, datetime, file, locator, number, select, textarea, text, toggle
+deactivate ControlSource
+
+Operator -> FormsService: add custom control provider
+activate FormsService
+FormsService -> ControlSource: register provider by control name
+activate ControlSource
+ControlSource --> FormsService: provider registered
+deactivate ControlSource
+FormsService --> Operator: control available
+deactivate FormsService
+
+Operator -> FormsService: show form structure
+activate FormsService
+alt supplied element
+  FormsService -> Form: mount form in supplied element
+else overlay dialog
+  FormsService -> OverlayService: open form overlay
+  activate OverlayService
+  OverlayService --> FormsService: overlay reference
+  deactivate OverlayService
+  FormsService -> Form: mount form in overlay
+end
+activate Form
+Form -> ControlSource: resolve controls by name
+activate ControlSource
+ControlSource --> Form: control providers
+deactivate ControlSource
+Operator -> Form: save or cancel
+alt save
+  Form --> FormsService: resolve changed values
+else cancel
+  Form --> FormsService: reject form promise
+end
+deactivate Form
+FormsService --> Operator: form result
+deactivate FormsService
+@enduml

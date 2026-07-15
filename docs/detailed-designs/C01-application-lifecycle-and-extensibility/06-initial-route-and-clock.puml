@@ -1,0 +1,19 @@
+@startuml
+title C01 initial route and clock activation
+' Traces: OMCT-C01-L2-02.07
+actor Host
+participant "cupola Shell" as Shell
+participant "Time Service" as Time
+participant "Routing Service" as Routing
+
+Host -> Shell ++: bootstrap startup
+Shell -> Time ++: get active clock
+Time --> Shell --: none
+Shell -> Time ++: activate default clock
+Time --> Shell --: default clock active
+Shell -> Routing ++: inspect current route
+Routing --> Shell --: root route
+Shell -> Routing ++: redirect /browse/
+Routing --> Shell --: browse route active
+Shell --> Host --: startup initialization completed
+@enduml

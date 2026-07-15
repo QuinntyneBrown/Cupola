@@ -1,0 +1,57 @@
+@startuml
+title C15 adaptive shell branding and about dialog
+' Traces: OMCT-C15-L2-05.01, OMCT-C15-L2-05.02, OMCT-C15-L2-05.03, OMCT-C15-L2-05.04
+actor Operator
+participant "DeviceClassifierService" as DeviceClassifier
+participant "ThemeService" as ThemeService
+participant "BrandingService" as BrandingService
+participant "HttpBrandingGateway" as BrandingGateway
+participant "Cupola.Api BrandingController" as BrandingController
+participant "AppLogoComponent" as AppLogo
+participant "OverlayService" as OverlayService
+participant "AboutDialogComponent" as AboutDialog
+
+DeviceClassifier -> DeviceClassifier: detect device, orientation, and touch characteristics
+DeviceClassifier -> DeviceClassifier: add matching body classes
+ThemeService -> ThemeService: remove existing theme link
+ThemeService -> ThemeService: append selected theme CSS link
+
+AppLogo -> BrandingService: getBranding()
+activate BrandingService
+BrandingService -> BrandingGateway: GET branding
+activate BrandingGateway
+BrandingGateway -> BrandingController: GET /api/branding
+activate BrandingController
+BrandingController --> BrandingGateway: branding options
+deactivate BrandingController
+BrandingGateway --> BrandingService: branding options
+deactivate BrandingGateway
+BrandingService --> AppLogo: logo and about options
+deactivate BrandingService
+AppLogo --> Operator: display configured logo
+
+Operator -> AppLogo: activate logo
+activate AppLogo
+AppLogo -> BrandingService: getBuildInfo()
+activate BrandingService
+BrandingService -> BrandingGateway: GET build info
+activate BrandingGateway
+BrandingGateway -> BrandingController: GET /api/branding/build-info
+activate BrandingController
+BrandingController --> BrandingGateway: build information
+deactivate BrandingController
+BrandingGateway --> BrandingService: build information
+deactivate BrandingGateway
+BrandingService --> AppLogo: build information
+deactivate BrandingService
+AppLogo -> OverlayService: open large overlay
+activate OverlayService
+OverlayService -> AboutDialog: render branding, build, and license information
+activate AboutDialog
+AboutDialog --> OverlayService: dialog rendered
+deactivate AboutDialog
+OverlayService --> AppLogo: overlay displayed
+deactivate OverlayService
+AppLogo --> Operator: display about dialog
+deactivate AppLogo
+@enduml

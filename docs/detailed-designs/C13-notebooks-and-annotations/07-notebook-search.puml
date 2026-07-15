@@ -1,0 +1,24 @@
+@startuml
+title C13 notebook entry search
+' Traces: OMCT-C13-L2-02.04
+actor Operator
+participant "NotebookComponent" as Notebook
+participant "SearchResults" as Results
+participant "@cupola/core NotebookService" as NotebookService
+
+Operator -> Notebook: enter search term
+activate Notebook
+Notebook -> NotebookService: searchEntries(term)
+activate NotebookService
+loop each section and page
+  NotebookService -> NotebookService: compare searchable content
+end
+NotebookService --> Notebook: matching entries
+deactivate NotebookService
+Notebook -> Results: render matches
+activate Results
+Results --> Notebook: rendered search results
+deactivate Results
+Notebook --> Operator: display matching entries
+deactivate Notebook
+@enduml

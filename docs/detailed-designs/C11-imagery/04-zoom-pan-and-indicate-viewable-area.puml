@@ -1,0 +1,32 @@
+@startuml
+title Image zoom pan and viewable-area indicator
+' Traces: OMCT-C11-L2-02.01, OMCT-C11-L2-02.02
+actor Operator
+participant "Imagery View" as View
+participant "Image Controls" as Controls
+participant "Focused Image" as Image
+participant "Viewable Area Indicator" as Indicator
+
+Operator -> Controls: interact(zoomOrPan)
+activate Controls
+Controls -> View: applyInteraction(point, delta)
+activate View
+alt zoom interaction
+    View -> Image: updateScaleAroundPoint(point, delta)
+else pan interaction while zoomed
+    View -> Image: updateTranslation(delta)
+end
+activate Image
+Image --> View: scale and translation within bounds
+deactivate Image
+opt zoom factor greater than one
+    View -> Indicator: renderCurrentArea(scale, translation)
+    activate Indicator
+    Indicator --> View: indicator rendered
+    deactivate Indicator
+end
+View --> Controls: image inspection state updated
+deactivate View
+Controls --> Operator: focused image refreshed
+deactivate Controls
+@enduml

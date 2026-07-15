@@ -1,0 +1,40 @@
+@startuml
+title Folder grid and list presentation
+' Traces: OMCT-C09-L2-03.04
+actor Operator
+participant "Angular Shell" as Shell
+participant "Folder View Selector" as Selector
+participant "Composition Service" as Composition
+participant "Folder Grid View" as Grid
+participant "Folder List View" as List
+
+Operator -> Shell: navigate(folder)
+activate Shell
+Shell -> Selector: selectPresentation(gridOrList)
+activate Selector
+Selector -> Composition: readChildren(folder)
+activate Composition
+Composition --> Selector: composed children
+deactivate Composition
+alt grid selected
+    Selector -> Grid: render(children)
+    activate Grid
+    loop each child
+        Grid -> Grid: renderGridItem(child)
+    end
+    Grid --> Selector: selectable grid
+    deactivate Grid
+else list selected
+    Selector -> List: render(children)
+    activate List
+    loop each child
+        List -> List: renderListItem(child)
+    end
+    List --> Selector: selectable list
+    deactivate List
+end
+Selector --> Shell: selected presentation
+deactivate Selector
+Shell --> Operator: folder children shown
+deactivate Shell
+@enduml

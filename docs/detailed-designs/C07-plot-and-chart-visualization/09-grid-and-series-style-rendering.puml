@@ -1,0 +1,32 @@
+@startuml
+title C07 Grid and series style rendering
+' Traces: OMCT-C07-L2-03.04
+
+participant "Plot View" as PlotView
+participant "Plot Series Configuration" as SeriesConfiguration
+participant "Grid Renderer" as GridRenderer
+participant "Series Renderer" as SeriesRenderer
+
+PlotView -> SeriesConfiguration: read grid and series settings
+activate SeriesConfiguration
+SeriesConfiguration --> PlotView: grid, color, line, point, interpolation
+deactivate SeriesConfiguration
+PlotView -> GridRenderer: renderGrid(visibility)
+activate GridRenderer
+GridRenderer --> PlotView: grid state rendered
+deactivate GridRenderer
+loop each series
+    PlotView -> SeriesRenderer: renderSeries(style settings)
+    activate SeriesRenderer
+    SeriesRenderer --> PlotView: series rendered
+    deactivate SeriesRenderer
+end
+opt configuration changes
+    SeriesConfiguration -> PlotView: settingsChanged(updated settings)
+    activate PlotView
+    PlotView -> GridRenderer: renderGrid(updated visibility)
+    PlotView -> SeriesRenderer: renderSeries(updated style settings)
+    PlotView --> SeriesConfiguration: rendered with updated settings
+    deactivate PlotView
+end
+@enduml

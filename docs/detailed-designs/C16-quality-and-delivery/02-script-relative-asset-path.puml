@@ -1,0 +1,25 @@
+@startuml
+title C16 script-relative asset path initialization
+' Traces: OMCT-C16-L2-01.05
+participant "Browser document" as Document
+participant "openmct.js initializer" as Initializer
+participant "Webpack runtime" as WebpackRuntime
+
+Initializer -> Document: read current script URL
+activate Document
+alt URL ends with /openmct.js
+  Document --> Initializer: script URL
+  Initializer -> Initializer: derive containing directory
+  Initializer -> WebpackRuntime: set public path
+  activate WebpackRuntime
+  WebpackRuntime --> Initializer: public path set
+  deactivate WebpackRuntime
+else script URL unavailable
+  Document --> Initializer: no script URL
+  Initializer -> WebpackRuntime: leave configured public path
+  activate WebpackRuntime
+  WebpackRuntime --> Initializer: public path unchanged
+  deactivate WebpackRuntime
+end
+deactivate Document
+@enduml

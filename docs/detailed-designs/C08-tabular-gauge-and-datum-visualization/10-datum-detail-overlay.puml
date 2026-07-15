@@ -1,0 +1,34 @@
+@startuml
+title C08 Datum detail overlay
+' Traces: OMCT-C08-L2-04.04
+
+actor "Operator" as Operator
+participant "Compatible Telemetry View" as TelemetryView
+participant "View Datum Action" as ViewDatumAction
+participant "@cupola/core Telemetry Metadata Manager" as MetadataManager
+participant "@cupola/core Telemetry Value Formatter" as ValueFormatter
+participant "@cupola/components Overlay Service" as OverlayService
+
+Operator -> TelemetryView: select datum
+activate TelemetryView
+TelemetryView -> ViewDatumAction: run(selected datum)
+activate ViewDatumAction
+ViewDatumAction -> MetadataManager: getMetadata(object)
+activate MetadataManager
+MetadataManager --> ViewDatumAction: metadata fields
+deactivate MetadataManager
+loop each metadata field
+    ViewDatumAction -> ValueFormatter: format(datum[field])
+    activate ValueFormatter
+    ValueFormatter --> ViewDatumAction: formatted value
+    deactivate ValueFormatter
+end
+ViewDatumAction -> OverlayService: open datum details(fields)
+activate OverlayService
+OverlayService --> ViewDatumAction: overlay opened
+deactivate OverlayService
+ViewDatumAction --> TelemetryView: action complete
+deactivate ViewDatumAction
+TelemetryView --> Operator: datum details visible
+deactivate TelemetryView
+@enduml

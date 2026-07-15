@@ -1,0 +1,53 @@
+@startuml
+title C13 notebook section and page editing
+' Traces: OMCT-C13-L2-01.02
+actor Operator
+participant "NotebookView" as View
+participant "SectionCollection" as Sections
+participant "PageCollection" as Pages
+participant "@cupola/core NotebookService" as NotebookService
+participant "HttpObjectsGateway" as ObjectsGateway
+participant "Cupola.Api ObjectsController" as ObjectsController
+participant "Cupola.Core IObjectStore" as Store
+participant "RealtimeHub" as Hub
+
+Operator -> View: perform section or page operation
+activate View
+alt section operation
+  View -> Sections: add, rename, reorder, or delete
+  activate Sections
+  Sections -> NotebookService: update section structure
+  activate NotebookService
+  NotebookService --> Sections: updated notebook
+  deactivate NotebookService
+  Sections --> View: updated notebook
+  deactivate Sections
+else page operation
+  View -> Pages: add, rename, reorder, or delete
+  activate Pages
+  Pages -> NotebookService: update page structure
+  activate NotebookService
+  NotebookService --> Pages: updated notebook
+  deactivate NotebookService
+  Pages --> View: updated notebook
+  deactivate Pages
+end
+View -> ObjectsGateway: saveNotebook(updated notebook)
+activate ObjectsGateway
+ObjectsGateway -> ObjectsController: update domain object
+activate ObjectsController
+ObjectsController -> Store: persist notebook structure
+activate Store
+Store --> ObjectsController: persisted notebook
+deactivate Store
+ObjectsController -> Hub: emit objectChanged
+activate Hub
+Hub --> ObjectsController: broadcast accepted
+deactivate Hub
+ObjectsController --> ObjectsGateway: persisted notebook
+deactivate ObjectsController
+ObjectsGateway --> View: persisted notebook
+deactivate ObjectsGateway
+View --> Operator: display persisted structure
+deactivate View
+@enduml

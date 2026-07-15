@@ -1,0 +1,49 @@
+@startuml
+title C14 notification lifecycle
+' Traces: OMCT-C14-L2-04.01, OMCT-C14-L2-04.02, OMCT-C14-L2-04.03, OMCT-C14-L2-04.04
+actor Extension
+participant "NotificationService" as Notifications
+participant "NotificationIndicator" as Indicator
+participant "NotificationArea" as Area
+
+Extension -> Notifications: publish notification
+activate Notifications
+alt information notification
+  Notifications -> Area: display severity information
+  activate Area
+  Area --> Notifications: displayed
+  deactivate Area
+  Notifications -> Indicator: update count
+  activate Indicator
+  Indicator --> Notifications: count displayed
+  deactivate Indicator
+  ... configured timeout ...
+  Notifications -> Area: dismiss notification
+  activate Area
+  Area --> Notifications: dismissed
+  deactivate Area
+else alert or error notification
+  Notifications -> Area: display persistent severity
+  activate Area
+  Area --> Notifications: displayed
+  deactivate Area
+  Notifications -> Indicator: update count
+  activate Indicator
+  Indicator --> Notifications: count displayed
+  deactivate Indicator
+else progress notification
+  Notifications -> Area: display progress
+  activate Area
+  Area --> Notifications: displayed
+  deactivate Area
+  Notifications --> Extension: progress control
+  Extension -> Notifications: update progress control
+  Notifications -> Area: update message, text, or percentage
+  Area --> Notifications: updated
+  Extension -> Notifications: dismiss progress control
+  Notifications -> Area: remove progress notification
+  Area --> Notifications: removed
+end
+Notifications --> Extension: notification result
+deactivate Notifications
+@enduml

@@ -1,0 +1,23 @@
+@startuml
+title C14 indicator registration and priority rendering
+' Traces: OMCT-C14-L2-05.01
+actor Extension
+participant "IndicatorService" as IndicatorService
+participant "IndicatorArea" as IndicatorArea
+
+Extension -> IndicatorService: registerIndicator(indicator, priority)
+activate IndicatorService
+IndicatorService -> IndicatorService: store indicator
+IndicatorService --> Extension: indicator registered
+deactivate IndicatorService
+
+IndicatorArea -> IndicatorService: getIndicators()
+activate IndicatorService
+IndicatorService -> IndicatorService: sort by priority
+IndicatorService --> IndicatorArea: ordered indicators
+deactivate IndicatorService
+loop each indicator
+  IndicatorArea -> IndicatorArea: render HTML or component indicator
+end
+IndicatorArea --> Extension: priority order rendered
+@enduml

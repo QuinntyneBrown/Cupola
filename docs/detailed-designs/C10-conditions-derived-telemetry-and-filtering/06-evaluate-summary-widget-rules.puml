@@ -1,0 +1,35 @@
+@startuml
+title Summary-widget rule and aggregate evaluation
+' Traces: OMCT-C10-L2-02.03, OMCT-C10-L2-02.04
+participant "Telemetry Service" as Telemetry
+participant "Summary Widget View" as Widget
+participant "Summary Widget Evaluator" as Evaluator
+participant "Summary Widget Rule Renderer" as Renderer
+
+Telemetry -> Widget: telemetryChanged(currentValues)
+activate Widget
+Widget -> Evaluator: evaluate(orderedRules, currentValues)
+activate Evaluator
+loop ordered rules
+    alt single object scope
+        Evaluator -> Evaluator: matchConfiguredObject(rule)
+    else any composed object scope
+        Evaluator -> Evaluator: matchAnyComposedObject(rule)
+    else all composed objects scope
+        Evaluator -> Evaluator: matchAllComposedObjects(rule)
+    end
+    alt rule matches
+        Evaluator --> Widget: selected rule
+        Evaluator -> Evaluator: stop at first matching rule
+    else rule does not match
+        Evaluator -> Evaluator: continue evaluation
+    end
+end
+deactivate Evaluator
+Widget -> Renderer: render(text, icon, image, color, border)
+activate Renderer
+Renderer --> Widget: rule presentation rendered
+deactivate Renderer
+Widget --> Telemetry: summary refreshed
+deactivate Widget
+@enduml

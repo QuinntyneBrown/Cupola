@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Cupola.Api\Cupola.Api.csproj" />
+    <ProjectReference Include="..\..\nonproduction\Cupola.Simulators\Cupola.Simulators.csproj" />
   </ItemGroup>
 
 </Project>

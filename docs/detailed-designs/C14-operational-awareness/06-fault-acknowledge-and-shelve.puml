@@ -1,0 +1,32 @@
+@startuml
+title C14 fault acknowledge and shelving actions
+' Traces: OMCT-C14-L2-03.03, OMCT-C14-L2-03.04
+actor Operator
+participant "FaultListView" as FaultList
+participant "FaultManagementService" as FaultService
+participant "FaultProvider" as FaultProvider
+
+Operator -> FaultList: run fault action
+activate FaultList
+alt acknowledge selected fault
+  FaultList -> FaultService: acknowledge(fault)
+  activate FaultService
+  FaultService -> FaultProvider: acknowledge(fault)
+  activate FaultProvider
+  FaultProvider --> FaultService: acknowledgement accepted
+  deactivate FaultProvider
+  FaultService --> FaultList: acknowledgement result
+  deactivate FaultService
+else shelve selected fault
+  FaultList -> FaultService: shelve(fault)
+  activate FaultService
+  FaultService -> FaultProvider: shelve(fault)
+  activate FaultProvider
+  FaultProvider --> FaultService: shelving accepted
+  deactivate FaultProvider
+  FaultService --> FaultList: shelving result
+  deactivate FaultService
+end
+FaultList --> Operator: display action result
+deactivate FaultList
+@enduml

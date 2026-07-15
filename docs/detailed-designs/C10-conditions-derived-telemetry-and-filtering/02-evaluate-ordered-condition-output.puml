@@ -1,0 +1,51 @@
+@startuml
+title Ordered condition evaluation and output publication
+' Traces: OMCT-C10-L2-01.02, OMCT-C10-L2-01.03, OMCT-C10-L2-01.04
+participant "Telemetry Simulator Hosted Service" as Simulator
+participant "RealtimeHub" as Hub
+participant "SignalRRealtimeGateway" as Realtime
+participant "Telemetry Service" as Telemetry
+participant "Condition Set View" as View
+participant "Condition Evaluator" as Evaluator
+participant "Condition Result Service" as Results
+
+Simulator -> Hub: telemetry datum
+activate Hub
+Hub -> Realtime: emit telemetry datum
+activate Realtime
+Realtime -> Telemetry: publish(datum)
+activate Telemetry
+Telemetry -> View: telemetryChanged(datum)
+activate View
+View -> Evaluator: evaluate(conditions, currentTelemetry)
+activate Evaluator
+loop conditions in configured order
+    loop criteria in condition
+        Evaluator -> Evaluator: compare(operation, operands, value)
+    end
+    alt ANY trigger
+        Evaluator -> Evaluator: select true when any criterion matches
+    else ALL trigger
+        Evaluator -> Evaluator: select true when every criterion matches
+    end
+    alt condition result is true
+        Evaluator --> View: first matching output
+        View -> Results: publish(output)
+        activate Results
+        Results --> View: output published
+        deactivate Results
+        Evaluator -> Evaluator: stop at first true condition
+    else condition result is false
+        Evaluator -> Evaluator: continue evaluation
+    end
+end
+deactivate Evaluator
+View --> Telemetry: evaluation complete
+deactivate View
+Telemetry --> Realtime: update handled
+deactivate Telemetry
+Realtime --> Hub: delivered
+deactivate Realtime
+Hub --> Simulator: delivery complete
+deactivate Hub
+@enduml

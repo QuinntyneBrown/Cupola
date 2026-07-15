@@ -1,0 +1,48 @@
+@startuml
+title C06 Telemetry collection load and subscribe
+' Traces: OMCT-C06-L2-04.01, OMCT-C06-L2-04.02
+
+actor "Consumer" as Consumer
+participant "@cupola/core Telemetry API" as TelemetryApi
+participant "Telemetry Collection" as Collection
+participant "@cupola/core Time API" as TimeApi
+participant "@cupola/core Telemetry Metadata Manager" as MetadataManager
+participant "Diagnostic Logger" as Logger
+
+Consumer -> TelemetryApi: requestCollection(object)
+activate TelemetryApi
+TelemetryApi -> TimeApi: getContext(path)
+activate TimeApi
+TimeApi --> TelemetryApi: time context
+deactivate TimeApi
+TelemetryApi -> MetadataManager: getMetadata(object)
+activate MetadataManager
+MetadataManager --> TelemetryApi: normalized metadata
+deactivate MetadataManager
+TelemetryApi -> Collection: create(object, metadata, time context)
+activate Collection
+Collection -> Collection: check active time-system key
+alt metadata lacks active time domain
+    Collection -> Logger: warn time-metadata mismatch
+end
+Collection --> TelemetryApi: collection
+deactivate Collection
+TelemetryApi --> Consumer: collection
+deactivate TelemetryApi
+
+Consumer -> Collection: load()
+activate Collection
+Collection -> TelemetryApi: request(object, bounds)
+activate TelemetryApi
+TelemetryApi --> Collection: historical data
+deactivate TelemetryApi
+Collection --> Consumer: bounded data
+
+Consumer -> Collection: subscribe(callback)
+Collection -> TelemetryApi: subscribe(object, callback)
+activate TelemetryApi
+TelemetryApi --> Collection: unsubscribe handle
+deactivate TelemetryApi
+Collection --> Consumer: unsubscribe handle
+deactivate Collection
+@enduml

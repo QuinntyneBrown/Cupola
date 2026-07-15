@@ -1,0 +1,27 @@
+@startuml
+title C16 accessibility scan and failure artifacts
+' Traces: OMCT-C16-L2-03.01, OMCT-C16-L2-03.03
+participant "Visual-accessibility test" as Test
+participant "Playwright page" as Page
+participant "axe scanner" as Axe
+participant "Playwright test-results" as Results
+
+Test -> Page: open visual-accessibility page
+activate Page
+Page --> Test: page ready
+deactivate Page
+Test -> Axe: scan with wcag2aa tags
+activate Axe
+Axe --> Test: violations list
+deactivate Axe
+alt no violations
+  Test -> Test: assert zero violations
+else one or more violations
+  Test -> Results: write JSON accessibility report
+  activate Results
+  Results --> Test: report written
+  Test -> Results: write screenshot
+  Results --> Test: screenshot written
+  deactivate Results
+end
+@enduml

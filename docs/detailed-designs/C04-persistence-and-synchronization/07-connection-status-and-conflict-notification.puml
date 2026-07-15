@@ -1,0 +1,30 @@
+@startuml
+title C04 connection status and conflict notification
+' Traces: OMCT-C04-L2-02.06, OMCT-C04-L2-02.07
+actor Operator
+participant "CouchStatusIndicator" as Indicator
+participant "CouchObjectProvider" as Provider
+participant "Notification Service" as Notifications
+participant "Editor Service" as Editor
+participant "@cupola/core Object Service" as Objects
+
+Provider -> Indicator ++: request state changed
+alt pending
+    Indicator --> Operator --: pending state displayed
+else connected
+    Indicator --> Operator --: connected state displayed
+else disconnected
+    Indicator --> Operator --: disconnected state displayed
+else unknown
+    Indicator --> Operator --: unknown state displayed
+end
+
+Operator -> Editor ++: save edited object
+Editor -> Objects ++: save(object)
+Objects -> Provider ++: create or update
+Provider --> Objects --: persistence conflict rejection
+Objects -> Notifications ++: issue conflict notification
+Notifications --> Objects --: notification issued
+Objects --> Editor --: save failed; unsaved state preserved
+Editor --> Operator --: edit retained
+@enduml

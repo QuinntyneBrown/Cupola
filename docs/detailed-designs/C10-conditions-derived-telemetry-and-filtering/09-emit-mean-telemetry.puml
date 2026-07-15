@@ -1,0 +1,26 @@
+@startuml
+title Mean telemetry sample-window calculation
+' Traces: OMCT-C10-L2-03.03
+participant "Mean Telemetry Provider" as Provider
+participant "Telemetry Service" as Telemetry
+participant "Mean Calculator" as Calculator
+participant "Mean Telemetry Stream" as Stream
+
+Provider -> Telemetry: request(sourceRange)
+activate Telemetry
+Telemetry --> Provider: source values
+deactivate Telemetry
+Provider -> Calculator: selectLatestWindow(sampleCount)
+activate Calculator
+alt at least sample count available
+    Calculator -> Calculator: calculateArithmeticMean(values)
+    Calculator --> Provider: mean datum
+    Provider -> Stream: emit(mean datum)
+    activate Stream
+    Stream --> Provider: mean accepted
+    deactivate Stream
+else fewer samples available
+    Calculator --> Provider: no mean datum
+end
+deactivate Calculator
+@enduml

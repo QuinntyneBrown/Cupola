@@ -1,0 +1,50 @@
+@startuml
+title C15 overlay stack and tooltip lifecycle
+' Traces: OMCT-C15-L2-04.04, OMCT-C15-L2-04.05
+actor Operator
+participant "OverlayService" as OverlayService
+participant "Overlay" as Overlay
+participant "TooltipService" as TooltipService
+participant "TooltipComponent" as Tooltip
+
+Operator -> OverlayService: show overlay
+activate OverlayService
+alt previous overlay auto-hides
+  OverlayService -> Overlay: hide previous overlay
+  activate Overlay
+  Overlay --> OverlayService: previous overlay hidden
+  deactivate Overlay
+end
+OverlayService -> Overlay: push new overlay
+activate Overlay
+Overlay --> OverlayService: overlay active
+deactivate Overlay
+OverlayService --> Operator: overlay displayed
+deactivate OverlayService
+
+Operator -> OverlayService: press Escape
+activate OverlayService
+OverlayService -> Overlay: dismiss last dismissible overlay
+activate Overlay
+Overlay --> OverlayService: overlay dismissed
+deactivate Overlay
+opt hidden previous overlay exists
+  OverlayService -> Overlay: restore previous overlay
+  activate Overlay
+  Overlay --> OverlayService: previous overlay restored
+  deactivate Overlay
+end
+OverlayService --> Operator: overlay stack updated
+deactivate OverlayService
+
+Operator -> TooltipService: show tooltip
+activate TooltipService
+TooltipService -> Tooltip: destroy existing tooltips
+activate Tooltip
+Tooltip --> TooltipService: existing tooltips removed
+TooltipService -> Tooltip: show active tooltip
+Tooltip --> TooltipService: active tooltip displayed
+deactivate Tooltip
+TooltipService --> Operator: tooltip tracked as active
+deactivate TooltipService
+@enduml

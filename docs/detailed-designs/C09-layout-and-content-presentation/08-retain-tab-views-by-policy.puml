@@ -1,0 +1,38 @@
+@startuml
+title Tab view retention policy
+' Traces: OMCT-C09-L2-03.02
+actor Operator
+participant "Tabs View" as Tabs
+participant "Loading Policy" as Policy
+participant "View Registry" as Views
+participant "Inactive Child View" as Inactive
+participant "Active Child View" as Active
+
+Operator -> Tabs: selectTab(child)
+activate Tabs
+Tabs -> Policy: readLoadingPolicy(tabsObject)
+activate Policy
+Policy --> Tabs: eager or keepAlive policy
+deactivate Policy
+Tabs -> Active: deactivateCurrent()
+activate Active
+Active --> Tabs: deactivated
+deactivate Active
+alt eager loading or keep-alive enabled
+    Tabs -> Inactive: retainView()
+    activate Inactive
+    Inactive --> Tabs: retained inactive view
+    deactivate Inactive
+else retention disabled
+    Tabs -> Inactive: destroyView()
+    activate Inactive
+    Inactive --> Tabs: destroyed inactive view
+    deactivate Inactive
+end
+Tabs -> Views: instantiateOrRestore(child)
+activate Views
+Views --> Tabs: selected child view
+deactivate Views
+Tabs --> Operator: active tab changed
+deactivate Tabs
+@enduml

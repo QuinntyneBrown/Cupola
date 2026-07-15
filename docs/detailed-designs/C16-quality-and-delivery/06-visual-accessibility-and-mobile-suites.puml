@@ -1,0 +1,30 @@
+@startuml
+title C16 visual-accessibility and mobile browser suites
+' Traces: OMCT-C16-L2-03.02, OMCT-C16-L2-03.04
+participant "Playwright runner" as Runner
+participant "Visual-accessibility suite" as VisualSuite
+participant "Mobile projects" as MobileProjects
+participant "Browser page" as Page
+
+Runner -> VisualSuite: run scenarios under e2e/tests/visual-a11y
+activate VisualSuite
+loop covered page or plugin scenario
+  VisualSuite -> Page: execute visual and accessibility check
+  activate Page
+  Page --> VisualSuite: scenario result
+  deactivate Page
+end
+VisualSuite --> Runner: suite result
+deactivate VisualSuite
+
+Runner -> MobileProjects: run iPad landscape and iPhone 14 Pro WebKit projects
+activate MobileProjects
+loop mobile smoke scenario
+  MobileProjects -> Page: verify tree, search navigation, time conductor editing, or removal confirmation
+  activate Page
+  Page --> MobileProjects: scenario result
+  deactivate Page
+end
+MobileProjects --> Runner: mobile result
+deactivate MobileProjects
+@enduml

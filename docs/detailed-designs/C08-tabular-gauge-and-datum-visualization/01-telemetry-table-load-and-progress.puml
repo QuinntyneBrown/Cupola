@@ -1,0 +1,36 @@
+@startuml
+title C08 Telemetry table load and progress
+' Traces: OMCT-C08-L2-01.01, OMCT-C08-L2-01.02
+
+participant "Telemetry Table View" as TableView
+participant "Table Component" as TableComponent
+participant "@cupola/core Telemetry Metadata Manager" as MetadataManager
+participant "@cupola/core Telemetry API" as TelemetryApi
+participant "@cupola/api Telemetry Gateway" as TelemetryGateway
+participant "Cupola.Api telemetry endpoint" as TelemetryEndpoint
+
+TableView -> TableComponent: load table
+activate TableComponent
+TableComponent -> TableComponent: show progress indicator
+TableComponent -> MetadataManager: getMetadata(object)
+activate MetadataManager
+MetadataManager --> TableComponent: selected metadata columns
+deactivate MetadataManager
+TableComponent -> TelemetryApi: request(object, bounds)
+activate TelemetryApi
+TelemetryApi -> TelemetryGateway: GET /api/telemetry/{id}
+activate TelemetryGateway
+TelemetryGateway -> TelemetryEndpoint: get historical telemetry
+activate TelemetryEndpoint
+TelemetryEndpoint --> TelemetryGateway: telemetry data
+deactivate TelemetryEndpoint
+TelemetryGateway --> TelemetryApi: telemetry data
+deactivate TelemetryGateway
+TelemetryApi --> TableComponent: historical data
+deactivate TelemetryApi
+TableComponent -> TableComponent: render one row per datum
+TableComponent -> TableComponent: render one data column per selected metadata value
+TableComponent -> TableComponent: hide progress indicator
+TableComponent --> TableView: table rendered
+deactivate TableComponent
+@enduml

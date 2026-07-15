@@ -1,0 +1,29 @@
+@startuml
+title C04 remote object operations and shared-worker fallback
+' Traces: OMCT-C04-L2-02.01, OMCT-C04-L2-02.04
+actor Consumer
+participant "CouchObjectProvider" as Provider
+participant "Shared Worker" as Worker
+participant "@cupola/api HttpObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+
+Consumer -> Provider ++: get or save object
+alt shared worker available
+    Provider -> Worker ++: dispatch operation
+    Worker -> Gateway ++: GET, POST, or PUT /api/objects
+else shared worker unavailable
+    Provider -> Gateway ++: GET, POST, or PUT /api/objects
+end
+Gateway -> Controller ++: object operation
+Controller -> Store ++: corresponding store operation
+Store --> Controller --: operation result
+Controller --> Gateway --: HTTP result
+alt shared worker available
+    Gateway --> Worker --: HTTP result
+    Worker --> Provider --: operation result
+else shared worker unavailable
+    Gateway --> Provider --: operation result
+end
+Provider --> Consumer --: object result
+@enduml

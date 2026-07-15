@@ -1,0 +1,26 @@
+@startuml
+title C03 folder creation
+' Traces: OMCT-C03-L2-02.01
+actor Operator
+participant "New Folder Action" as FolderAction
+participant "Composition Service" as Composition
+participant "@cupola/core Object Service" as Objects
+participant "@cupola/api HttpObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+
+Operator -> FolderAction ++: invoke(parent)
+FolderAction -> Composition ++: allow(parent, folder type)
+Composition --> FolderAction --: parent accepts folder
+FolderAction -> Objects ++: save(folder object)
+Objects -> Gateway ++: POST /api/objects
+Gateway -> Controller ++: POST /api/objects
+Controller -> Store ++: create(folder object)
+Store --> Controller --: folder created
+Controller --> Gateway --: folder object
+Gateway --> Objects --: folder object
+Objects --> FolderAction --: folder object
+FolderAction -> Composition ++: add(parent, folder identifier)
+Composition --> FolderAction --: parent composition updated
+FolderAction --> Operator --: folder created
+@enduml

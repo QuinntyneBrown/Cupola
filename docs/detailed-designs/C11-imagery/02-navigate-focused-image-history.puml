@@ -1,0 +1,33 @@
+@startuml
+title Focused image thumbnail and keyboard navigation
+' Traces: OMCT-C11-L2-01.03, OMCT-C11-L2-01.04
+actor Operator
+participant "Imagery View" as View
+participant "Image History" as History
+participant "Image Thumbnail" as Thumbnail
+participant "Focused Image" as Focused
+
+Operator -> View: interactWithHistory(control)
+activate View
+alt thumbnail selected
+    View -> Thumbnail: select(thumbnailId)
+    activate Thumbnail
+    Thumbnail -> History: resolveImage(thumbnailId)
+    activate History
+    History --> Thumbnail: image and timestamp
+    deactivate History
+    Thumbnail --> View: selected image
+    deactivate Thumbnail
+else arrow key pressed
+    View -> History: adjacentImage(direction)
+    activate History
+    History --> View: adjacent image and timestamp
+    deactivate History
+end
+View -> Focused: display(image, timestamp)
+activate Focused
+Focused --> View: focused image updated
+deactivate Focused
+View --> Operator: image focus changed
+deactivate View
+@enduml

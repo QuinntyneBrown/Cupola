@@ -1,0 +1,66 @@
+@startuml
+title C06 Shared realtime subscription lifecycle
+' Traces: OMCT-C06-L2-02.01, OMCT-C06-L2-02.02
+
+actor "Consumer A" as ConsumerA
+actor "Consumer B" as ConsumerB
+participant "@cupola/core Telemetry API" as TelemetryApi
+participant "@cupola/api Realtime Gateway" as RealtimeGateway
+participant "Cupola.Api RealtimeHub" as RealtimeHub
+participant "Telemetry Simulator Hosted Service" as Simulator
+
+ConsumerA -> TelemetryApi: subscribe(object, strategy)
+activate TelemetryApi
+TelemetryApi -> TelemetryApi: create shared cache entry
+TelemetryApi -> RealtimeGateway: connect /hubs/realtime
+activate RealtimeGateway
+RealtimeGateway -> RealtimeHub: SubscribeToTelemetry(keyString)
+activate RealtimeHub
+RealtimeHub --> RealtimeGateway: subscribed
+deactivate RealtimeHub
+RealtimeGateway --> TelemetryApi: provider unsubscribe handle
+deactivate RealtimeGateway
+TelemetryApi --> ConsumerA: consumer unsubscribe handle
+deactivate TelemetryApi
+
+ConsumerB -> TelemetryApi: subscribe(object, strategy)
+activate TelemetryApi
+TelemetryApi -> TelemetryApi: reuse shared cache entry
+TelemetryApi --> ConsumerB: consumer unsubscribe handle
+deactivate TelemetryApi
+
+loop telemetry emission
+    Simulator -> RealtimeHub: TelemetryReceived(datum)
+    activate RealtimeHub
+    RealtimeHub -> RealtimeGateway: push datum
+    deactivate RealtimeHub
+    activate RealtimeGateway
+    RealtimeGateway -> TelemetryApi: emit telemetry
+    deactivate RealtimeGateway
+    activate TelemetryApi
+    TelemetryApi -> ConsumerA: callback(datum)
+    TelemetryApi -> ConsumerB: callback(datum)
+    deactivate TelemetryApi
+end
+
+ConsumerA -> TelemetryApi: unsubscribe()
+activate TelemetryApi
+TelemetryApi -> TelemetryApi: remove Consumer A
+TelemetryApi --> ConsumerA: unsubscribed
+deactivate TelemetryApi
+
+ConsumerB -> TelemetryApi: unsubscribe()
+activate TelemetryApi
+TelemetryApi -> TelemetryApi: remove final consumer
+TelemetryApi -> RealtimeGateway: provider unsubscribe
+activate RealtimeGateway
+RealtimeGateway -> RealtimeHub: UnsubscribeFromTelemetry(keyString)
+activate RealtimeHub
+RealtimeHub --> RealtimeGateway: unsubscribed
+deactivate RealtimeHub
+RealtimeGateway --> TelemetryApi: released
+deactivate RealtimeGateway
+TelemetryApi -> TelemetryApi: remove cache entry
+TelemetryApi --> ConsumerB: unsubscribed
+deactivate TelemetryApi
+@enduml

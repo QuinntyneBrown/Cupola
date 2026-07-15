@@ -1,0 +1,45 @@
+@startuml
+title Condition configuration editing and persistence
+' Traces: OMCT-C10-L2-01.06
+actor Operator
+participant "Condition Inspector" as Inspector
+participant "Condition Manager" as Manager
+participant "ObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+participant "RealtimeHub" as Hub
+
+Operator -> Inspector: changeConditionProperty(property)
+activate Inspector
+Inspector -> Manager: applyChange(property)
+activate Manager
+alt addition
+    Manager -> Manager: addConditionOrCriterion(property)
+else removal
+    Manager -> Manager: removeConditionOrCriterion(property)
+else reorder
+    Manager -> Manager: reorderConditions(property)
+else trigger criteria or output property
+    Manager -> Manager: updateConditionProperty(property)
+end
+Manager -> Gateway: PUT /api/objects/{id}
+activate Gateway
+Gateway -> Controller: PUT /api/objects/{id}
+activate Controller
+Controller -> Store: update(conditionSet)
+activate Store
+Store --> Controller: saved condition set
+deactivate Store
+Controller -> Hub: broadcast objectUpdated
+activate Hub
+Hub --> Controller: broadcast accepted
+deactivate Hub
+Controller --> Gateway: 200 OK
+deactivate Controller
+Gateway --> Manager: saved configuration
+deactivate Gateway
+Manager --> Inspector: configuration updated
+deactivate Manager
+Inspector --> Operator: editable state refreshed
+deactivate Inspector
+@enduml

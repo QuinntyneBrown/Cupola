@@ -1,0 +1,23 @@
+@startuml
+title C02 custom composition provider observation
+' Traces: OMCT-C02-L2-03.03
+actor Consumer
+participant "Composition Service" as Composition
+participant "Custom Composition Provider" as Provider
+participant "Composition Observer" as Observer
+
+Consumer -> Composition ++: get(parent)
+Composition -> Provider ++: load(parent)
+Provider --> Composition --: provider children
+Composition --> Consumer --: composition collection
+
+opt provider supports observation
+    Consumer -> Composition ++: observe(observer)
+    Composition -> Provider ++: observe(parent)
+    Provider --> Composition --: unsubscribe handle
+    Provider -> Composition ++: membership changed
+    Composition -> Observer ++: relay membership change
+    Observer --> Composition --: handled
+    Composition --> Provider --: change relayed
+end
+@enduml

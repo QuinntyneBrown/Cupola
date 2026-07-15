@@ -1,0 +1,22 @@
+@startuml
+title C04 object migration and legacy identifier conversion
+' Traces: OMCT-C04-L2-04.01, OMCT-C04-L2-04.02
+actor Consumer
+participant "@cupola/core Object Service" as Objects
+participant "Object Provider" as Provider
+participant "Object Migration Interceptor" as Migration
+participant "Identifier Utilities" as Identifier
+
+Consumer -> Objects ++: get(identifier)
+Objects -> Provider ++: get(identifier)
+Provider --> Objects --: persisted state
+Objects -> Migration ++: apply if legacy condition matches
+alt legacy object matches migration
+    Migration -> Identifier ++: convert string identifiers and composition
+    Identifier --> Migration --: namespace-key identifiers
+    Migration --> Objects --: migrated representation
+else current representation
+    Migration --> Objects --: unchanged representation
+end
+Objects --> Consumer --: domain object
+@enduml

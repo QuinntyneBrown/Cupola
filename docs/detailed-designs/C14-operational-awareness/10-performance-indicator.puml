@@ -1,0 +1,19 @@
+@startuml
+title C14 performance indicator frame sampling
+' Traces: OMCT-C14-L2-05.03
+participant "PerformanceIndicator" as Indicator
+participant "Browser animation frames" as Frames
+participant "IndicatorArea" as IndicatorArea
+
+loop animation frames sampled
+  Indicator -> Frames: request frame timestamp
+  activate Frames
+  Frames --> Indicator: frame timestamp
+  deactivate Frames
+  Indicator -> Indicator: calculate frames per second
+  Indicator -> IndicatorArea: update FPS value
+  activate IndicatorArea
+  IndicatorArea --> Indicator: value displayed
+  deactivate IndicatorArea
+end
+@enduml

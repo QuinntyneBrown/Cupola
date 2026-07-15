@@ -1,0 +1,32 @@
+@startuml
+title C03 removal and locked-object action policy
+' Traces: OMCT-C03-L2-02.05, OMCT-C03-L2-02.06
+actor Operator
+participant "Action Service" as Actions
+participant "Remove Action" as Remove
+participant "Move Action" as Move
+participant "Transaction" as Transaction
+participant "Mutable Parent Composition" as Parent
+
+Operator -> Actions ++: applicableActions(selection)
+Actions -> Remove ++: appliesTo(selection)
+Actions -> Move ++: appliesTo(selection)
+alt locked original selected
+    Remove --> Actions --: direct removal rejected
+    Move --> Actions --: permitted move rules applied
+    Actions --> Operator --: allowed hierarchy actions
+else removable child selected
+    Remove --> Actions --: applicable
+    Actions --> Operator --: remove action exposed
+    Operator -> Remove ++: invoke(child, parent)
+    Remove -> Transaction ++: open(parent)
+    Transaction -> Parent ++: remove child
+    Parent --> Transaction --: child removed
+    Transaction --> Remove --: transaction closed
+    Remove --> Operator --: membership removed
+else alias workflow selected
+    Remove --> Actions --: alias rule applied
+    Move --> Actions --: alias rule applied
+    Actions --> Operator --: allowed alias actions
+end
+@enduml

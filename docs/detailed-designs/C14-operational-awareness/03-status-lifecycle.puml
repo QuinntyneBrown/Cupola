@@ -1,0 +1,36 @@
+@startuml
+title C14 object status lifecycle
+' Traces: OMCT-C14-L2-02.01
+actor Extension
+participant "@cupola/core StatusService" as StatusService
+participant "StatusObserver" as Observer
+
+Extension -> StatusService: observeStatus(identifier, observer)
+activate StatusService
+StatusService -> Observer: register observer
+activate Observer
+Observer --> StatusService: registered
+deactivate Observer
+StatusService --> Extension: subscription
+deactivate StatusService
+
+Extension -> StatusService: setStatus(identifier, status)
+activate StatusService
+StatusService -> StatusService: store status
+StatusService -> Observer: statusChanged(status)
+activate Observer
+Observer --> StatusService: acknowledged
+deactivate Observer
+StatusService --> Extension: status stored
+deactivate StatusService
+
+Extension -> StatusService: deleteStatus(identifier)
+activate StatusService
+StatusService -> StatusService: remove status
+StatusService -> Observer: statusDeleted(identifier)
+activate Observer
+Observer --> StatusService: acknowledged
+deactivate Observer
+StatusService --> Extension: status removed
+deactivate StatusService
+@enduml

@@ -1,0 +1,17 @@
+@startuml
+title C02 identifier conversion and type registration
+' Traces: OMCT-C02-L2-01.01, OMCT-C02-L2-01.02
+actor Extension
+participant "Identifier Utilities" as Identifier
+participant "Type Registry" as Types
+
+Extension -> Identifier ++: toKeyString({namespace, key})
+Identifier --> Extension --: key string
+Extension -> Identifier ++: parseKeyString(key string)
+Identifier --> Extension --: {namespace, key}
+
+Extension -> Types ++: add(typeKey, definition)
+Types --> Extension --: type registered
+Extension -> Types ++: get(typeKey)
+Types --> Extension --: standardized registered type
+@enduml

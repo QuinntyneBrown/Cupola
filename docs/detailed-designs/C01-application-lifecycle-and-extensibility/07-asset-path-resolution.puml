@@ -1,0 +1,18 @@
+@startuml
+title C01 asset path resolution
+' Traces: OMCT-C01-L2-03.01, OMCT-C01-L2-03.02
+actor Extension
+participant "cupola Shell" as Shell
+participant "Configuration" as Config
+
+Extension -> Shell ++: getAssetPath()
+Shell -> Config ++: read assetPath
+alt configured path exists
+    Config --> Shell --: configured path
+    Shell --> Shell: normalize one trailing slash
+    Shell --> Extension --: normalized path
+else no configured path
+    Config --> Shell --: no value
+    Shell --> Extension --: /
+end
+@enduml

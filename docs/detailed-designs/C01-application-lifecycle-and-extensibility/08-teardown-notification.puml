@@ -1,0 +1,24 @@
+@startuml
+title C01 teardown notification
+' Traces: OMCT-C01-L2-03.03
+actor Host
+participant "cupola Shell" as Shell
+participant "Browser Window" as Window
+participant "Destroy Listener" as Listener
+
+Host -> Shell ++: start()
+Shell -> Window ++: add unload listener
+Window --> Shell --: listener registered
+Shell --> Host --: application started
+
+alt host destroys application
+    Host -> Shell ++: destroy()
+else browser unloads application
+    Window -> Shell ++: unload
+end
+Shell -> Listener ++: emit destroy
+Listener --> Shell --: event received
+Shell -> Window ++: remove unload listener
+Window --> Shell --: listener removed
+Shell --> Host --: destroyed
+@enduml

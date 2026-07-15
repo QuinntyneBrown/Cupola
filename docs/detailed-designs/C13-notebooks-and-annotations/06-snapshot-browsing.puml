@@ -1,0 +1,34 @@
+@startuml
+title C13 notebook snapshot browsing
+' Traces: OMCT-C13-L2-02.03
+actor Operator
+participant "NotebookComponent" as Notebook
+participant "NotebookSnapshotContainer" as SnapshotContainer
+participant "NotebookEmbed" as Embed
+
+Operator -> Notebook: open snapshot container
+activate Notebook
+Notebook -> SnapshotContainer: load entry snapshots
+activate SnapshotContainer
+SnapshotContainer -> Embed: render available snapshot content
+activate Embed
+Embed --> SnapshotContainer: snapshot rendered
+deactivate Embed
+SnapshotContainer --> Notebook: displayed snapshot list
+deactivate SnapshotContainer
+Notebook --> Operator: display available snapshots
+deactivate Notebook
+
+Operator -> Notebook: expand snapshot
+activate Notebook
+Notebook -> SnapshotContainer: set expanded state
+activate SnapshotContainer
+SnapshotContainer -> Embed: display expanded snapshot
+activate Embed
+Embed --> SnapshotContainer: expanded content rendered
+deactivate Embed
+SnapshotContainer --> Notebook: expanded state
+deactivate SnapshotContainer
+Notebook --> Operator: display expanded snapshot
+deactivate Notebook
+@enduml

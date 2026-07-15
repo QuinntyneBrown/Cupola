@@ -1,0 +1,35 @@
+@startuml
+title C15 shell selection state
+' Traces: OMCT-C15-L2-01.05
+actor Operator
+participant "Selectable directive" as Selectable
+participant "SelectionService" as Selection
+participant "Selected DOM elements" as Elements
+participant "RouteEventsService" as Events
+
+Operator -> Selectable: select element
+activate Selectable
+Selectable -> Selection: select(context)
+activate Selection
+alt single selection
+  Selection -> Selection: replace selected collection
+else multi-selection
+  Selection -> Selection: append selection context
+end
+Selection -> Elements: apply selected attributes
+activate Elements
+Elements --> Selection: selected attributes applied
+deactivate Elements
+Selection -> Elements: apply selected-parent attributes
+activate Elements
+Elements --> Selection: selected-parent attributes applied
+deactivate Elements
+Selection -> Events: emit selection-change
+activate Events
+Events --> Selection: event emitted
+deactivate Events
+Selection --> Selectable: selection state updated
+deactivate Selection
+Selectable --> Operator: display selected state
+deactivate Selectable
+@enduml

@@ -1,0 +1,51 @@
+@startuml
+title Image layer visibility and persistence
+' Traces: OMCT-C11-L2-02.04
+actor Operator
+participant "Imagery View" as View
+participant "Telemetry Metadata" as Metadata
+participant "Layer Settings" as Layers
+participant "Image Overlay Renderer" as Overlays
+participant "ObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+participant "RealtimeHub" as Hub
+
+View -> Metadata: readLayers(focusedImage)
+activate Metadata
+Metadata --> View: named layers
+deactivate Metadata
+View -> Layers: renderLayerControls(namedLayers)
+activate Layers
+Layers --> View: controls rendered
+Operator -> Layers: toggleLayer(layer)
+Layers -> View: setLayerVisibility(layer, visible)
+activate View
+View -> Overlays: renderVisibleOverlays(visibleLayers)
+activate Overlays
+Overlays --> View: overlays updated
+deactivate Overlays
+alt object supports mutation
+    View -> Gateway: PUT /api/objects/{id}
+    activate Gateway
+    Gateway -> Controller: PUT /api/objects/{id}
+    activate Controller
+    Controller -> Store: update(layerVisibility)
+    activate Store
+    Store --> Controller: saved object
+    deactivate Store
+    Controller -> Hub: broadcast objectUpdated
+    activate Hub
+    Hub --> Controller: broadcast accepted
+    deactivate Hub
+    Controller --> Gateway: 200 OK
+    deactivate Controller
+    Gateway --> View: saved layer visibility
+    deactivate Gateway
+else object does not support mutation
+    View --> Layers: visible overlays updated only
+end
+View --> Operator: layer visibility changed
+deactivate View
+deactivate Layers
+@enduml

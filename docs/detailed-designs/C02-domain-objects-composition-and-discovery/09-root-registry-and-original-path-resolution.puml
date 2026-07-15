@@ -1,0 +1,25 @@
+@startuml
+title C02 root registry and original path resolution
+' Traces: OMCT-C02-L2-03.05, OMCT-C02-L2-03.06
+actor Consumer
+participant "Root Registry" as Roots
+participant "@cupola/core Object Service" as Objects
+participant "Composition Service" as Composition
+
+Consumer -> Roots ++: registerRoot(identifier, priority)
+Roots --> Consumer --: root registered
+Consumer -> Roots ++: loadRootComposition()
+Roots -> Roots: sort identifiers by priority
+loop each root identifier
+    Roots -> Objects ++: get(identifier)
+    Objects --> Roots --: root domain object
+end
+Roots --> Consumer --: roots in priority order
+
+Consumer -> Objects ++: getOriginalPath(object)
+loop location chain until next location repeats or ends
+    Objects -> Composition ++: parentFor(current)
+    Composition --> Objects --: parent or repeated location
+end
+Objects --> Consumer --: constructible original path
+@enduml

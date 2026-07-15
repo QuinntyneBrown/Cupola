@@ -1,0 +1,53 @@
+@startuml
+title C13 default notebook destination resolution
+' Traces: OMCT-C13-L2-01.05
+actor Operator
+participant "NotebookView" as View
+participant "@cupola/core NotebookStorageService" as StorageService
+participant "Browser localStorage" as LocalStorage
+participant "HttpObjectsGateway" as ObjectsGateway
+participant "Cupola.Api ObjectsController" as ObjectsController
+participant "Cupola.Core IObjectStore" as Store
+
+Operator -> View: select default copy destination
+activate View
+View -> StorageService: storeDefault(notebook, section, page)
+activate StorageService
+StorageService -> LocalStorage: set destination identifiers
+activate LocalStorage
+LocalStorage --> StorageService: stored
+deactivate LocalStorage
+StorageService --> View: destination stored
+deactivate StorageService
+View --> Operator: display default destination
+deactivate View
+
+Operator -> View: resolve default destination
+activate View
+View -> StorageService: getDefault()
+activate StorageService
+StorageService -> LocalStorage: get destination identifiers
+activate LocalStorage
+LocalStorage --> StorageService: stored identifiers
+deactivate LocalStorage
+StorageService -> ObjectsGateway: getObject(notebookKey)
+activate ObjectsGateway
+ObjectsGateway -> ObjectsController: GET /api/objects/{keyString}
+activate ObjectsController
+ObjectsController -> Store: get notebook
+activate Store
+Store --> ObjectsController: notebook or not found
+deactivate Store
+ObjectsController --> ObjectsGateway: notebook or not found
+deactivate ObjectsController
+ObjectsGateway --> StorageService: notebook or not found
+deactivate ObjectsGateway
+alt destination remains valid
+  StorageService --> View: notebook, section, and page
+else destination invalid
+  StorageService --> View: no default destination
+end
+deactivate StorageService
+View --> Operator: display resolved destination
+deactivate View
+@enduml

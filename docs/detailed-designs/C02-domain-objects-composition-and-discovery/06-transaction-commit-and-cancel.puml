@@ -1,0 +1,28 @@
+@startuml
+title C02 transaction commit and cancel
+' Traces: OMCT-C02-L2-02.07
+actor Editor
+participant "Editor Service" as EditorService
+participant "Transaction" as Transaction
+participant "@cupola/core Object Service" as Objects
+
+Editor -> EditorService ++: startTransaction()
+EditorService -> Transaction ++: open
+Transaction --> EditorService --: transaction active
+EditorService --> Editor --: transaction handle
+Editor -> Transaction ++: markDirty(objects)
+Transaction --> Editor --: dirty objects tracked
+
+alt commit
+    Editor -> Transaction ++: commit()
+    loop each dirty object
+        Transaction -> Objects ++: save(object)
+        Objects --> Transaction --: saved object
+    end
+    Transaction --> Editor --: transaction closed
+else cancel
+    Editor -> Transaction ++: cancel()
+    Transaction -> Transaction: clear dirty objects
+    Transaction --> Editor --: transaction closed without save
+end
+@enduml

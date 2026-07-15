@@ -1,0 +1,36 @@
+@startuml
+title Old-data criterion evaluation
+' Traces: OMCT-C10-L2-01.05
+participant "Telemetry Service" as Telemetry
+participant "Condition Set View" as View
+participant "No-data Timer" as Timer
+participant "Condition Evaluator" as Evaluator
+participant "Condition Result Service" as Results
+
+Telemetry -> View: subscribe(source)
+activate View
+View -> Timer: start(noDataInterval)
+activate Timer
+alt matching telemetry arrives before interval
+    Telemetry -> View: telemetryChanged(datum)
+    View -> Timer: reset(noDataInterval)
+    Timer --> View: timer reset
+    View -> Evaluator: evaluateAge(datumTime, interval)
+    activate Evaluator
+    Evaluator --> View: oldData false
+    deactivate Evaluator
+else interval elapses without matching telemetry
+    Timer -> View: elapsed()
+    View -> Evaluator: evaluateAge(lastDatumTime, interval)
+    activate Evaluator
+    Evaluator --> View: oldData true
+    deactivate Evaluator
+    View -> Results: publish(conditionOutput)
+    activate Results
+    Results --> View: output published
+    deactivate Results
+end
+deactivate Timer
+View --> Telemetry: criterion state updated
+deactivate View
+@enduml

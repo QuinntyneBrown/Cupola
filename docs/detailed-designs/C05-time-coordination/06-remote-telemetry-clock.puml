@@ -1,0 +1,64 @@
+@startuml
+title C05 Remote telemetry clock
+' Traces: OMCT-C05-L2-03.05
+
+participant "@cupola/core Time API" as TimeApi
+participant "Remote Telemetry Clock" as RemoteClock
+participant "@cupola/core Telemetry API" as TelemetryApi
+participant "@cupola/api Telemetry Gateway" as TelemetryGateway
+participant "Cupola.Api telemetry endpoint" as TelemetryEndpoint
+participant "Cupola.Api RealtimeHub" as RealtimeHub
+participant "Telemetry Simulator Hosted Service" as Simulator
+participant "@cupola/core Time Context" as TimeContext
+
+TimeApi -> RemoteClock: activate(remoteClockObjectId)
+activate RemoteClock
+RemoteClock -> TelemetryApi: requestLatest(remoteClockObjectId)
+activate TelemetryApi
+TelemetryApi -> TelemetryGateway: GET /api/telemetry/{id}?strategy=latest
+activate TelemetryGateway
+TelemetryGateway -> TelemetryEndpoint: get latest telemetry
+activate TelemetryEndpoint
+TelemetryEndpoint --> TelemetryGateway: latest datum
+deactivate TelemetryEndpoint
+TelemetryGateway --> TelemetryApi: latest datum
+deactivate TelemetryGateway
+TelemetryApi --> RemoteClock: latest datum
+deactivate TelemetryApi
+RemoteClock -> TimeContext: tick(parsedTime)
+activate TimeContext
+TimeContext --> RemoteClock: tick accepted
+deactivate TimeContext
+
+RemoteClock -> TelemetryApi: subscribe(remoteClockObjectId)
+activate TelemetryApi
+TelemetryApi -> TelemetryGateway: connect /hubs/realtime
+activate TelemetryGateway
+TelemetryGateway -> RealtimeHub: SubscribeToTelemetry(id)
+activate RealtimeHub
+RealtimeHub --> TelemetryGateway: subscribed
+deactivate RealtimeHub
+TelemetryGateway --> TelemetryApi: subscription handle
+deactivate TelemetryGateway
+TelemetryApi --> RemoteClock: subscription handle
+deactivate TelemetryApi
+
+loop telemetry update
+    Simulator -> RealtimeHub: TelemetryReceived(datum)
+    activate RealtimeHub
+    RealtimeHub -> TelemetryGateway: push datum
+    deactivate RealtimeHub
+    activate TelemetryGateway
+    TelemetryGateway -> TelemetryApi: emit datum
+    deactivate TelemetryGateway
+    activate TelemetryApi
+    TelemetryApi -> RemoteClock: callback(datum)
+    deactivate TelemetryApi
+    RemoteClock -> RemoteClock: parse time value
+    RemoteClock -> TimeContext: tick(parsedTime)
+    activate TimeContext
+    TimeContext --> RemoteClock: tick accepted
+    deactivate TimeContext
+end
+deactivate RemoteClock
+@enduml

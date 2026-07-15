@@ -1,0 +1,46 @@
+@startuml
+title Time-strip composition and shared time axis
+' Traces: OMCT-C12-L2-02.01, OMCT-C12-L2-02.02
+actor Operator
+participant "Time Strip View" as TimeStrip
+participant "Timeline Composition Policy" as Policy
+participant "Composition Service" as Composition
+participant "Time Axis" as Axis
+participant "Timeline View Layout" as Layout
+participant "Child View Registry" as Views
+
+Operator -> TimeStrip: proposeChild(child)
+activate TimeStrip
+TimeStrip -> Policy: evaluateEligibility(child)
+activate Policy
+alt child has implemented time-based view
+    Policy --> TimeStrip: allow child
+    TimeStrip -> Composition: addChild(child)
+    activate Composition
+    Composition --> TimeStrip: child composed
+    deactivate Composition
+else child is incompatible
+    Policy --> TimeStrip: reject child
+end
+deactivate Policy
+TimeStrip -> Axis: calculateVisibleScale(bounds)
+activate Axis
+Axis --> TimeStrip: strip time scale
+deactivate Axis
+TimeStrip -> Composition: readChildren(timeStrip)
+activate Composition
+Composition --> TimeStrip: composed children
+deactivate Composition
+loop each composed child
+    TimeStrip -> Views: instantiateTimeBasedView(child)
+    activate Views
+    Views --> TimeStrip: child view
+    deactivate Views
+    TimeStrip -> Layout: alignChildToAxis(child, stripTimeScale)
+    activate Layout
+    Layout --> TimeStrip: aligned row
+    deactivate Layout
+end
+TimeStrip --> Operator: shared-axis strip shown
+deactivate TimeStrip
+@enduml

@@ -1,0 +1,37 @@
+@startuml
+title Flexible layout rendering and styles
+' Traces: OMCT-C09-L2-02.01, OMCT-C09-L2-02.03
+actor Operator
+participant "Angular Shell" as Shell
+participant "Flexible Layout View" as View
+participant "Composition Service" as Composition
+participant "Style Service" as Styles
+participant "View Registry" as Views
+
+Operator -> Shell: navigate(flexibleLayout)
+activate Shell
+Shell -> View: render(flexibleLayout)
+activate View
+View -> Composition: readChildren(flexibleLayout)
+activate Composition
+Composition --> View: child composition
+deactivate Composition
+View -> Styles: readStyleProperties(flexibleLayout)
+activate Styles
+Styles --> View: background border text styles
+deactivate Styles
+loop each configured pane
+    View -> Views: instantiate(child, assignedPane)
+    activate Views
+    Views --> View: child object view
+    deactivate Views
+    View -> Styles: applyTargetStyles(pane)
+    activate Styles
+    Styles --> View: styles applied
+    deactivate Styles
+end
+View --> Shell: configured panes rendered
+deactivate View
+Shell --> Operator: flexible layout shown
+deactivate Shell
+@enduml

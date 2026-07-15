@@ -1,0 +1,40 @@
+@startuml
+title C03 edit transaction save, cancel, and failed-save retention
+' Traces: OMCT-C03-L2-01.03, OMCT-C03-L2-01.04, OMCT-C03-L2-01.05
+actor Operator
+participant "Edit Properties Action" as Edit
+participant "Editor Service" as Editor
+participant "Form Service" as Form
+participant "Transaction" as Transaction
+participant "@cupola/core Object Service" as Objects
+
+Operator -> Edit ++: invoke(selection)
+Edit -> Editor ++: start transaction
+Editor -> Transaction ++: open(selection)
+Transaction --> Editor --: transaction active
+Editor --> Edit --: transaction handle
+Edit -> Form ++: present editable properties
+Form --> Edit --: changed properties
+
+alt operator confirms valid changes
+    Edit -> Transaction ++: commit()
+    Transaction -> Objects ++: save(changed object)
+    alt save succeeds
+        Objects --> Transaction --: saved object
+        Transaction --> Edit --: transaction closed
+        Edit -> Form ++: close
+        Form --> Edit --: closed
+        Edit --> Operator --: changes saved
+    else save rejected
+        Objects --> Transaction --: rejection
+        Transaction --> Edit --: transaction retained
+        Edit --> Operator --: edit remains open
+    end
+else operator cancels form
+    Edit -> Transaction ++: cancel()
+    Transaction --> Edit --: pre-edit state restored
+    Edit -> Form ++: close
+    Form --> Edit --: closed
+    Edit --> Operator --: changes discarded
+end
+@enduml

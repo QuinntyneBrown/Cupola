@@ -1,0 +1,47 @@
+@startuml
+title C07 Plot composition eligibility
+' Traces: OMCT-C07-L2-01.03, OMCT-C07-L2-01.04
+
+actor "Operator" as Operator
+participant "cupola Shell" as Shell
+participant "@cupola/core Composition Service" as CompositionService
+participant "Overlay Plot Composition Policy" as OverlayPolicy
+participant "Stacked Plot Composition Policy" as StackedPolicy
+participant "@cupola/core Telemetry Metadata Manager" as MetadataManager
+
+Operator -> Shell: add child to plot
+activate Shell
+Shell -> CompositionService: canCompose(parent, child)
+activate CompositionService
+alt parent is overlay plot
+    CompositionService -> OverlayPolicy: allow(parent, child)
+    activate OverlayPolicy
+    OverlayPolicy -> MetadataManager: getMetadata(child)
+    activate MetadataManager
+    MetadataManager --> OverlayPolicy: range metadata
+    deactivate MetadataManager
+    alt child has numeric range
+        OverlayPolicy --> CompositionService: allowed
+    else child is incompatible
+        OverlayPolicy --> CompositionService: rejected
+    end
+    deactivate OverlayPolicy
+else parent is stacked plot
+    CompositionService -> StackedPolicy: allow(parent, child)
+    activate StackedPolicy
+    StackedPolicy -> MetadataManager: getMetadata(child)
+    activate MetadataManager
+    MetadataManager --> StackedPolicy: telemetry or plot metadata
+    deactivate MetadataManager
+    alt child is eligible telemetry or plot object
+        StackedPolicy --> CompositionService: allowed as row
+    else child is incompatible
+        StackedPolicy --> CompositionService: rejected
+    end
+    deactivate StackedPolicy
+end
+CompositionService --> Shell: eligibility result
+deactivate CompositionService
+Shell --> Operator: composition result
+deactivate Shell
+@enduml

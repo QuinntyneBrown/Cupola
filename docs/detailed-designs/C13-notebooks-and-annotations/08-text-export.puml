@@ -1,0 +1,24 @@
+@startuml
+title C13 notebook text export
+' Traces: OMCT-C13-L2-02.05
+actor Operator
+participant "ExportNotebookAsTextAction" as Action
+participant "@cupola/core NotebookService" as NotebookService
+participant "Browser download" as Download
+
+Operator -> Action: run export-notebook-as-text
+activate Action
+Action -> NotebookService: formatText(notebook)
+activate NotebookService
+loop each section, page, and entry
+  NotebookService -> NotebookService: append text representation
+end
+NotebookService --> Action: text export payload
+deactivate NotebookService
+Action -> Download: download text file
+activate Download
+Download --> Action: download started
+deactivate Download
+Action --> Operator: export initiated
+deactivate Action
+@enduml

@@ -1,0 +1,48 @@
+@startuml
+title C07 Pan, zoom, pause, and resume
+' Traces: OMCT-C07-L2-02.05, OMCT-C07-L2-02.06
+
+actor "Operator" as Operator
+participant "@cupola/components Plot View" as PlotView
+participant "Plot Scale Service" as ScaleService
+participant "@cupola/core Time API" as TimeApi
+participant "@cupola/core Telemetry API" as TelemetryApi
+
+Operator -> PlotView: pan or zoom gesture
+activate PlotView
+alt context is outside restricted time strip
+    PlotView -> ScaleService: updateScale(gesture)
+    activate ScaleService
+    ScaleService --> PlotView: new bounds
+    deactivate ScaleService
+    PlotView -> TimeApi: setBounds(new bounds)
+    activate TimeApi
+    TimeApi --> PlotView: bounds accepted
+    deactivate TimeApi
+    opt new bounds require data
+        PlotView -> TelemetryApi: request(object, new bounds)
+        activate TelemetryApi
+        TelemetryApi --> PlotView: telemetry data
+        deactivate TelemetryApi
+    end
+else restricted time-strip context
+    PlotView --> Operator: interaction ignored
+end
+deactivate PlotView
+
+Operator -> PlotView: pause
+activate PlotView
+PlotView -> PlotView: preserve inspected window
+PlotView --> Operator: paused
+deactivate PlotView
+
+Operator -> PlotView: resume
+activate PlotView
+PlotView -> TimeApi: followActiveTime()
+activate TimeApi
+TimeApi --> PlotView: active bounds
+deactivate TimeApi
+PlotView -> PlotView: render active window
+PlotView --> Operator: resumed
+deactivate PlotView
+@enduml

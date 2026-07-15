@@ -1,0 +1,31 @@
+@startuml
+title C05 URL time-settings synchronization
+' Traces: OMCT-C05-L2-04.03
+
+participant "URL Time Settings Synchronizer" as UrlSync
+participant "@cupola/core Time API" as TimeApi
+participant "Global Time Context" as GlobalContext
+participant "Browser URL" as BrowserUrl
+
+UrlSync -> TimeApi: listen(global time events)
+activate TimeApi
+TimeApi --> UrlSync: unsubscribe handles
+deactivate TimeApi
+
+alt active clock changes
+    GlobalContext -> UrlSync: emit clockChanged(clockKey, offsets)
+else time system changes
+    GlobalContext -> UrlSync: emit timeSystemChanged(timeSystemKey)
+else bounds change
+    GlobalContext -> UrlSync: emit boundsChanged(bounds)
+else offsets change
+    GlobalContext -> UrlSync: emit offsetsChanged(offsets)
+end
+activate UrlSync
+UrlSync -> BrowserUrl: replace search parameters
+activate BrowserUrl
+BrowserUrl --> UrlSync: URL state updated
+deactivate BrowserUrl
+UrlSync --> GlobalContext: event handled
+deactivate UrlSync
+@enduml

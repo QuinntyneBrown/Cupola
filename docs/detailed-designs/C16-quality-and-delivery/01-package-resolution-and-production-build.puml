@@ -1,0 +1,33 @@
+@startuml
+title C16 package resolution and production build
+' Traces: OMCT-C16-L2-01.03, OMCT-C16-L2-01.04, OMCT-C16-L2-02.01
+actor "Package consumer" as Consumer
+participant "Package metadata" as PackageMetadata
+participant "Build script" as BuildScript
+participant "Webpack production config" as Webpack
+participant "TypeScript compiler" as Tsc
+participant "dist package" as Dist
+
+Consumer -> PackageMetadata: resolve package entry points
+activate PackageMetadata
+PackageMetadata --> Consumer: import, require, module, main, and type paths
+deactivate PackageMetadata
+
+BuildScript -> Webpack: run production webpack build
+activate Webpack
+Webpack -> Dist: emit UMD bundle, workers, theme CSS, favicons, index page, imagery assets
+activate Dist
+Dist --> Webpack: assets emitted
+deactivate Dist
+Webpack --> BuildScript: webpack build complete
+deactivate Webpack
+BuildScript -> Tsc: compile type declarations
+activate Tsc
+Tsc -> Dist: emit dist/types/index.d.ts
+activate Dist
+Dist --> Tsc: declarations emitted
+deactivate Dist
+Tsc --> BuildScript: TypeScript build complete
+deactivate Tsc
+BuildScript --> Consumer: built package artifacts available
+@enduml

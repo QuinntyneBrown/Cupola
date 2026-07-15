@@ -1,0 +1,51 @@
+@startuml
+title C08 Latest-available-data table composition and latest values
+' Traces: OMCT-C08-L2-02.01, OMCT-C08-L2-02.02
+
+actor "Operator" as Operator
+participant "@cupola/core Composition Service" as CompositionService
+participant "LAD Table Composition Policy" as LadPolicy
+participant "@cupola/core Telemetry API" as TelemetryApi
+participant "LAD Table View" as LadTableView
+participant "@cupola/core Telemetry Metadata Manager" as MetadataManager
+
+Operator -> CompositionService: add child to LAD table
+activate CompositionService
+CompositionService -> LadPolicy: allow(child)
+activate LadPolicy
+LadPolicy -> TelemetryApi: supportsTelemetry(child)
+activate TelemetryApi
+TelemetryApi --> LadPolicy: support result
+deactivate TelemetryApi
+alt child produces telemetry
+    LadPolicy --> CompositionService: allowed
+else child does not produce telemetry
+    LadPolicy --> CompositionService: rejected
+end
+deactivate LadPolicy
+CompositionService --> Operator: eligibility result
+deactivate CompositionService
+
+LadTableView -> CompositionService: getComposedTelemetryObjects()
+activate CompositionService
+CompositionService --> LadTableView: telemetry objects
+deactivate CompositionService
+loop each composed telemetry object
+    LadTableView -> TelemetryApi: requestLatest(object)
+    activate TelemetryApi
+    TelemetryApi --> LadTableView: latest datum
+    deactivate TelemetryApi
+    LadTableView -> MetadataManager: getMetadata(object)
+    activate MetadataManager
+    MetadataManager --> LadTableView: domain and range metadata
+    deactivate MetadataManager
+    LadTableView -> LadTableView: render object name and latest values
+end
+opt updated data arrives
+    TelemetryApi -> LadTableView: callback(updated datum)
+    activate LadTableView
+    LadTableView -> LadTableView: update object's latest row
+    LadTableView --> TelemetryApi: row updated
+    deactivate LadTableView
+end
+@enduml

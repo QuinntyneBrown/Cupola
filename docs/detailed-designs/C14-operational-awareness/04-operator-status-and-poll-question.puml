@@ -1,0 +1,42 @@
+@startuml
+title C14 operator status and poll question authorization
+' Traces: OMCT-C14-L2-02.02, OMCT-C14-L2-02.03
+actor Operator
+participant "OperatorStatusIndicator" as StatusIndicator
+participant "PollQuestion" as PollQuestion
+participant "@cupola/core UserService" as UserService
+participant "StatusProvider" as StatusProvider
+
+Operator -> StatusIndicator: select allowed status
+activate StatusIndicator
+StatusIndicator -> UserService: getCurrentUser()
+activate UserService
+UserService --> StatusIndicator: current user
+deactivate UserService
+StatusIndicator -> StatusProvider: submitStatus(user, status)
+activate StatusProvider
+StatusProvider --> StatusIndicator: provider result
+deactivate StatusProvider
+StatusIndicator --> Operator: display provider result
+deactivate StatusIndicator
+
+Operator -> PollQuestion: change poll question
+activate PollQuestion
+PollQuestion -> UserService: getCurrentUser()
+activate UserService
+UserService --> PollQuestion: current user
+deactivate UserService
+PollQuestion -> StatusProvider: canChangePollQuestion(user)
+activate StatusProvider
+alt permission true
+  StatusProvider --> PollQuestion: allowed
+  PollQuestion -> StatusProvider: submitPollQuestion(question)
+  StatusProvider --> PollQuestion: question changed
+  PollQuestion --> Operator: display changed question
+else permission false
+  StatusProvider --> PollQuestion: not allowed
+  PollQuestion --> Operator: leave question unchanged
+end
+deactivate StatusProvider
+deactivate PollQuestion
+@enduml

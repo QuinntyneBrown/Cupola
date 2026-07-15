@@ -1,0 +1,33 @@
+@startuml
+title C02 mutable observation and provider synchronization
+' Traces: OMCT-C02-L2-02.05, OMCT-C02-L2-02.06
+actor Consumer
+participant "Mutable Domain Object" as Mutable
+participant "Observer" as Observer
+participant "ObjectUpdatesService" as Updates
+participant "@cupola/api RealtimeGateway" as Realtime
+participant "RealtimeHub" as Hub
+participant "@cupola/core Object Service" as Objects
+
+Consumer -> Mutable ++: observe(property path, observer)
+Mutable --> Consumer --: unsubscribe handle
+Consumer -> Mutable ++: change property
+Mutable -> Observer ++: notify changed value
+Observer --> Mutable --: handled
+Mutable --> Consumer --: mutation accepted
+
+Hub -> Realtime ++: objectChanged(identifier, remote state)
+Realtime -> Updates ++: emit provider change
+Updates -> Mutable ++: apply remote state
+Mutable -> Observer ++: notify changed value
+Observer --> Mutable --: handled
+Mutable --> Updates --: live object updated
+Updates --> Realtime --: change relayed
+
+Consumer -> Objects ++: refresh(identifier)
+Objects -> Updates ++: apply provider state
+Updates -> Mutable ++: update live object
+Mutable --> Updates --: live object refreshed
+Updates --> Objects --: refresh applied
+Objects --> Consumer --: refreshed object
+@enduml

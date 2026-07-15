@@ -1,0 +1,37 @@
+@startuml
+title C16 secure URL and rich-text rendering
+' Traces: OMCT-C16-L2-04.01, OMCT-C16-L2-04.02
+actor Operator
+participant "Destination view" as DestinationView
+participant "UrlSanitizer" as UrlSanitizer
+participant "NotebookEntry" as NotebookEntry
+participant "AnnotationSearchResult" as AnnotationResult
+participant "HtmlSanitizer" as HtmlSanitizer
+
+Operator -> DestinationView: render configured destination URL
+activate DestinationView
+DestinationView -> UrlSanitizer: sanitize(url)
+activate UrlSanitizer
+UrlSanitizer --> DestinationView: sanitized URL
+deactivate UrlSanitizer
+DestinationView --> Operator: render destination with sanitized URL
+deactivate DestinationView
+
+Operator -> NotebookEntry: render notebook text
+activate NotebookEntry
+NotebookEntry -> HtmlSanitizer: sanitize markdown-derived HTML
+activate HtmlSanitizer
+HtmlSanitizer --> NotebookEntry: sanitized HTML
+deactivate HtmlSanitizer
+NotebookEntry --> Operator: display sanitized text
+deactivate NotebookEntry
+
+Operator -> AnnotationResult: render annotation search result
+activate AnnotationResult
+AnnotationResult -> HtmlSanitizer: strip or sanitize HTML
+activate HtmlSanitizer
+HtmlSanitizer --> AnnotationResult: sanitized result HTML
+deactivate HtmlSanitizer
+AnnotationResult --> Operator: display sanitized result
+deactivate AnnotationResult
+@enduml

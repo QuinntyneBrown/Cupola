@@ -1,0 +1,68 @@
+@startuml
+title C16 performance, memory, and disclosure flows
+' Traces: OMCT-C16-L2-05.01, OMCT-C16-L2-05.02, OMCT-C16-L2-05.03, OMCT-C16-L2-05.04, OMCT-C16-L2-05.05, OMCT-C16-L2-06.01, OMCT-C16-L2-06.02, OMCT-C16-L2-06.03
+actor Operator
+participant "Playwright runner" as Runner
+participant "Production server" as ProdServer
+participant "Development server" as DevServer
+participant "Browser page" as Page
+participant "AppLogoComponent" as AppLogo
+participant "HttpBrandingGateway" as BrandingGateway
+participant "Cupola.Api BrandingController" as BrandingController
+participant "AboutDialogComponent" as AboutDialog
+participant "Licenses plugin" as LicensesPlugin
+participant "OverlayService" as OverlayService
+participant "LicensesComponent" as LicensesComponent
+
+Runner -> ProdServer: start production-mode server
+activate ProdServer
+ProdServer --> Runner: server ready
+Runner -> Page: run non-contract performance tests
+activate Page
+Page --> Runner: performance results
+Runner -> Page: open view and navigate away
+Page --> Runner: garbage-collection verification result
+Runner -> Page: change tabs and perform plot tagging
+Page --> Runner: rendering and tagging results
+deactivate Page
+deactivate ProdServer
+
+Runner -> DevServer: start development-mode server
+activate DevServer
+DevServer --> Runner: server ready
+Runner -> Page: run contract performance specifications
+activate Page
+Page --> Runner: contract results
+deactivate Page
+deactivate DevServer
+
+Operator -> AppLogo: activate about dialog
+activate AppLogo
+AppLogo -> BrandingGateway: getBuildInfo()
+activate BrandingGateway
+BrandingGateway -> BrandingController: GET /api/branding/build-info
+activate BrandingController
+BrandingController --> BrandingGateway: version, build date, revision, branch
+deactivate BrandingController
+BrandingGateway --> AppLogo: build information
+deactivate BrandingGateway
+AppLogo -> AboutDialog: render version and Apache-2.0 license information
+activate AboutDialog
+AboutDialog --> AppLogo: about content rendered
+deactivate AboutDialog
+AppLogo --> Operator: display about dialog
+deactivate AppLogo
+
+Operator -> LicensesPlugin: navigate to /licenses
+activate LicensesPlugin
+LicensesPlugin -> OverlayService: open full-screen nondismissible overlay
+activate OverlayService
+OverlayService -> LicensesComponent: render third-party licenses
+activate LicensesComponent
+LicensesComponent --> OverlayService: licenses rendered
+deactivate LicensesComponent
+OverlayService --> LicensesPlugin: overlay displayed
+deactivate OverlayService
+LicensesPlugin --> Operator: display license route
+deactivate LicensesPlugin
+@enduml

@@ -1,0 +1,48 @@
+@startuml
+title C07 Axis, legend, and limit rendering
+' Traces: OMCT-C07-L2-02.03, OMCT-C07-L2-02.04, OMCT-C07-L2-02.07
+
+participant "@cupola/components Plot View" as PlotView
+participant "@cupola/core Time API" as TimeApi
+participant "@cupola/core Telemetry Metadata Manager" as MetadataManager
+participant "Domain Axis" as XAxis
+participant "Range Axis" as YAxis
+participant "Plot Legend" as Legend
+participant "@cupola/core Limit Evaluation" as LimitEvaluation
+participant "Limit Line" as LimitLine
+
+PlotView -> TimeApi: getActiveTimeSystem()
+activate TimeApi
+TimeApi --> PlotView: domain format
+deactivate TimeApi
+PlotView -> MetadataManager: getMetadata(series)
+activate MetadataManager
+MetadataManager --> PlotView: normalized metadata
+deactivate MetadataManager
+PlotView -> XAxis: renderTicksAndLabel(domain metadata)
+activate XAxis
+XAxis --> PlotView: domain axis rendered
+deactivate XAxis
+PlotView -> YAxis: renderTicksAndLabel(range metadata)
+activate YAxis
+YAxis --> PlotView: range axis rendered
+deactivate YAxis
+alt legend mode is collapsed
+    PlotView -> Legend: renderCollapsed(series)
+else legend mode is expanded
+    PlotView -> Legend: renderExpanded(series)
+end
+activate Legend
+Legend --> PlotView: legend rendered
+deactivate Legend
+opt limit display configured
+    PlotView -> LimitEvaluation: evaluate(series data)
+    activate LimitEvaluation
+    LimitEvaluation --> PlotView: applicable limit states
+    deactivate LimitEvaluation
+    PlotView -> LimitLine: render limit lines and alarm styling
+    activate LimitLine
+    LimitLine --> PlotView: limits rendered
+    deactivate LimitLine
+end
+@enduml

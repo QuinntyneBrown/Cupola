@@ -1,0 +1,24 @@
+@startuml
+title C02 federated provider search
+' Traces: OMCT-C02-L2-04.01
+actor Consumer
+participant "Search Service" as Search
+participant "@cupola/api HttpSearchGateway" as Gateway
+participant "Cupola.Api SearchController" as Controller
+participant "Provider A" as ProviderA
+participant "Provider B" as ProviderB
+
+Consumer -> Search ++: search(query)
+Search -> Gateway ++: GET /api/search?q=query
+Gateway -> Controller ++: GET /api/search?q=query
+par provider A search
+    Controller -> ProviderA ++: search(query)
+    ProviderA --> Controller --: result promise A
+else provider B search
+    Controller -> ProviderB ++: search(query)
+    ProviderB --> Controller --: result promise B
+end
+Controller --> Gateway --: separate provider result promises
+Gateway --> Search --: separate provider result promises
+Search --> Consumer --: separate provider result promises
+@enduml

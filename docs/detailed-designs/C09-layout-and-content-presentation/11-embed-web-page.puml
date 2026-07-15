@@ -1,0 +1,22 @@
+@startuml
+title Web page embedding
+' Traces: OMCT-C09-L2-04.03
+actor Operator
+participant "Angular Shell" as Shell
+participant "Web Page View" as View
+participant "Browser Frame" as Frame
+
+Operator -> Shell: navigate(webPageObject)
+activate Shell
+Shell -> View: render(webPageObject)
+activate View
+View -> View: readConfiguredUrl(object)
+View -> Frame: createFrame(url)
+activate Frame
+Frame --> View: embedded page frame
+deactivate Frame
+View --> Shell: frame rendered
+Shell --> Operator: web page object shown
+deactivate View
+deactivate Shell
+@enduml

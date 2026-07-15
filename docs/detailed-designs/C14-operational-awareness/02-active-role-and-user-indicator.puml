@@ -1,0 +1,36 @@
+@startuml
+title C14 active role synchronization and user indicator
+' Traces: OMCT-C14-L2-01.03, OMCT-C14-L2-01.04
+actor Operator
+participant "UserIndicator" as Indicator
+participant "@cupola/core UserService" as UserService
+participant "UserProvider" as UserProvider
+participant "ActiveRoleSynchronizer" as RoleSync
+
+Indicator -> UserService: getCurrentUser()
+activate UserService
+alt provider configured
+  UserService -> UserProvider: currentUser()
+  activate UserProvider
+  UserProvider --> UserService: identifier and name
+  deactivate UserProvider
+  UserService --> Indicator: active user
+else no provider configured
+  UserService --> Indicator: no active user
+end
+deactivate UserService
+Indicator --> Operator: display name when present
+
+Operator -> RoleSync: change active role
+activate RoleSync
+RoleSync -> UserProvider: setActiveRole(role)
+activate UserProvider
+UserProvider --> RoleSync: stored role
+deactivate UserProvider
+RoleSync -> UserService: notifyActiveRoleListeners(role)
+activate UserService
+UserService --> RoleSync: listeners notified
+deactivate UserService
+RoleSync --> Operator: active role changed
+deactivate RoleSync
+@enduml

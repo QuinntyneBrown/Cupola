@@ -1,0 +1,37 @@
+@startuml
+title C04 persistence batching results
+' Traces: OMCT-C04-L2-02.03
+actor ConsumerA
+actor ConsumerB
+participant "CouchObjectProvider" as Provider
+participant "CouchObjectQueue" as Queue
+participant "@cupola/api HttpObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+
+ConsumerA -> Provider ++: save(object A)
+Provider -> Queue ++: enqueue save A
+Queue --> Provider --: queued promise A
+Provider --> ConsumerA --: promise A
+ConsumerB -> Provider ++: save(object B)
+Provider -> Queue ++: enqueue save B
+Queue --> Provider --: queued promise B
+Provider --> ConsumerB --: promise B
+
+Queue -> Gateway ++: dispatch batched save
+Gateway -> Controller ++: batch save
+Controller -> Store ++: save objects A and B
+Store --> Controller --: mixed success and failure entries
+Controller --> Gateway --: batch response
+Gateway --> Queue --: batch response
+alt entry A successful
+    Queue --> ConsumerA --: resolve promise A
+else entry A failed
+    Queue --> ConsumerA --: reject promise A
+end
+alt entry B successful
+    Queue --> ConsumerB --: resolve promise B
+else entry B failed
+    Queue --> ConsumerB --: reject promise B
+end
+@enduml

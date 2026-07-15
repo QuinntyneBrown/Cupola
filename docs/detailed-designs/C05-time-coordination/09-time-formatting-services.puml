@@ -1,0 +1,40 @@
+@startuml
+title C05 Time formatting services
+' Traces: OMCT-C05-L2-05.01, OMCT-C05-L2-05.02
+
+actor "Consumer" as Consumer
+participant "@cupola/core Format Registry" as FormatRegistry
+participant "UTC Time Format" as UtcFormat
+participant "Duration Format" as DurationFormat
+participant "Local Time Format" as LocalFormat
+participant "ISO Time Format" as IsoFormat
+
+Consumer -> FormatRegistry: get(formatKey)
+activate FormatRegistry
+alt UTC format selected
+    FormatRegistry --> Consumer: UTC Time Format
+    Consumer -> UtcFormat: formatParseValidate(value)
+    activate UtcFormat
+    UtcFormat --> Consumer: UTC representation or validation result
+    deactivate UtcFormat
+else duration format selected
+    FormatRegistry --> Consumer: Duration Format
+    Consumer -> DurationFormat: formatParseValidate(value)
+    activate DurationFormat
+    DurationFormat --> Consumer: duration representation or validation result
+    deactivate DurationFormat
+else local-time format selected
+    FormatRegistry --> Consumer: Local Time Format
+    Consumer -> LocalFormat: formatParseValidate(value)
+    activate LocalFormat
+    LocalFormat --> Consumer: local representation or validation result
+    deactivate LocalFormat
+else ISO format selected
+    FormatRegistry --> Consumer: ISO Time Format
+    Consumer -> IsoFormat: formatParseValidate(value)
+    activate IsoFormat
+    IsoFormat --> Consumer: ISO representation or validation result
+    deactivate IsoFormat
+end
+deactivate FormatRegistry
+@enduml

@@ -1,0 +1,39 @@
+@startuml
+title C04 concurrent CouchDB request batching
+' Traces: OMCT-C04-L2-02.02
+actor ConsumerA
+actor ConsumerB
+participant "CouchObjectProvider" as Provider
+participant "CouchObjectQueue" as Queue
+participant "@cupola/api HttpObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+
+ConsumerA -> Provider ++: get(identifier A)
+Provider -> Queue ++: enqueue(identifier A)
+Queue --> Provider --: queued promise A
+Provider --> ConsumerA --: promise A
+
+alt second retrieval arrives during batching interval
+    ConsumerB -> Provider ++: get(identifier B)
+    Provider -> Queue ++: enqueue(identifier B)
+    Queue --> Provider --: queued promise B
+    Provider --> ConsumerB --: promise B
+    Queue -> Gateway ++: dispatch batched retrieval
+    Gateway -> Controller ++: batch get
+    Controller -> Store ++: get identifiers A and B
+    Store --> Controller --: objects A and B
+    Controller --> Gateway --: batch result
+    Gateway --> Queue --: batch result
+    Queue --> ConsumerA --: object A
+    Queue --> ConsumerB --: object B
+else no second retrieval in interval
+    Queue -> Gateway ++: dispatch direct retrieval
+    Gateway -> Controller ++: direct get
+    Controller -> Store ++: get(identifier A)
+    Store --> Controller --: object A
+    Controller --> Gateway --: object A
+    Gateway --> Queue --: object A
+    Queue --> ConsumerA --: object A
+end
+@enduml

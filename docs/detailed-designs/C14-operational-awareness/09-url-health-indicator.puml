@@ -1,0 +1,20 @@
+@startuml
+title C14 URL health indicator polling
+' Traces: OMCT-C14-L2-05.02
+participant "UrlHealthIndicator" as Indicator
+participant "Configured endpoint" as Endpoint
+participant "IndicatorArea" as IndicatorArea
+
+loop every configured interval
+  Indicator -> Endpoint: poll URL
+  activate Endpoint
+  alt poll succeeds
+    Endpoint --> Indicator: success
+    Indicator -> IndicatorArea: display nominal state
+  else poll fails
+    Endpoint --> Indicator: failure
+    Indicator -> IndicatorArea: display error state
+  end
+  deactivate Endpoint
+end
+@enduml

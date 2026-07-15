@@ -1,0 +1,67 @@
+@startuml
+title C13 remote notebook synchronization
+' Traces: OMCT-C13-L2-03.01, OMCT-C13-L2-03.02, OMCT-C13-L2-03.03
+actor "Remote operator" as RemoteOperator
+participant "Remote cupola Shell" as RemoteShell
+participant "HttpObjectsGateway" as RemoteGateway
+participant "Cupola.Api ObjectsController" as ObjectsController
+participant "Cupola.Core IObjectStore" as Store
+participant "RealtimeHub" as Hub
+participant "SignalR RealtimeGateway" as RealtimeGateway
+participant "ObjectUpdatesService" as Updates
+participant "NotebookComponent" as Notebook
+actor Operator
+
+Operator -> Notebook: open observed notebook page
+activate Notebook
+Notebook -> Updates: subscribe(notebookKey)
+activate Updates
+Updates -> RealtimeGateway: objectUpdates(notebookKey)
+activate RealtimeGateway
+RealtimeGateway -> Hub: SubscribeToObject(notebookKey)
+activate Hub
+Hub --> RealtimeGateway: subscribed
+deactivate Hub
+RealtimeGateway --> Updates: update stream
+deactivate RealtimeGateway
+Updates --> Notebook: subscribed
+deactivate Updates
+Notebook --> Operator: display current entries
+deactivate Notebook
+
+RemoteOperator -> RemoteShell: modify notebook entry
+activate RemoteShell
+RemoteShell -> RemoteGateway: saveNotebook(changed notebook)
+activate RemoteGateway
+RemoteGateway -> ObjectsController: update domain object
+activate ObjectsController
+ObjectsController -> Store: persist notebook change
+activate Store
+Store --> ObjectsController: persisted notebook
+deactivate Store
+ObjectsController -> Hub: emit objectChanged
+activate Hub
+Hub -> RealtimeGateway: ObjectUpdated(persisted notebook)
+activate RealtimeGateway
+RealtimeGateway -> Updates: publish server update
+activate Updates
+alt entry modified
+  Updates -> Notebook: update rendered entry
+else entry added
+  Updates -> Notebook: add rendered entry
+else entry removed
+  Updates -> Notebook: remove rendered entry
+end
+Updates --> RealtimeGateway: delivered
+deactivate Updates
+RealtimeGateway --> Hub: delivered
+deactivate RealtimeGateway
+Hub --> ObjectsController: broadcast complete
+deactivate Hub
+ObjectsController --> RemoteGateway: persisted notebook
+deactivate ObjectsController
+RemoteGateway --> RemoteShell: persisted notebook
+deactivate RemoteGateway
+RemoteShell --> RemoteOperator: change saved
+deactivate RemoteShell
+@enduml

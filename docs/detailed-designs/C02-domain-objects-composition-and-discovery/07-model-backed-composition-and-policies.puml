@@ -1,0 +1,36 @@
+@startuml
+title C02 model-backed composition and policies
+' Traces: OMCT-C02-L2-03.01, OMCT-C02-L2-03.02, OMCT-C02-L2-03.04
+actor Consumer
+participant "Composition Service" as Composition
+participant "Composition Provider Registry" as Providers
+participant "Default Composition Provider" as DefaultProvider
+participant "Composition Policies" as Policies
+participant "Mutable Parent Object" as Parent
+
+Consumer -> Composition ++: get(parent)
+Composition -> Providers ++: matching providers(parent)
+alt no provider supports parent
+    Providers --> Composition --: no provider
+    Composition --> Consumer --: falsy result
+else default provider supports parent
+    Providers --> Composition --: default provider
+    Composition -> DefaultProvider ++: load(parent)
+    DefaultProvider --> Composition --: composition collection
+    Consumer -> Composition ++: add(child)
+    Composition -> Policies ++: allow(parent, child)
+    alt every applicable policy allows
+        Policies --> Composition --: allowed
+        Composition -> Parent ++: mutate composition
+        Parent --> Composition --: membership updated
+        Composition --> Consumer --: child added
+    else a policy rejects
+        Policies --> Composition --: rejected
+        Composition --> Consumer --: relationship rejected
+    end
+    Consumer -> Composition ++: remove or reorder(child)
+    Composition -> Parent ++: mutate composition
+    Parent --> Composition --: membership or order updated
+    Composition --> Consumer --: operation completed
+end
+@enduml

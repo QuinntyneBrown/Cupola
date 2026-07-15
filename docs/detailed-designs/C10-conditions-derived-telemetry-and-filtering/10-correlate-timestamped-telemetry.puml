@@ -1,0 +1,24 @@
+@startuml
+title Timestamp correlation telemetry
+' Traces: OMCT-C10-L2-03.04
+participant "Correlation Telemetry Provider" as Provider
+participant "Telemetry Service" as Telemetry
+participant "Timestamp Correlator" as Correlator
+participant "Correlation Telemetry Stream" as Stream
+
+Provider -> Telemetry: request(horizontalSource, verticalSource)
+activate Telemetry
+Telemetry --> Provider: source values
+deactivate Telemetry
+Provider -> Correlator: correlateByParsedTimestamp(values)
+activate Correlator
+loop timestamps present in both sources
+    Correlator -> Correlator: pairValues(timestamp)
+    Correlator --> Provider: correlated datum
+    Provider -> Stream: emit(pairedValues, timestamp)
+    activate Stream
+    Stream --> Provider: datum accepted
+    deactivate Stream
+end
+deactivate Correlator
+@enduml

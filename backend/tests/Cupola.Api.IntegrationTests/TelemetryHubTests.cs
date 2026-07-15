@@ -7,17 +7,17 @@ namespace Cupola.Api.IntegrationTests;
 [TestFixture]
 public class TelemetryHubTests
 {
-    private CupolaApiFactory _factory = null!;
+    private TelemetryCupolaApiFactory _factory = null!;
 
     [OneTimeSetUp]
-    public void OneTimeSetUp() => _factory = new CupolaApiFactory();
+    public void OneTimeSetUp() => _factory = new TelemetryCupolaApiFactory();
 
     [OneTimeTearDown]
     public void OneTimeTearDown() => _factory.Dispose();
 
     [Test]
     [Requirement("OMCT-C15-L2-02.05")]
-    public async Task SubscribeToTelemetry_ReceivesTelemetryForThatObject()
+    public async Task OptInSimulator_PublishesTelemetryForSubscribedObject()
     {
         await using var connection = new HubConnectionBuilder()
             .WithUrl(new Uri(_factory.Server.BaseAddress, "hubs/realtime"), options =>

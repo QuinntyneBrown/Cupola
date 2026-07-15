@@ -1,0 +1,50 @@
+@startuml
+title C16 package verification commands
+' Traces: OMCT-C16-L2-02.01, OMCT-C16-L2-02.02, OMCT-C16-L2-02.03
+actor Developer
+participant "Package scripts" as Scripts
+participant "Webpack production config" as Webpack
+participant "TypeScript compiler" as Tsc
+participant "JavaScript linter" as JsLint
+participant "Vue linter" as VueLint
+participant "Spelling linter" as Spelling
+participant "Karma" as Karma
+participant "Jasmine" as Jasmine
+
+Developer -> Scripts: run package script
+activate Scripts
+alt build script
+  Scripts -> Webpack: run production build
+  activate Webpack
+  Webpack --> Scripts: production assets built
+  deactivate Webpack
+  Scripts -> Tsc: compile declarations
+  activate Tsc
+  Tsc --> Scripts: declarations compiled
+  deactivate Tsc
+else lint script
+  Scripts -> JsLint: lint JavaScript
+  activate JsLint
+  JsLint --> Scripts: JavaScript lint result
+  deactivate JsLint
+  Scripts -> VueLint: lint Vue
+  activate VueLint
+  VueLint --> Scripts: Vue lint result
+  deactivate VueLint
+  Scripts -> Spelling: lint spelling
+  activate Spelling
+  Spelling --> Scripts: spelling lint result
+  deactivate Spelling
+else test script
+  Scripts -> Karma: start with repository configuration
+  activate Karma
+  Karma -> Jasmine: execute unit tests
+  activate Jasmine
+  Jasmine --> Karma: unit-test results
+  deactivate Jasmine
+  Karma --> Scripts: Karma result
+  deactivate Karma
+end
+Scripts --> Developer: command result
+deactivate Scripts
+@enduml

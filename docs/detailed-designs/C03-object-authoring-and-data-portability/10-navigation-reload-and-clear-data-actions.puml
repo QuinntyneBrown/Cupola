@@ -1,0 +1,33 @@
+@startuml
+title C03 navigation, reload, and clear-data actions
+' Traces: OMCT-C03-L2-04.01, OMCT-C03-L2-04.02, OMCT-C03-L2-04.03, OMCT-C03-L2-04.04
+actor Operator
+participant "Action Service" as Actions
+participant "Routing Service" as Routing
+participant "Browser Window" as Window
+participant "@cupola/core Object Service" as Objects
+participant "Global Event Bus" as Events
+
+Operator -> Actions ++: invoke(action, selection)
+alt go-to-original action
+    Actions -> Objects ++: originalPath(alias)
+    Objects --> Actions --: original object path
+    Actions -> Routing ++: navigate(path)
+    Routing --> Actions --: route changed
+    Actions --> Operator --: original location shown
+else open-in-new-tab action
+    Actions -> Routing ++: routeFor(selection)
+    Routing --> Actions --: object route
+    Actions -> Window ++: open(route)
+    Window --> Actions --: tab opened
+    Actions --> Operator --: route opened
+else reload action
+    Actions -> Objects ++: refresh(selection)
+    Objects --> Actions --: fresh provider state
+    Actions --> Operator --: object reloaded
+else clear-data action or indicator
+    Actions -> Events ++: emit clearData
+    Events --> Actions --: event published
+    Actions --> Operator --: clear-data event emitted
+end
+@enduml

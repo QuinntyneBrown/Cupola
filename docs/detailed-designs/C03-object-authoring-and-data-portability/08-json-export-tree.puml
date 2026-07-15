@@ -1,0 +1,33 @@
+@startuml
+title C03 JSON export of object trees
+' Traces: OMCT-C03-L2-03.01, OMCT-C03-L2-03.02, OMCT-C03-L2-03.03
+actor Operator
+participant "Export as JSON Action" as ExportAction
+participant "JSON Exporter" as Exporter
+participant "Composition Service" as Composition
+participant "@cupola/core Object Service" as Objects
+participant "File Download" as Download
+
+Operator -> ExportAction ++: run(selected object)
+ExportAction -> Exporter ++: export(root)
+Exporter -> Objects ++: get(root)
+Objects --> Exporter --: root object
+loop each composed descendant
+    Exporter -> Composition ++: load(object)
+    Composition --> Exporter --: child references
+    alt child is creatable and not already visited
+        Exporter -> Objects ++: get(child)
+        Objects --> Exporter --: child object
+    else child is non-creatable
+        Exporter --> Exporter: skip descendant
+    else repeated reference or cycle
+        Exporter --> Exporter: stop recursive traversal
+    else external reference
+        Exporter --> Exporter: serialize importable external link
+    end
+end
+Exporter --> ExportAction --: JSON export
+ExportAction -> Download ++: save JSON
+Download --> ExportAction --: saved
+ExportAction --> Operator --: export completed
+@enduml

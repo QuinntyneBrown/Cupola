@@ -1,0 +1,40 @@
+@startuml
+title C05 Time conductor controls and current-time display
+' Traces: OMCT-C05-L2-04.01, OMCT-C05-L2-04.02
+
+actor "Operator" as Operator
+participant "cupola Shell" as Shell
+participant "@cupola/components Time Conductor" as Conductor
+participant "@cupola/core Time API" as TimeApi
+participant "@cupola/core Time Context" as TimeContext
+participant "Active Clock" as Clock
+
+Operator -> Shell: open view
+activate Shell
+Shell -> Conductor: bind active context
+activate Conductor
+Conductor -> TimeApi: getContext(path)
+activate TimeApi
+TimeApi --> Conductor: Time Context
+deactivate TimeApi
+Conductor -> TimeContext: getMode()
+activate TimeContext
+TimeContext --> Conductor: mode
+deactivate TimeContext
+alt fixed mode
+    Conductor -> Conductor: render bounds controls
+else real-time mode
+    Conductor -> Conductor: render clock controls
+    loop clock tick
+        Clock -> TimeContext: tick(value)
+        activate TimeContext
+        TimeContext -> Conductor: emit tick(value)
+        deactivate TimeContext
+        Conductor -> Conductor: update current-time display
+    end
+end
+Conductor --> Shell: controls rendered
+deactivate Conductor
+Shell --> Operator: conductor visible
+deactivate Shell
+@enduml

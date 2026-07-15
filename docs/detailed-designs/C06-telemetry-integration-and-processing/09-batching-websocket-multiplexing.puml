@@ -1,0 +1,45 @@
+@startuml
+title C06 Batching WebSocket multiplexing
+' Traces: OMCT-C06-L2-04.05
+
+actor "Consumer A" as ConsumerA
+actor "Consumer B" as ConsumerB
+participant "Batching WebSocket" as BatchingWebSocket
+participant "WebSocket Worker" as Worker
+participant "Telemetry Endpoint" as Endpoint
+
+ConsumerA -> BatchingWebSocket: subscribe(endpoint, keyA)
+activate BatchingWebSocket
+BatchingWebSocket -> Worker: open(endpoint)
+activate Worker
+Worker -> Endpoint: connect endpoint
+activate Endpoint
+Endpoint --> Worker: connected
+deactivate Endpoint
+Worker --> BatchingWebSocket: connection ready
+deactivate Worker
+BatchingWebSocket -> BatchingWebSocket: register logical subscriber keyA
+BatchingWebSocket --> ConsumerA: unsubscribe handle
+deactivate BatchingWebSocket
+
+ConsumerB -> BatchingWebSocket: subscribe(endpoint, keyB)
+activate BatchingWebSocket
+BatchingWebSocket -> BatchingWebSocket: reuse endpoint worker
+BatchingWebSocket -> BatchingWebSocket: register logical subscriber keyB
+BatchingWebSocket --> ConsumerB: unsubscribe handle
+deactivate BatchingWebSocket
+
+loop endpoint messages
+    Endpoint -> Worker: message(key, payload)
+    activate Worker
+    Worker -> BatchingWebSocket: dispatch(key, payload)
+    deactivate Worker
+    activate BatchingWebSocket
+    alt key matches Consumer A
+        BatchingWebSocket -> ConsumerA: callback(payload)
+    else key matches Consumer B
+        BatchingWebSocket -> ConsumerB: callback(payload)
+    end
+    deactivate BatchingWebSocket
+end
+@enduml

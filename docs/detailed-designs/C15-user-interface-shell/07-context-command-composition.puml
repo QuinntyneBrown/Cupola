@@ -1,0 +1,35 @@
+@startuml
+title C15 context command composition
+' Traces: OMCT-C15-L2-03.01, OMCT-C15-L2-03.02, OMCT-C15-L2-03.05
+actor Operator
+participant "ActionRegistryService" as ActionRegistry
+participant "ActionCollection" as ActionCollection
+participant "ToolbarRegistryService" as ToolbarRegistry
+participant "ToolbarContainer" as ToolbarContainer
+participant "SelectionService" as Selection
+
+Operator -> Selection: select object path and view
+activate Selection
+Selection --> ActionRegistry: selection context
+deactivate Selection
+ActionRegistry -> ActionRegistry: evaluate action applicability
+activate ActionRegistry
+ActionRegistry --> ActionCollection: applicable actions
+deactivate ActionRegistry
+ActionCollection -> ActionCollection: enable, disable, hide, or show action
+ActionCollection -> ActionCollection: filter visible and status-bar actions
+ActionCollection --> Operator: action collection state
+
+ToolbarContainer -> Selection: get current selection
+activate Selection
+Selection --> ToolbarContainer: selection
+deactivate Selection
+ToolbarContainer -> ToolbarRegistry: getToolbarStructure(selection)
+activate ToolbarRegistry
+loop each toolbar provider
+  ToolbarRegistry -> ToolbarRegistry: append controls when predicate is true
+end
+ToolbarRegistry --> ToolbarContainer: concatenated controls
+deactivate ToolbarRegistry
+ToolbarContainer --> Operator: display toolbar controls
+@enduml

@@ -1,0 +1,28 @@
+@startuml
+title Summary-widget test data preview
+' Traces: OMCT-C10-L2-02.05
+actor Operator
+participant "Summary Widget View" as Widget
+participant "Test Data Manager" as TestData
+participant "Summary Widget Evaluator" as Evaluator
+participant "Summary Widget Preview" as Preview
+
+Operator -> Widget: enterEditMode()
+activate Widget
+Operator -> TestData: enableTestData()
+activate TestData
+TestData --> Widget: test data enabled
+Operator -> TestData: changeTestValue(value)
+TestData -> Evaluator: evaluateWithTestValues(value)
+activate Evaluator
+Evaluator --> TestData: preview rule result
+deactivate Evaluator
+TestData -> Preview: renderPreview(ruleResult)
+activate Preview
+Preview --> TestData: preview rendered
+deactivate Preview
+TestData --> Widget: source telemetry unchanged
+deactivate TestData
+Widget --> Operator: preview shown
+deactivate Widget
+@enduml

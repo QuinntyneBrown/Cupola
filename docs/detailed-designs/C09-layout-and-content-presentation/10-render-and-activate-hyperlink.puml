@@ -1,0 +1,42 @@
+@startuml
+title Hyperlink presentation and target activation
+' Traces: OMCT-C09-L2-04.01, OMCT-C09-L2-04.02
+actor Operator
+participant "Angular Shell" as Shell
+participant "Hyperlink View" as View
+participant "Hyperlink Provider" as Provider
+participant "Browser" as Browser
+
+Operator -> Shell: navigate(hyperlinkObject)
+activate Shell
+Shell -> View: render(hyperlinkObject)
+activate View
+View -> Provider: readDisplayConfiguration(object)
+activate Provider
+Provider --> View: label presentation target
+deactivate Provider
+alt link presentation
+    View --> Shell: text link rendered
+else button presentation
+    View --> Shell: button rendered
+end
+Shell --> Operator: hyperlink shown
+Operator -> View: activateHyperlink()
+View -> Provider: resolveTargetBehavior(object)
+activate Provider
+Provider --> View: currentTab or newTab
+deactivate Provider
+alt current tab target
+    View -> Browser: navigate(url)
+    activate Browser
+    Browser --> View: navigation started
+    deactivate Browser
+else new tab target
+    View -> Browser: openNewTab(url)
+    activate Browser
+    Browser --> View: new tab opened
+    deactivate Browser
+end
+deactivate View
+deactivate Shell
+@enduml

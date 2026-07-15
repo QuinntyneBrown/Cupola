@@ -1,0 +1,33 @@
+@startuml
+title C07 Initial historical plot load
+' Traces: OMCT-C07-L2-02.01
+
+participant "@cupola/components Plot View" as PlotView
+participant "@cupola/core Time API" as TimeApi
+participant "@cupola/core Telemetry API" as TelemetryApi
+participant "@cupola/api Telemetry Gateway" as TelemetryGateway
+participant "Cupola.Api telemetry endpoint" as TelemetryEndpoint
+
+PlotView -> PlotView: mount telemetry plot
+activate PlotView
+PlotView -> TimeApi: getActiveBounds()
+activate TimeApi
+TimeApi --> PlotView: active bounds
+deactivate TimeApi
+PlotView -> TelemetryApi: request(object, bounds)
+activate TelemetryApi
+TelemetryApi -> TelemetryGateway: GET /api/telemetry/{id}
+activate TelemetryGateway
+TelemetryGateway -> TelemetryEndpoint: get historical telemetry
+activate TelemetryEndpoint
+TelemetryEndpoint --> TelemetryGateway: telemetry collection
+deactivate TelemetryEndpoint
+TelemetryGateway --> TelemetryApi: telemetry collection
+deactivate TelemetryGateway
+TelemetryApi --> PlotView: initial data
+deactivate TelemetryApi
+PlotView -> PlotView: mark initial request issued
+PlotView -> PlotView: render series data
+PlotView --> PlotView: plot loaded
+deactivate PlotView
+@enduml

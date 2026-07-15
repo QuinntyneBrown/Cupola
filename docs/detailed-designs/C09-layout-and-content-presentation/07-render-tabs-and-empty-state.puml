@@ -1,0 +1,33 @@
+@startuml
+title Tabs child rendering and empty state
+' Traces: OMCT-C09-L2-03.01, OMCT-C09-L2-03.03
+actor Operator
+participant "Angular Shell" as Shell
+participant "Tabs View" as Tabs
+participant "Composition Service" as Composition
+participant "View Registry" as Views
+
+Operator -> Shell: navigate(tabsObject)
+activate Shell
+Shell -> Tabs: render(tabsObject)
+activate Tabs
+Tabs -> Composition: readChildren(tabsObject)
+activate Composition
+Composition --> Tabs: composed children
+deactivate Composition
+alt children exist
+    loop each child
+        Tabs -> Tabs: createTab(child)
+    end
+    Tabs -> Views: instantiate(activeChild)
+    activate Views
+    Views --> Tabs: active child view
+    deactivate Views
+    Tabs --> Shell: tabs and active child view
+else no children
+    Tabs --> Shell: empty-state message
+end
+deactivate Tabs
+Shell --> Operator: tabs presentation shown
+deactivate Shell
+@enduml

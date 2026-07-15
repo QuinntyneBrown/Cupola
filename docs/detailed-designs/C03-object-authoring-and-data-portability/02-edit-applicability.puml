@@ -1,0 +1,23 @@
+@startuml
+title C03 edit applicability
+' Traces: OMCT-C03-L2-01.02
+actor Operator
+participant "Action Service" as Actions
+participant "Edit Properties Action" as Edit
+participant "@cupola/core Object Service" as Objects
+participant "Type Registry" as Types
+
+Operator -> Actions ++: applicableActions(selection)
+Actions -> Edit ++: appliesTo(selection)
+Edit -> Objects ++: isPersistable(selection)
+Objects --> Edit --: persistable state
+Edit -> Types ++: editableProperties(type)
+Types --> Edit --: editable property definitions
+alt persistable and editable
+    Edit --> Actions --: applicable
+    Actions --> Operator --: edit-properties action exposed
+else not persistable or no editable properties
+    Edit --> Actions --: not applicable
+    Actions --> Operator --: edit-properties action hidden
+end
+@enduml

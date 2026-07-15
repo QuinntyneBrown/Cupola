@@ -1,0 +1,49 @@
+@startuml
+title C06 Limit and staleness evaluation
+' Traces: OMCT-C06-L2-04.03, OMCT-C06-L2-04.04
+
+actor "Consumer" as Consumer
+participant "@cupola/core Telemetry API" as TelemetryApi
+participant "Limit Provider Registry" as LimitRegistry
+participant "Limit Provider" as LimitProvider
+participant "Staleness Provider" as StalenessProvider
+
+Consumer -> TelemetryApi: evaluateLimit(object, datum)
+activate TelemetryApi
+TelemetryApi -> LimitRegistry: providers()
+activate LimitRegistry
+LimitRegistry --> TelemetryApi: limit providers
+deactivate LimitRegistry
+loop limit providers
+    TelemetryApi -> LimitProvider: supports(object, datum)
+    activate LimitProvider
+    LimitProvider --> TelemetryApi: support result
+    alt supported
+        TelemetryApi -> LimitProvider: evaluate(datum)
+        LimitProvider --> TelemetryApi: limit state
+        TelemetryApi --> Consumer: first applicable limit state
+        TelemetryApi -> TelemetryApi: stop limit provider search
+    else unsupported
+        LimitProvider --> TelemetryApi: unsupported
+    end
+    deactivate LimitProvider
+end
+deactivate TelemetryApi
+
+Consumer -> TelemetryApi: observeStaleness(object)
+activate TelemetryApi
+TelemetryApi -> StalenessProvider: supports(object)
+activate StalenessProvider
+StalenessProvider --> TelemetryApi: supported
+TelemetryApi -> StalenessProvider: subscribe(object, callback)
+StalenessProvider --> TelemetryApi: unsubscribe handle
+TelemetryApi --> Consumer: staleness unsubscribe handle
+StalenessProvider -> TelemetryApi: stalenessChanged(state)
+TelemetryApi -> Consumer: callback(state)
+Consumer -> TelemetryApi: unsubscribeStaleness()
+TelemetryApi -> StalenessProvider: unsubscribe()
+StalenessProvider --> TelemetryApi: resources released
+deactivate StalenessProvider
+TelemetryApi --> Consumer: unsubscribed
+deactivate TelemetryApi
+@enduml

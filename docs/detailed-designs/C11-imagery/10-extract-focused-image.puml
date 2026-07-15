@@ -1,0 +1,38 @@
+@startuml
+title Focused image extraction
+' Traces: OMCT-C11-L2-04.01, OMCT-C11-L2-04.02
+actor Operator
+participant "Imagery View" as View
+participant "Open Image Action" as OpenAction
+participant "Save Image Action" as SaveAction
+participant "Image Exporter" as Exporter
+participant "Browser" as Browser
+
+Operator -> View: selectImageAction(action)
+activate View
+alt open image in new tab
+    View -> OpenAction: run(focusedImageUrl)
+    activate OpenAction
+    OpenAction -> Browser: open(url, noopener, noreferrer)
+    activate Browser
+    Browser --> OpenAction: tab opened
+    deactivate Browser
+    OpenAction --> View: open complete
+    deactivate OpenAction
+else save image
+    View -> SaveAction: run(focusedImage)
+    activate SaveAction
+    SaveAction -> Exporter: exportDisplayedImage(focusedImage)
+    activate Exporter
+    Exporter --> SaveAction: image content and derived filename
+    deactivate Exporter
+    SaveAction -> Browser: download(content, filename)
+    activate Browser
+    Browser --> SaveAction: download started
+    deactivate Browser
+    SaveAction --> View: save complete
+    deactivate SaveAction
+end
+View --> Operator: extraction action completed
+deactivate View
+@enduml

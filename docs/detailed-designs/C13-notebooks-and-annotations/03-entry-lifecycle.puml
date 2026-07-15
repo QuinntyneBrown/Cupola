@@ -1,0 +1,57 @@
+@startuml
+title C13 notebook entry lifecycle
+' Traces: OMCT-C13-L2-01.03, OMCT-C13-L2-01.04
+actor Operator
+participant "NotebookEntryEditor" as Editor
+participant "UserProvider" as UserProvider
+participant "@cupola/core NotebookService" as NotebookService
+participant "HttpObjectsGateway" as ObjectsGateway
+participant "Cupola.Api ObjectsController" as ObjectsController
+participant "Cupola.Core IObjectStore" as Store
+participant "RealtimeHub" as Hub
+
+Operator -> Editor: save entry change
+activate Editor
+alt create entry
+  Editor -> UserProvider: get current user
+  activate UserProvider
+  alt active user available
+    UserProvider --> Editor: identifier and name
+  else no active user
+    UserProvider --> Editor: no user
+  end
+  deactivate UserProvider
+  Editor -> NotebookService: createEntry(section, page, text, user)
+  activate NotebookService
+  NotebookService --> Editor: entry with identifier and timestamp
+  deactivate NotebookService
+else edit entry
+  Editor -> NotebookService: updateEntry(entryId, text)
+  activate NotebookService
+  NotebookService --> Editor: updated entry
+  deactivate NotebookService
+else delete entry
+  Editor -> NotebookService: deleteEntry(entryId)
+  activate NotebookService
+  NotebookService --> Editor: entry removed
+  deactivate NotebookService
+end
+Editor -> ObjectsGateway: saveNotebook(notebook)
+activate ObjectsGateway
+ObjectsGateway -> ObjectsController: update domain object
+activate ObjectsController
+ObjectsController -> Store: persist entry change
+activate Store
+Store --> ObjectsController: persisted notebook
+deactivate Store
+ObjectsController -> Hub: emit objectChanged
+activate Hub
+Hub --> ObjectsController: broadcast accepted
+deactivate Hub
+ObjectsController --> ObjectsGateway: persisted notebook
+deactivate ObjectsController
+ObjectsGateway --> Editor: persisted notebook
+deactivate ObjectsGateway
+Editor --> Operator: display entry state
+deactivate Editor
+@enduml

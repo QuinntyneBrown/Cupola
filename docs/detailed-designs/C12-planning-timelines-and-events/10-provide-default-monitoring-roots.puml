@@ -1,0 +1,24 @@
+@startuml
+title Default activity-state and plan-monitoring roots
+' Traces: OMCT-C12-L2-04.01, OMCT-C12-L2-04.03
+participant "Angular Shell" as Shell
+participant "ObjectsGateway" as Gateway
+participant "Activity States Interceptor" as ActivityInterceptor
+participant "Plan Monitoring Interceptor" as PlanInterceptor
+
+Shell -> Gateway: getObject(configuredIdentifier)
+activate Gateway
+alt activity-state identifier is missing
+    Gateway -> ActivityInterceptor: interceptMissingObject(identifier)
+    activate ActivityInterceptor
+    ActivityInterceptor --> Gateway: Activity States root object
+    deactivate ActivityInterceptor
+else plan-monitoring identifier is missing
+    Gateway -> PlanInterceptor: interceptMissingObject(identifier)
+    activate PlanInterceptor
+    PlanInterceptor --> Gateway: Plan Execution Monitoring root object
+    deactivate PlanInterceptor
+end
+Gateway --> Shell: default root representation
+deactivate Gateway
+@enduml

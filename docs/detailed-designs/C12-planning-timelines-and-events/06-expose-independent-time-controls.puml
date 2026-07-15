@@ -1,0 +1,30 @@
+@startuml
+title Independent time conductor controls
+' Traces: OMCT-C12-L2-02.03
+actor Operator
+participant "Time Strip View" as TimeStrip
+participant "Timeline View Layout" as Layout
+participant "Independent Time Conductor" as Conductor
+participant "Time Controls" as Controls
+
+Operator -> TimeStrip: render(timeStrip)
+activate TimeStrip
+TimeStrip -> Layout: readIndependentTimeConfiguration(timeStrip)
+activate Layout
+Layout --> TimeStrip: independent time configuration
+deactivate Layout
+TimeStrip -> Conductor: createOrUse(configuration)
+activate Conductor
+alt fixed independent time
+    Conductor -> Controls: renderFixedControls(bounds)
+else realtime independent time
+    Conductor -> Controls: renderRealtimeControls(clock)
+end
+activate Controls
+Controls --> Conductor: controls rendered
+deactivate Controls
+Conductor --> TimeStrip: independent controls exposed
+deactivate Conductor
+TimeStrip --> Operator: time strip controls shown
+deactivate TimeStrip
+@enduml

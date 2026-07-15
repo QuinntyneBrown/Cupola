@@ -1,0 +1,27 @@
+@startuml
+title C07 Plot view availability
+' Traces: OMCT-C07-L2-01.01, OMCT-C07-L2-01.02
+
+actor "View consumer" as Consumer
+participant "@cupola/core View Registry" as ViewRegistry
+participant "Plot View Provider" as PlotProvider
+participant "@cupola/core Telemetry Metadata Manager" as MetadataManager
+
+Consumer -> ViewRegistry: applicableViews(object)
+activate ViewRegistry
+ViewRegistry -> PlotProvider: canView(object)
+activate PlotProvider
+PlotProvider -> MetadataManager: getMetadata(object)
+activate MetadataManager
+MetadataManager --> PlotProvider: range metadata
+deactivate MetadataManager
+alt at least one range is numeric
+    PlotProvider --> ViewRegistry: telemetry plot view applies
+    ViewRegistry --> Consumer: offer telemetry plot view
+else every range is nonnumeric
+    PlotProvider --> ViewRegistry: telemetry plot view does not apply
+    ViewRegistry --> Consumer: omit telemetry plot view
+end
+deactivate PlotProvider
+deactivate ViewRegistry
+@enduml

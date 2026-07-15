@@ -1,0 +1,60 @@
+@startuml
+title Display layout canvas creation and rendering
+' Traces: OMCT-C09-L2-01.01, OMCT-C09-L2-01.04
+actor Operator
+participant "Angular Shell" as Shell
+participant "Object Type Registry" as Types
+participant "ObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+participant "RealtimeHub" as Hub
+participant "Display Layout View" as View
+participant "View Registry" as Views
+
+Operator -> Shell: create(displayLayout)
+activate Shell
+Shell -> Types: resolveCreatable(displayLayout)
+activate Types
+Types --> Shell: display layout definition
+deactivate Types
+Shell -> Gateway: POST /api/objects
+activate Gateway
+Gateway -> Controller: POST /api/objects
+activate Controller
+Controller -> Store: create(object)
+activate Store
+Store --> Controller: created object
+deactivate Store
+Controller -> Hub: broadcast objectUpdated
+activate Hub
+Hub --> Controller: broadcast accepted
+deactivate Hub
+Controller --> Gateway: 201 Created
+deactivate Controller
+Gateway --> Shell: created object
+deactivate Gateway
+Shell -> View: open(created object)
+activate View
+View -> Gateway: GET /api/objects/{id}
+activate Gateway
+Gateway -> Controller: GET /api/objects/{id}
+activate Controller
+Controller -> Store: get(key)
+activate Store
+Store --> Controller: display layout object
+deactivate Store
+Controller --> Gateway: 200 OK
+deactivate Controller
+Gateway --> View: display layout object
+deactivate Gateway
+loop each configured layout item
+    View -> Views: instantiate(objectKey, viewKey)
+    activate Views
+    Views --> View: embedded object view
+    deactivate Views
+end
+View --> Shell: canvas with contained view items
+deactivate View
+Shell --> Operator: display layout shown
+deactivate Shell
+@enduml

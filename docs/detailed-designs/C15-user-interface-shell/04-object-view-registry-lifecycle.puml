@@ -1,0 +1,37 @@
+@startuml
+title C15 object view registry applicability and lifecycle
+' Traces: OMCT-C15-L2-02.01, OMCT-C15-L2-02.02
+participant "ViewHostComponent" as ViewHost
+participant "ViewRegistryService" as ViewRegistry
+participant "ViewProvider" as Provider
+participant "CupolaView" as View
+
+ViewHost -> ViewRegistry: getApplicableViews(object, path)
+activate ViewRegistry
+loop each registered provider
+  ViewRegistry -> Provider: canView(object, path)
+  activate Provider
+  Provider --> ViewRegistry: true or false
+  deactivate Provider
+end
+ViewRegistry -> ViewRegistry: filter true results and sort by priority
+ViewRegistry --> ViewHost: applicable providers
+deactivate ViewRegistry
+
+ViewHost -> ViewRegistry: createView(providerKey, object, path)
+activate ViewRegistry
+ViewRegistry -> Provider: createView(object, path)
+activate Provider
+Provider --> ViewRegistry: view instance
+deactivate Provider
+ViewRegistry -> View: attach provider key and parent element
+activate View
+View --> ViewRegistry: context attached
+deactivate View
+ViewRegistry -> Provider: show(view, parentElement)
+activate Provider
+Provider --> ViewRegistry: view shown
+deactivate Provider
+ViewRegistry --> ViewHost: rendered view
+deactivate ViewRegistry
+@enduml

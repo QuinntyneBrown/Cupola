@@ -1,0 +1,18 @@
+@startuml
+title C01 headless startup
+' Traces: OMCT-C01-L2-02.05, OMCT-C01-L2-02.06
+actor Host
+participant "cupola Shell" as Shell
+participant "Routing Service" as Routing
+participant "Startup Listener" as Listener
+
+Host -> Shell ++: startHeadless()
+Shell -> Routing ++: start routing
+Routing --> Shell --: routing started
+opt visible layout omitted
+    Shell --> Shell: skip application layout mount
+end
+Shell -> Listener ++: emit start
+Listener --> Shell --: event received
+Shell --> Host --: headless startup completed
+@enduml

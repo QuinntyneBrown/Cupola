@@ -1,0 +1,21 @@
+@startuml
+title C01 application construction, capability APIs, and plugin catalog
+' Traces: OMCT-C01-L2-01.02, OMCT-C01-L2-01.03, OMCT-C01-L2-01.04, OMCT-C01-L2-01.05
+actor Extension
+participant "Application Constructor" as Constructor
+participant "@cupola/core Capability APIs" as APIs
+participant "Baseline Plugin Catalog" as Baseline
+participant "Optional Plugin Catalog" as Optional
+participant "Build Info Provider" as Build
+
+Extension -> Constructor ++: new application()
+Constructor -> APIs ++: initialize interfaces
+APIs --> Constructor --: object, composition, telemetry, time, action, user, notification, status, fault, form, annotation, routing, overlay, menu, tooltip, editor, indicator, branding, priority, type, view, inspector, toolbar
+Constructor -> Baseline ++: install baseline plugins
+Baseline --> Constructor --: baseline views and actions registered
+Constructor -> Optional ++: expose plugin factories
+Optional --> Constructor --: plugins catalog
+Constructor -> Build ++: read build metadata
+Build --> Constructor --: version, buildDate, revision, branch
+Constructor --> Extension --: application instance
+@enduml

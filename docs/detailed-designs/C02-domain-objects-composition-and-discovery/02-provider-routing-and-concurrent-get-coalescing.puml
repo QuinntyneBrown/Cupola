@@ -1,0 +1,43 @@
+@startuml
+title C02 provider routing and concurrent get coalescing
+' Traces: OMCT-C02-L2-01.03, OMCT-C02-L2-01.04
+actor Consumer
+participant "@cupola/core Object Service" as Objects
+participant "Namespace Provider Registry" as Providers
+participant "@cupola/api HttpObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+
+Consumer -> Objects ++: get(identifier)
+Objects -> Providers ++: providerFor(namespace)
+Providers --> Objects --: namespace provider
+Objects -> Gateway ++: GET /api/objects/{id}
+Gateway -> Controller ++: GET /api/objects/{id}
+Controller -> Store ++: get(identifier)
+
+Consumer -> Objects ++: get(same identifier)
+Objects --> Consumer --: shared in-flight request
+
+Store --> Controller --: domain object
+Controller --> Gateway --: 200 domain object
+Gateway --> Objects --: domain object
+Objects --> Consumer --: domain object
+Objects --> Consumer --: domain object
+
+Consumer -> Objects ++: create or update(domain object)
+Objects -> Providers ++: providerFor(namespace)
+Providers --> Objects --: namespace provider
+alt create operation
+    Objects -> Gateway ++: POST /api/objects
+    Gateway -> Controller ++: POST /api/objects
+    Controller -> Store ++: create(domain object)
+else update operation
+    Objects -> Gateway ++: PUT /api/objects/{id}
+    Gateway -> Controller ++: PUT /api/objects/{id}
+    Controller -> Store ++: update(domain object)
+end
+Store --> Controller --: saved object
+Controller --> Gateway --: saved object
+Gateway --> Objects --: saved object
+Objects --> Consumer --: routed operation result
+@enduml

@@ -1,0 +1,37 @@
+@startuml
+title C08 Table filtering, sorting, and CSV export
+' Traces: OMCT-C08-L2-01.05, OMCT-C08-L2-01.08
+
+actor "Operator" as Operator
+participant "Table Component" as TableComponent
+participant "Table Row Collection" as RowCollection
+participant "Telemetry Table View Actions" as ViewActions
+participant "CSV Exporter" as CsvExporter
+
+Operator -> TableComponent: set column filter or sort
+activate TableComponent
+TableComponent -> RowCollection: applyFilterOrSort(column, direction, filter)
+activate RowCollection
+RowCollection -> RowCollection: compute visible row set and order
+RowCollection --> TableComponent: visible rows
+deactivate RowCollection
+TableComponent --> Operator: table display updated
+deactivate TableComponent
+
+Operator -> ViewActions: export CSV(scope)
+activate ViewActions
+alt marked subset selected
+    ViewActions -> TableComponent: getMarkedRows()
+else all rows selected
+    ViewActions -> TableComponent: getAllRows()
+end
+activate TableComponent
+TableComponent --> ViewActions: rows for export
+deactivate TableComponent
+ViewActions -> CsvExporter: export(rows)
+activate CsvExporter
+CsvExporter --> ViewActions: CSV file
+deactivate CsvExporter
+ViewActions --> Operator: CSV produced
+deactivate ViewActions
+@enduml

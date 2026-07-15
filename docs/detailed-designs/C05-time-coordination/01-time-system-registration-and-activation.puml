@@ -1,0 +1,34 @@
+@startuml
+title C05 Time-system registration and activation
+' Traces: OMCT-C05-L2-01.01, OMCT-C05-L2-01.02
+
+actor "Extension" as Extension
+actor "Consumer" as Consumer
+participant "cupola Shell" as Shell
+participant "@cupola/core Time API" as TimeApi
+participant "@cupola/core Time Context" as TimeContext
+
+Extension -> Shell: install time-system definition
+activate Shell
+Shell -> TimeApi: registerTimeSystem(definition)
+activate TimeApi
+TimeApi -> TimeApi: store by unique key
+TimeApi --> Shell: registered
+deactivate TimeApi
+Shell --> Extension: time system available
+deactivate Shell
+
+Consumer -> TimeApi: setActiveTimeSystem(key)
+activate TimeApi
+TimeApi -> TimeApi: find registered key
+alt key is registered
+    TimeApi -> TimeContext: setTimeSystem(definition)
+    activate TimeContext
+    TimeContext --> TimeApi: active time system
+    deactivate TimeContext
+    TimeApi --> Consumer: activated
+else key is unknown
+    TimeApi --> Consumer: rejected
+end
+deactivate TimeApi
+@enduml

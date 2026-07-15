@@ -1,0 +1,35 @@
+@startuml
+title C05 Time context resolution for object paths
+' Traces: OMCT-C05-L2-02.01, OMCT-C05-L2-02.02, OMCT-C05-L2-02.03
+
+actor "View" as View
+participant "cupola Shell" as Shell
+participant "@cupola/core Object Registry" as ObjectRegistry
+participant "@cupola/core Time API" as TimeApi
+participant "Global Time Context" as GlobalContext
+participant "Independent Time Context" as IndependentContext
+
+View -> Shell: request time context for path
+activate Shell
+Shell -> ObjectRegistry: read path configuration
+activate ObjectRegistry
+ObjectRegistry --> Shell: object path
+deactivate ObjectRegistry
+Shell -> TimeApi: getContext(path)
+activate TimeApi
+TimeApi -> TimeApi: inspect path nearest first
+alt no object declares independent time
+    TimeApi --> Shell: Global Time Context
+else path object owns independent time
+    TimeApi -> IndependentContext: createContext(configuration)
+    activate IndependentContext
+    IndependentContext --> TimeApi: context with local bounds and clock state
+    deactivate IndependentContext
+    TimeApi --> Shell: Independent Time Context
+else nearest ancestor owns independent time
+    TimeApi --> Shell: ancestor Independent Time Context
+end
+deactivate TimeApi
+Shell --> View: selected time context
+deactivate Shell
+@enduml

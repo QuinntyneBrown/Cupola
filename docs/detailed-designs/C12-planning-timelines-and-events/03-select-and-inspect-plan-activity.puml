@@ -1,0 +1,28 @@
+@startuml
+title Plan activity selection and inspection
+' Traces: OMCT-C12-L2-01.04
+actor Operator
+participant "Plan View" as View
+participant "Application Selection Service" as Selection
+participant "Activity Inspector View Provider" as Provider
+participant "Plan Activities Inspector" as Inspector
+
+Operator -> View: selectActivity(activity)
+activate View
+View -> Selection: publish(activity)
+activate Selection
+Selection -> Provider: findApplicableInspector(activity)
+activate Provider
+Provider --> Selection: activity inspector view
+deactivate Provider
+Selection -> Inspector: render(activity)
+activate Inspector
+Inspector -> Inspector: formatTiming(activity)
+Inspector -> Inspector: renderDisplayProperties(activity)
+Inspector --> Selection: inspector content
+deactivate Inspector
+Selection --> View: activity selected
+deactivate Selection
+View --> Operator: activity inspection shown
+deactivate View
+@enduml

@@ -1,0 +1,57 @@
+@startuml
+title Display layout composition and item synchronization
+' Traces: OMCT-C09-L2-01.02
+actor Operator
+participant "Display Layout View" as View
+participant "Composition Service" as Composition
+participant "Layout Item Configuration" as Config
+participant "ObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+participant "RealtimeHub" as Hub
+
+Operator -> View: changeCompositionOrItems(change)
+activate View
+View -> Composition: readChildren(displayLayout)
+activate Composition
+Composition --> View: composed children
+deactivate Composition
+View -> Config: readItems(displayLayout)
+activate Config
+Config --> View: configured items
+deactivate Config
+alt composition has child without item
+    View -> Config: addItemForChild(child)
+    activate Config
+    Config --> View: updated item configuration
+    deactivate Config
+else item references missing child
+    View -> Config: removeItemForMissingChild(item)
+    activate Config
+    Config --> View: updated item configuration
+    deactivate Config
+else item exists without composition entry
+    View -> Composition: addCompositionEntry(item.objectKey)
+    activate Composition
+    Composition --> View: updated composition
+    deactivate Composition
+end
+View -> Gateway: PUT /api/objects/{id}
+activate Gateway
+Gateway -> Controller: PUT /api/objects/{id}
+activate Controller
+Controller -> Store: update(object)
+activate Store
+Store --> Controller: saved object
+deactivate Store
+Controller -> Hub: broadcast objectUpdated
+activate Hub
+Hub --> Controller: broadcast accepted
+deactivate Hub
+Controller --> Gateway: 200 OK
+deactivate Controller
+Gateway --> View: saved display layout
+deactivate Gateway
+View --> Operator: synchronized layout shown
+deactivate View
+@enduml

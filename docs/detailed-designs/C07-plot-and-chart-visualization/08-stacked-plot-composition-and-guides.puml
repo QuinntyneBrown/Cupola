@@ -1,0 +1,43 @@
+@startuml
+title C07 Stacked plot composition and cursor guides
+' Traces: OMCT-C07-L2-03.02, OMCT-C07-L2-03.03
+
+actor "Operator" as Operator
+participant "Stacked Plot View" as StackedView
+participant "@cupola/core Composition Service" as CompositionService
+participant "Stacked Row" as Row
+participant "Cursor Guide Coordinator" as GuideCoordinator
+
+Operator -> CompositionService: add or remove child
+activate CompositionService
+CompositionService -> StackedView: compositionChanged(change)
+activate StackedView
+alt compatible child added
+    StackedView -> Row: create rendered series
+    activate Row
+    Row --> StackedView: row added
+    deactivate Row
+else child removed
+    StackedView -> Row: remove rendered series
+    activate Row
+    Row --> StackedView: row removed
+    deactivate Row
+end
+StackedView --> CompositionService: row set updated
+deactivate StackedView
+CompositionService --> Operator: composition applied
+deactivate CompositionService
+
+Operator -> Row: pointerMove(domainPosition)
+activate Row
+Row -> GuideCoordinator: updateGuide(domainPosition)
+activate GuideCoordinator
+GuideCoordinator -> StackedView: display aligned guide state
+activate StackedView
+StackedView --> GuideCoordinator: guides displayed
+deactivate StackedView
+GuideCoordinator --> Row: guide state applied
+deactivate GuideCoordinator
+Row --> Operator: pointer handled
+deactivate Row
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+title Condition-set composition eligibility
+' Traces: OMCT-C10-L2-01.01
+actor Operator
+participant "Condition Set View" as View
+participant "Composition Policy" as Policy
+participant "Telemetry Registry" as Telemetry
+participant "Composition Service" as Composition
+
+Operator -> View: proposeChild(child)
+activate View
+View -> Policy: evaluateEligibility(child)
+activate Policy
+Policy -> Telemetry: producesTelemetry(child)
+activate Telemetry
+Telemetry --> Policy: telemetry capability
+deactivate Telemetry
+alt child produces telemetry
+    Policy --> View: allow child
+    View -> Composition: addChild(child)
+    activate Composition
+    Composition --> View: child composed
+    deactivate Composition
+else child lacks telemetry
+    Policy --> View: reject child
+end
+deactivate Policy
+View --> Operator: eligibility result shown
+deactivate View
+@enduml

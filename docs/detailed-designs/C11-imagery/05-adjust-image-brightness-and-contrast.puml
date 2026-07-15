@@ -1,0 +1,25 @@
+@startuml
+title Image brightness contrast and reset
+' Traces: OMCT-C11-L2-02.03
+actor Operator
+participant "Filter Settings" as Settings
+participant "Imagery View" as View
+participant "Focused Image" as Image
+
+Operator -> Settings: changeFilter(control)
+activate Settings
+alt brightness or contrast changed
+    Settings -> View: setFilter(brightness, contrast)
+else reset selected
+    Settings -> View: setFilter(100 percent, 100 percent)
+end
+activate View
+View -> Image: applyCssFilter(brightness, contrast)
+activate Image
+Image --> View: filter applied
+deactivate Image
+View --> Settings: filter state updated
+deactivate View
+Settings --> Operator: focused image refreshed
+deactivate Settings
+@enduml

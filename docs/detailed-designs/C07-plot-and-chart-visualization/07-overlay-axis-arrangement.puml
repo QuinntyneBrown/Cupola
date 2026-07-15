@@ -1,0 +1,29 @@
+@startuml
+title C07 Overlay axis arrangement
+' Traces: OMCT-C07-L2-03.01
+
+participant "Overlay Plot View" as OverlayView
+participant "Overlay Plot Configuration" as Configuration
+participant "Range Axis Renderer" as AxisRenderer
+participant "Telemetry Series" as Series
+
+OverlayView -> Configuration: getAxisMode()
+activate Configuration
+Configuration --> OverlayView: single-axis or multiple-axis
+deactivate Configuration
+alt single-axis mode
+    OverlayView -> AxisRenderer: renderSharedRangeAxis(series set)
+    activate AxisRenderer
+    AxisRenderer --> OverlayView: shared range axis
+    deactivate AxisRenderer
+    OverlayView -> Series: renderAgainstSharedAxis()
+else multiple-axis mode
+    loop each telemetry series
+        OverlayView -> AxisRenderer: renderSeriesRangeAxis(series)
+        activate AxisRenderer
+        AxisRenderer --> OverlayView: per-series range axis
+        deactivate AxisRenderer
+        OverlayView -> Series: renderAgainstSeriesAxis()
+    end
+end
+@enduml

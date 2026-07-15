@@ -1,0 +1,24 @@
+@startuml
+title C03 link and move hierarchy membership
+' Traces: OMCT-C03-L2-02.03, OMCT-C03-L2-02.04
+actor Operator
+participant "Hierarchy Action" as Action
+participant "Composition Service" as Composition
+participant "Current Parent" as CurrentParent
+participant "Destination Parent" as DestinationParent
+
+Operator -> Action ++: invoke(source, currentParent, destinationParent)
+Action -> Composition ++: allow(destinationParent, source)
+Composition --> Action --: destination eligible
+alt link action
+    Action -> DestinationParent ++: add alias(source identifier)
+    DestinationParent --> Action --: alias added
+    Action --> Operator --: original membership retained
+else move action
+    Action -> DestinationParent ++: add child(source identifier)
+    DestinationParent --> Action --: child added
+    Action -> CurrentParent ++: remove child(source identifier)
+    CurrentParent --> Action --: child removed
+    Action --> Operator --: membership transferred
+end
+@enduml

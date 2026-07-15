@@ -1,0 +1,52 @@
+@startuml
+title Flexible layout pane editing
+' Traces: OMCT-C09-L2-02.02
+actor Operator
+participant "Flexible Layout View" as View
+participant "Flexible Layout Toolbar" as Toolbar
+participant "Layout Configuration" as Config
+participant "ObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+participant "RealtimeHub" as Hub
+
+Operator -> View: enterEditMode()
+activate View
+Operator -> Toolbar: invokePaneControl(control)
+activate Toolbar
+Toolbar -> View: applyPaneControl(control)
+activate View
+alt add pane
+    View -> Config: addPane(target)
+else remove pane
+    View -> Config: removePane(target)
+else orient panes
+    View -> Config: setOrientation(target, orientation)
+else resize pane
+    View -> Config: setPaneSize(target, size)
+end
+activate Config
+Config --> View: layout configuration updated
+deactivate Config
+View -> Gateway: PUT /api/objects/{id}
+activate Gateway
+Gateway -> Controller: PUT /api/objects/{id}
+activate Controller
+Controller -> Store: update(object)
+activate Store
+Store --> Controller: saved object
+deactivate Store
+Controller -> Hub: broadcast objectUpdated
+activate Hub
+Hub --> Controller: broadcast accepted
+deactivate Hub
+Controller --> Gateway: 200 OK
+deactivate Controller
+Gateway --> View: saved flexible layout
+deactivate Gateway
+View --> Toolbar: edit persisted
+deactivate View
+Toolbar --> Operator: updated panes shown
+deactivate Toolbar
+deactivate View
+@enduml

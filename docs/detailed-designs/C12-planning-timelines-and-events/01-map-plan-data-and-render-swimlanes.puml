@@ -1,0 +1,41 @@
+@startuml
+title Plan data mapping and activity swimlanes
+' Traces: OMCT-C12-L2-01.01, OMCT-C12-L2-01.02
+actor Operator
+participant "Angular Shell" as Shell
+participant "Plan View" as View
+participant "Plan Data Source" as Source
+participant "Plan Mapping Utility" as Mapper
+participant "Time Scale" as Scale
+participant "Activity Swimlane Renderer" as Renderer
+
+Operator -> Shell: navigate(planObject)
+activate Shell
+Shell -> View: load(planObject, activeBounds)
+activate View
+View -> Source: loadPlanData(planObject)
+activate Source
+Source --> View: plan data and optional source map
+deactivate Source
+View -> Mapper: normalize(planData, sourceMap)
+activate Mapper
+Mapper --> View: activity groups
+deactivate Mapper
+View -> Scale: calculate(activeBounds)
+activate Scale
+Scale --> View: time scale
+deactivate Scale
+loop each visible activity group
+    View -> Renderer: renderGroup(group)
+    activate Renderer
+    loop each visible activity
+        Renderer -> Renderer: positionByStartAndEnd(activity, scale)
+    end
+    Renderer --> View: swimlane rendered
+    deactivate Renderer
+end
+View --> Shell: plan activities rendered
+deactivate View
+Shell --> Operator: plan shown
+deactivate Shell
+@enduml

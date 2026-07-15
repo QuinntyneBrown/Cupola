@@ -1,0 +1,40 @@
+@startuml
+title Time-list plan loading and activity filtering
+' Traces: OMCT-C12-L2-03.01, OMCT-C12-L2-03.02
+actor Operator
+participant "Time List View" as TimeList
+participant "Composition Service" as Composition
+participant "Plan Loader" as Loader
+participant "Activity Filter" as Filter
+participant "Time List Renderer" as Renderer
+
+Operator -> TimeList: load(timeListObject)
+activate TimeList
+TimeList -> Composition: readEligiblePlan(timeListObject)
+activate Composition
+Composition --> TimeList: composed plan
+deactivate Composition
+TimeList -> Loader: loadPlanActivities(plan)
+activate Loader
+Loader --> TimeList: activities and headers
+deactivate Loader
+TimeList -> Filter: evaluateVisibleActivities(activities, filters, bounds)
+activate Filter
+loop each activity
+    alt activity satisfies active filters
+        Filter -> Filter: include(activity)
+    else activity is marked in progress
+        Filter -> Filter: include(activity)
+    else activity does not satisfy filters
+        Filter -> Filter: exclude(activity)
+    end
+end
+Filter --> TimeList: visible activities
+deactivate Filter
+TimeList -> Renderer: render(headers, visibleActivities)
+activate Renderer
+Renderer --> TimeList: time list rendered
+deactivate Renderer
+TimeList --> Operator: filtered activities shown
+deactivate TimeList
+@enduml

@@ -1,0 +1,20 @@
+@startuml
+title C02 in-memory search and shared-worker fallback
+' Traces: OMCT-C02-L2-04.02, OMCT-C02-L2-04.03
+actor Consumer
+participant "InMemorySearchProvider" as Search
+participant "Shared Worker" as Worker
+participant "Local Search Index" as Index
+
+Consumer -> Search ++: search(query)
+alt shared worker available
+    Search -> Worker ++: search(query)
+    Worker -> Index ++: match partial or exact content
+    Index --> Worker --: matching objects or empty result
+    Worker --> Search --: search result
+else shared worker unavailable
+    Search -> Index ++: match partial or exact content
+    Index --> Search --: matching objects or empty result
+end
+Search --> Consumer --: search result
+@enduml

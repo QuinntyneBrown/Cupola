@@ -1,0 +1,26 @@
+@startuml
+title C14 user provider registration and current identity
+' Traces: OMCT-C14-L2-01.01, OMCT-C14-L2-01.02
+actor Extension
+participant "@cupola/core UserService" as UserService
+participant "UserProvider" as UserProvider
+
+Extension -> UserService: configureProvider(provider)
+activate UserService
+alt no provider configured
+  UserService -> UserService: store provider
+  UserService --> Extension: provider accepted
+else provider already configured
+  UserService --> Extension: second provider rejected
+end
+deactivate UserService
+
+Extension -> UserService: getCurrentUser()
+activate UserService
+UserService -> UserProvider: currentUser()
+activate UserProvider
+UserProvider --> UserService: identifier and name
+deactivate UserProvider
+UserService --> Extension: active identity
+deactivate UserService
+@enduml

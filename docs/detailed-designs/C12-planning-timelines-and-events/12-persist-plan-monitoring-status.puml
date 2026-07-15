@@ -1,0 +1,38 @@
+@startuml
+title Plan execution-monitoring status persistence
+' Traces: OMCT-C12-L2-04.04
+actor Operator
+participant "Plan Inspector" as Inspector
+participant "Plan Execution Monitoring View" as Monitoring
+participant "ObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+participant "RealtimeHub" as Hub
+
+Operator -> Inspector: selectPlan(plan)
+activate Inspector
+Inspector -> Monitoring: render(planIdentifier)
+activate Monitoring
+Operator -> Monitoring: changeStatusOrDuration(value)
+Monitoring -> Monitoring: updatePlanEntry(planIdentifier, status, duration)
+Monitoring -> Gateway: PUT /api/objects/{monitoringId}
+activate Gateway
+Gateway -> Controller: PUT /api/objects/{monitoringId}
+activate Controller
+Controller -> Store: update(monitoringObject)
+activate Store
+Store --> Controller: saved monitoring object
+deactivate Store
+Controller -> Hub: broadcast objectUpdated
+activate Hub
+Hub --> Controller: broadcast accepted
+deactivate Hub
+Controller --> Gateway: 200 OK
+deactivate Controller
+Gateway --> Monitoring: saved plan monitoring
+deactivate Gateway
+Monitoring --> Inspector: monitoring status updated
+deactivate Monitoring
+Inspector --> Operator: plan monitoring shown
+deactivate Inspector
+@enduml

@@ -1,0 +1,64 @@
+@startuml
+title C15 browse path resolution and root redirect
+' Traces: OMCT-C15-L2-01.03, OMCT-C15-L2-01.04
+actor Operator
+participant "BrowseResolver" as Resolver
+participant "BrowseStateService" as BrowseState
+participant "HttpObjectsGateway" as ObjectsGateway
+participant "Cupola.Api ObjectsController" as ObjectsController
+participant "Cupola.Core IObjectStore" as Store
+participant "ObjectUpdatesService" as Updates
+participant "ViewRegistryService" as ViewRegistry
+participant "ViewHostComponent" as ViewHost
+
+Operator -> Resolver: navigate to /browse path
+activate Resolver
+alt root browse path
+  Resolver -> ObjectsGateway: getComposition(root)
+  activate ObjectsGateway
+  ObjectsGateway -> ObjectsController: GET /api/objects/{root}/composition
+  activate ObjectsController
+  ObjectsController -> Store: get composition
+  activate Store
+  Store --> ObjectsController: root children
+  deactivate Store
+  ObjectsController --> ObjectsGateway: root children
+  deactivate ObjectsController
+  ObjectsGateway --> Resolver: root children
+  deactivate ObjectsGateway
+  Resolver --> Operator: navigate to /browse/{lastChild}
+else object path contains identifiers
+  loop each object identifier
+    Resolver -> ObjectsGateway: getObject(keyString)
+    activate ObjectsGateway
+    ObjectsGateway -> ObjectsController: GET /api/objects/{keyString}
+    activate ObjectsController
+    ObjectsController -> Store: get object
+    activate Store
+    Store --> ObjectsController: domain object
+    deactivate Store
+    ObjectsController --> ObjectsGateway: domain object
+    deactivate ObjectsController
+    ObjectsGateway --> Resolver: domain object
+    deactivate ObjectsGateway
+  end
+  Resolver -> BrowseState: set path and document title
+  activate BrowseState
+  BrowseState --> Resolver: browse state updated
+  deactivate BrowseState
+  Resolver -> Updates: subscribe selected object
+  activate Updates
+  Updates --> Resolver: object update stream
+  deactivate Updates
+  Resolver -> ViewRegistry: find applicable view
+  activate ViewRegistry
+  ViewRegistry --> Resolver: requested or preferred view
+  deactivate ViewRegistry
+  Resolver -> ViewHost: render view
+  activate ViewHost
+  ViewHost --> Resolver: view rendered
+  deactivate ViewHost
+  Resolver --> Operator: display selected object
+end
+deactivate Resolver
+@enduml

@@ -1,0 +1,37 @@
+@startuml
+title C15 hash routing and search-parameter synchronization
+' Traces: OMCT-C15-L2-01.01, OMCT-C15-L2-01.02
+actor Operator
+participant "Angular Router" as AngularRouter
+participant "BrowseResolver" as Resolver
+participant "RouteEventsService" as RouteEvents
+participant "AbortRegistry" as AbortRegistry
+participant "UrlParamsService" as UrlParams
+
+Operator -> AngularRouter: change hash path
+activate AngularRouter
+AngularRouter -> AbortRegistry: abortActiveTelemetryRequests()
+activate AbortRegistry
+AbortRegistry --> AngularRouter: requests aborted
+deactivate AbortRegistry
+AngularRouter -> Resolver: dispatch matching route
+activate Resolver
+Resolver --> AngularRouter: route handled
+deactivate Resolver
+AngularRouter -> RouteEvents: emitPathChange(path)
+activate RouteEvents
+RouteEvents --> AngularRouter: event emitted
+deactivate RouteEvents
+AngularRouter --> Operator: display routed shell state
+deactivate AngularRouter
+
+Operator -> UrlParams: set, delete, or replace parameter
+activate UrlParams
+UrlParams -> UrlParams: update URLSearchParams representation
+UrlParams -> RouteEvents: emitParameterChange(params)
+activate RouteEvents
+RouteEvents --> UrlParams: event emitted
+deactivate RouteEvents
+UrlParams --> Operator: updated hash-relative location
+deactivate UrlParams
+@enduml

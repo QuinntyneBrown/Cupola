@@ -1,0 +1,24 @@
+@startuml
+title Plan activity overlap row allocation
+' Traces: OMCT-C12-L2-01.03
+participant "Plan View" as View
+participant "Activity Layout" as Layout
+participant "Row Allocator" as Allocator
+participant "Activity Swimlane Renderer" as Renderer
+
+View -> Layout: calculateActivityExtents(activities)
+activate Layout
+Layout --> View: time and label extents
+deactivate Layout
+View -> Allocator: allocateRows(extents)
+activate Allocator
+loop activities in group
+    Allocator -> Allocator: assignNonoverlappingRow(activity)
+end
+Allocator --> View: row assignments
+deactivate Allocator
+View -> Renderer: renderRows(rowAssignments)
+activate Renderer
+Renderer --> View: nonoverlapping rows rendered
+deactivate Renderer
+@enduml

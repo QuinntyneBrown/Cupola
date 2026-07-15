@@ -1,0 +1,69 @@
+@startuml
+title Provider-side telemetry filter configuration and propagation
+' Traces: OMCT-C10-L2-04.01, OMCT-C10-L2-04.02, OMCT-C10-L2-04.03
+actor Operator
+participant "Filter Inspector" as Inspector
+participant "Telemetry Metadata" as Metadata
+participant "Filter Store" as Filters
+participant "ObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+participant "RealtimeHub" as Hub
+participant "Telemetry View" as View
+participant "Telemetry Gateway" as TelemetryGateway
+
+Operator -> Inspector: openFilters(telemetryObject)
+activate Inspector
+Inspector -> Metadata: readFilterDefinitions(object)
+activate Metadata
+Metadata --> Inspector: filter definitions
+deactivate Metadata
+alt available values below selection threshold
+    Inspector -> Inspector: renderRadioOrCheckboxControls()
+else free text filter
+    Inspector -> Inspector: renderTextInputControls()
+end
+Operator -> Inspector: saveFilter(scope, values)
+alt object-specific scope
+    Inspector -> Filters: saveObjectFilter(object, values)
+else global scope
+    Inspector -> Filters: saveGlobalFilter(view, values)
+end
+activate Filters
+Filters --> Inspector: filters stored
+deactivate Filters
+Inspector -> Gateway: PUT /api/objects/{viewId}
+activate Gateway
+Gateway -> Controller: PUT /api/objects/{viewId}
+activate Controller
+Controller -> Store: update(viewObject)
+activate Store
+Store --> Controller: saved view object
+deactivate Store
+Controller -> Hub: broadcast objectUpdated
+activate Hub
+Hub --> Controller: broadcast accepted
+deactivate Hub
+Controller --> Gateway: 200 OK
+deactivate Controller
+Gateway --> Inspector: saved filter configuration
+deactivate Gateway
+Inspector -> View: refreshTelemetry()
+activate View
+View -> Filters: readApplicableFilters(object, view)
+activate Filters
+Filters --> View: active filters
+deactivate Filters
+alt historical request
+    View -> TelemetryGateway: requestTelemetry(options.filters)
+else realtime subscription
+    View -> TelemetryGateway: subscribeTelemetry(options.filters)
+end
+activate TelemetryGateway
+TelemetryGateway --> View: provider operation accepted
+deactivate TelemetryGateway
+View --> Inspector: telemetry options propagated
+deactivate View
+Inspector --> Operator: filters applied
+deactivate Inspector
+@enduml

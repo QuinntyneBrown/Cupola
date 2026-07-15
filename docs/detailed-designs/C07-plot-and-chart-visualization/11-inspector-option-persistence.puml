@@ -1,0 +1,37 @@
+@startuml
+title C07 Inspector option persistence
+' Traces: OMCT-C07-L2-04.05
+
+actor "Operator" as Operator
+participant "Plot or Chart Inspector" as Inspector
+participant "cupola Shell" as Shell
+participant "@cupola/api Object Gateway" as ObjectGateway
+participant "Cupola.Api ObjectsController" as ObjectsController
+participant "Cupola.Core IObjectStore" as ObjectStore
+participant "Cupola.Api RealtimeHub" as RealtimeHub
+
+Operator -> Inspector: change exposed option
+activate Inspector
+Inspector -> Shell: update domain object configuration
+activate Shell
+Shell -> ObjectGateway: save configuration
+activate ObjectGateway
+ObjectGateway -> ObjectsController: PUT /api/objects/{keyString}
+activate ObjectsController
+ObjectsController -> ObjectStore: mutate domain object
+activate ObjectStore
+ObjectStore --> ObjectsController: updated domain object
+deactivate ObjectStore
+ObjectsController -> RealtimeHub: ObjectUpdated(updated)
+activate RealtimeHub
+RealtimeHub --> ObjectsController: broadcast accepted
+deactivate RealtimeHub
+ObjectsController --> ObjectGateway: updated domain object
+deactivate ObjectsController
+ObjectGateway --> Shell: saved configuration
+deactivate ObjectGateway
+Shell --> Inspector: configuration saved
+deactivate Shell
+Inspector --> Operator: option persisted
+deactivate Inspector
+@enduml

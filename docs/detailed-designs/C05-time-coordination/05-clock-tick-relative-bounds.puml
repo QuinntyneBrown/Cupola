@@ -1,0 +1,28 @@
+@startuml
+title C05 Clock tick relative bounds
+' Traces: OMCT-C05-L2-03.03, OMCT-C05-L2-03.04, OMCT-C05-L2-03.06
+
+participant "Local Clock" as LocalClock
+participant "Latest-available-data Clock" as LadClock
+participant "@cupola/core Time Context" as TimeContext
+participant "Time listener" as Listener
+
+TimeContext -> TimeContext: store start and end offsets
+activate TimeContext
+TimeContext --> TimeContext: offsets ready
+deactivate TimeContext
+
+loop configured clock interval
+    alt local clock is active
+        LocalClock -> TimeContext: tick(epochMilliseconds)
+    else latest-available-data clock is active
+        LadClock -> TimeContext: tick(latestDataTime)
+    end
+    activate TimeContext
+    TimeContext -> TimeContext: derive bounds from tick and offsets
+    TimeContext -> Listener: emit tick(value)
+    TimeContext -> Listener: emit boundsChanged(bounds)
+    TimeContext --> LocalClock: tick handled
+    deactivate TimeContext
+end
+@enduml

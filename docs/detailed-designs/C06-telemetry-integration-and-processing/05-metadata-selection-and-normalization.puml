@@ -1,0 +1,39 @@
+@startuml
+title C06 Metadata selection and normalization
+' Traces: OMCT-C06-L2-03.01, OMCT-C06-L2-03.02, OMCT-C06-L2-03.03
+
+actor "Consumer" as Consumer
+participant "@cupola/core Telemetry Metadata Manager" as MetadataManager
+participant "Metadata Provider Registry" as ProviderRegistry
+participant "Metadata Provider" as MetadataProvider
+participant "Default Metadata Provider" as DefaultProvider
+participant "Domain Object" as DomainObject
+
+Consumer -> MetadataManager: getMetadata(domainObject)
+activate MetadataManager
+MetadataManager -> ProviderRegistry: matching providers(domainObject)
+activate ProviderRegistry
+ProviderRegistry --> MetadataManager: providers
+deactivate ProviderRegistry
+loop matching providers
+    MetadataManager -> MetadataProvider: priority and registration order
+    activate MetadataProvider
+    MetadataProvider --> MetadataManager: candidate metadata
+    deactivate MetadataProvider
+end
+alt custom provider supersedes default
+    MetadataManager -> MetadataManager: select highest priority candidate
+else no custom provider supersedes default
+    MetadataManager -> DefaultProvider: derive metadata(domainObject.telemetry)
+    activate DefaultProvider
+    DefaultProvider -> DomainObject: read telemetry definitions
+    activate DomainObject
+    DomainObject --> DefaultProvider: metadata definitions
+    deactivate DomainObject
+    DefaultProvider --> MetadataManager: default metadata
+    deactivate DefaultProvider
+end
+MetadataManager -> MetadataManager: order domain and range values by hints and priority
+MetadataManager --> Consumer: normalized metadata
+deactivate MetadataManager
+@enduml

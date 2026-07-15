@@ -1,0 +1,52 @@
+@startuml
+title C16 export, import, and new-tab safety
+' Traces: OMCT-C16-L2-04.03, OMCT-C16-L2-04.04, OMCT-C16-L2-04.05, OMCT-C16-L2-04.06, OMCT-C16-L2-04.07
+actor Operator
+participant "CSVExporter" as CsvExporter
+participant "DomainObjectLoader" as Loader
+participant "OpenInNewTabAction" as NewTabAction
+participant "OpenImageInNewTabAction" as ImageNewTabAction
+participant "ImageExporter" as ImageExporter
+participant "Browser" as Browser
+
+Operator -> CsvExporter: export telemetry table row
+activate CsvExporter
+CsvExporter -> CsvExporter: neutralize formula-triggering cell values
+CsvExporter --> Operator: CSV export payload
+deactivate CsvExporter
+
+Operator -> Loader: load or import domain object JSON
+activate Loader
+Loader -> Loader: drop __proto__ payload properties
+Loader --> Operator: domain object without polluted prototype properties
+deactivate Loader
+
+Operator -> NewTabAction: open object in new tab
+activate NewTabAction
+NewTabAction -> Browser: open with opener isolation options
+activate Browser
+Browser --> NewTabAction: tab opened
+deactivate Browser
+NewTabAction --> Operator: isolated tab opened
+deactivate NewTabAction
+
+Operator -> ImageNewTabAction: open image in new tab
+activate ImageNewTabAction
+ImageNewTabAction -> ImageNewTabAction: evaluate image URL allow list
+alt URL allowed
+  ImageNewTabAction -> Browser: open image with opener isolation options
+  activate Browser
+  Browser --> ImageNewTabAction: tab opened
+  deactivate Browser
+  ImageNewTabAction --> Operator: image tab opened
+else URL blocked
+  ImageNewTabAction --> Operator: navigation blocked
+end
+deactivate ImageNewTabAction
+
+Operator -> ImageExporter: export image filename
+activate ImageExporter
+ImageExporter -> ImageExporter: remove unsupported characters and trim periods
+ImageExporter --> Operator: sanitized filename
+deactivate ImageExporter
+@enduml

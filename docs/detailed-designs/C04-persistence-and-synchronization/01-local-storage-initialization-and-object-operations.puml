@@ -1,0 +1,31 @@
+@startuml
+title C04 local-storage initialization and object operations
+' Traces: OMCT-C04-L2-01.01, OMCT-C04-L2-01.02
+actor Consumer
+participant "LocalStorageObjectProvider" as Provider
+participant "Browser localStorage" as Storage
+
+Consumer -> Provider ++: initialize(configured area)
+Provider -> Storage ++: getItem(area)
+alt area absent
+    Storage --> Provider --: no value
+    Provider -> Storage ++: setItem(area, empty structure)
+    Storage --> Provider --: structure stored
+else area exists
+    Storage --> Provider --: stored structure
+end
+Provider --> Consumer --: provider initialized
+
+Consumer -> Provider ++: create(domain object)
+Provider -> Storage ++: set object by identifier
+Storage --> Provider --: saved
+Provider --> Consumer --: object saved
+Consumer -> Provider ++: update(domain object)
+Provider -> Storage ++: replace object by identifier
+Storage --> Provider --: saved
+Provider --> Consumer --: object saved
+Consumer -> Provider ++: get(identifier)
+Provider -> Storage ++: read object by identifier
+Storage --> Provider --: serializable state
+Provider --> Consumer --: domain object
+@enduml

@@ -1,0 +1,28 @@
+@startuml
+title C04 remote changes to object observers
+' Traces: OMCT-C04-L2-02.05
+actor Consumer
+participant "@cupola/core Object Service" as Objects
+participant "ObjectUpdatesService" as Updates
+participant "@cupola/api RealtimeGateway" as Realtime
+participant "RealtimeHub" as Hub
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+participant "Object Observer" as Observer
+
+Consumer -> Objects ++: observe(identifier, observer)
+Objects -> Updates ++: subscribe(identifier)
+Updates --> Objects --: subscription active
+Objects --> Consumer --: unsubscribe handle
+
+Controller -> Store ++: update(domain object)
+Store --> Controller --: saved object
+Controller -> Hub ++: broadcast objectChanged
+Hub -> Realtime ++: objectChanged(identifier, remote state)
+Realtime -> Updates ++: emit remote state
+Updates -> Observer ++: notify(remote state)
+Observer --> Updates --: handled
+Updates --> Realtime --: notification completed
+Realtime --> Hub --: delivered
+Hub --> Controller --: broadcast completed
+@enduml

@@ -1,0 +1,40 @@
+@startuml
+title C08 Gauge forms, latest value, and limits
+' Traces: OMCT-C08-L2-03.01, OMCT-C08-L2-03.02, OMCT-C08-L2-03.03
+
+participant "Gauge View" as GaugeView
+participant "Gauge Configuration" as GaugeConfig
+participant "@cupola/core Telemetry API" as TelemetryApi
+participant "@cupola/core Telemetry Value Formatter" as ValueFormatter
+participant "@cupola/core Limit Evaluation" as LimitEvaluation
+
+GaugeView -> GaugeConfig: read form and range source
+activate GaugeConfig
+GaugeConfig --> GaugeView: form, bounds mode, limit mode
+deactivate GaugeConfig
+alt manual bounds configured
+    GaugeView -> GaugeView: use configured minimum and maximum
+else telemetry-derived limits configured
+    GaugeView -> LimitEvaluation: evaluateLimits(source)
+    activate LimitEvaluation
+    LimitEvaluation --> GaugeView: minimum, maximum, low limit, high limit
+    deactivate LimitEvaluation
+end
+GaugeView -> GaugeView: render selected gauge form
+note right of GaugeView
+Implemented forms are filled dial, needle dial, vertical meter, inverted vertical meter, and horizontal meter.
+end note
+GaugeView -> TelemetryApi: subscribe(source, latest)
+activate TelemetryApi
+TelemetryApi --> GaugeView: unsubscribe handle
+deactivate TelemetryApi
+TelemetryApi -> GaugeView: callback(numeric datum)
+activate GaugeView
+GaugeView -> ValueFormatter: format(range value)
+activate ValueFormatter
+ValueFormatter --> GaugeView: formatted value
+deactivate ValueFormatter
+GaugeView -> GaugeView: display value at gauge position
+GaugeView --> TelemetryApi: datum rendered
+deactivate GaugeView
+@enduml

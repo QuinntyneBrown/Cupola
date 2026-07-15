@@ -1,0 +1,40 @@
+@startuml
+title C15 global shell search
+' Traces: OMCT-C15-L2-05.05
+actor Operator
+participant "GrandSearchComponent" as Search
+participant "HttpSearchGateway" as SearchGateway
+participant "Cupola.Api SearchController" as SearchController
+participant "Cupola.Core IObjectStore" as Store
+participant "ObjectSearchResultComponent" as ObjectResult
+participant "AnnotationSearchResultComponent" as AnnotationResult
+
+Operator -> Search: enter search term
+activate Search
+Search -> SearchGateway: search(query)
+activate SearchGateway
+SearchGateway -> SearchController: GET /api/search?q={query}
+activate SearchController
+SearchController -> Store: search(query)
+activate Store
+Store --> SearchController: object and annotation matches
+deactivate Store
+SearchController --> SearchGateway: search response
+deactivate SearchController
+SearchGateway --> Search: search results
+deactivate SearchGateway
+alt object matches returned
+  Search -> ObjectResult: render object results
+  activate ObjectResult
+  ObjectResult --> Search: object results rendered
+  deactivate ObjectResult
+end
+alt annotation matches returned
+  Search -> AnnotationResult: render annotation results
+  activate AnnotationResult
+  AnnotationResult --> Search: annotation results rendered
+  deactivate AnnotationResult
+end
+Search --> Operator: display matching results
+deactivate Search
+@enduml

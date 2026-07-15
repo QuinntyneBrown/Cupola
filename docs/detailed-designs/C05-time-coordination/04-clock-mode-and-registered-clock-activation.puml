@@ -1,0 +1,44 @@
+@startuml
+title C05 Clock mode and registered-clock activation
+' Traces: OMCT-C05-L2-03.01, OMCT-C05-L2-03.02
+
+actor "Consumer" as Consumer
+participant "@cupola/core Time API" as TimeApi
+participant "@cupola/core Clock Registry" as ClockRegistry
+participant "@cupola/core Time Context" as TimeContext
+participant "Registered Clock" as Clock
+participant "Time listener" as Listener
+
+Consumer -> TimeApi: setClock(clockKey or null)
+activate TimeApi
+alt clock is cleared
+    TimeApi -> TimeContext: clearClock()
+    activate TimeContext
+    TimeContext -> Listener: emit modeChanged(fixed)
+    TimeContext --> TimeApi: fixed mode
+    deactivate TimeContext
+    TimeApi --> Consumer: fixed mode active
+else clock key is registered
+    TimeApi -> ClockRegistry: get(clockKey)
+    activate ClockRegistry
+    ClockRegistry --> TimeApi: Registered Clock
+    deactivate ClockRegistry
+    TimeApi -> Clock: subscribe(tickHandler)
+    activate Clock
+    Clock --> TimeApi: unsubscribe handle
+    deactivate Clock
+    TimeApi -> TimeContext: setClock(clockKey, unsubscribe)
+    activate TimeContext
+    TimeContext -> Listener: emit modeChanged(realTime)
+    TimeContext --> TimeApi: real-time mode
+    deactivate TimeContext
+    TimeApi --> Consumer: clock active
+else clock key is unknown
+    TimeApi -> ClockRegistry: get(clockKey)
+    activate ClockRegistry
+    ClockRegistry --> TimeApi: not found
+    deactivate ClockRegistry
+    TimeApi --> Consumer: rejected
+end
+deactivate TimeApi
+@enduml

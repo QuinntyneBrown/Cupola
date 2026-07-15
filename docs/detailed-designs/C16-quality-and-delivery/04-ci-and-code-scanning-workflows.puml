@@ -1,0 +1,36 @@
+@startuml
+title C16 CI and code scanning workflows
+' Traces: OMCT-C16-L2-02.04, OMCT-C16-L2-02.05
+actor "Workflow event" as Event
+participant "PR workflow" as PRWorkflow
+participant "CodeQL workflow" as CodeQLWorkflow
+participant "Dependency build/cache job" as DependencyJob
+participant "Quality jobs" as QualityJobs
+participant "CodeQL analysis" as CodeQL
+
+Event -> PRWorkflow: trigger pull-request workflow
+activate PRWorkflow
+PRWorkflow -> DependencyJob: build and cache dependencies
+activate DependencyJob
+DependencyJob --> PRWorkflow: dependencies available
+deactivate DependencyJob
+PRWorkflow -> QualityJobs: run lint, unit, sharded e2e, visual-a11y, performance, memory
+activate QualityJobs
+QualityJobs --> PRWorkflow: job results
+deactivate QualityJobs
+PRWorkflow --> Event: PR workflow result
+deactivate PRWorkflow
+
+Event -> CodeQLWorkflow: trigger push, pull-request, or weekly schedule
+activate CodeQLWorkflow
+CodeQLWorkflow -> CodeQL: initialize JavaScript security-and-quality queries
+activate CodeQL
+CodeQL --> CodeQLWorkflow: initialized
+CodeQLWorkflow -> CodeQL: autobuild
+CodeQL --> CodeQLWorkflow: autobuild complete
+CodeQLWorkflow -> CodeQL: perform analysis
+CodeQL --> CodeQLWorkflow: analysis result
+deactivate CodeQL
+CodeQLWorkflow --> Event: CodeQL workflow result
+deactivate CodeQLWorkflow
+@enduml

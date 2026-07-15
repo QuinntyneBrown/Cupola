@@ -1,0 +1,31 @@
+@startuml
+title C01 mount target resolution
+' Traces: OMCT-C01-L2-02.02, OMCT-C01-L2-02.03, OMCT-C01-L2-02.04
+actor Host
+participant "cupola Shell" as Shell
+participant "Browser Document" as Document
+participant "Angular Bootstrap" as Bootstrap
+
+Host -> Shell ++: start(target)
+alt supplied element
+    Shell -> Bootstrap ++: mount(element)
+    Bootstrap --> Shell --: layout mounted
+    Shell --> Host --: startup completed
+else selector resolves
+    Shell -> Document ++: querySelector(selector)
+    Document --> Shell --: element
+    Shell -> Bootstrap ++: mount(element)
+    Bootstrap --> Shell --: layout mounted
+    Shell --> Host --: startup completed
+else no target supplied
+    Shell -> Document ++: create mount element
+    Document --> Shell --: appended element
+    Shell -> Bootstrap ++: mount(appended element)
+    Bootstrap --> Shell --: layout mounted
+    Shell --> Host --: startup completed
+else invalid or unresolved target
+    Shell -> Document ++: resolve target
+    Document --> Shell --: no valid element
+    Shell --> Host --: error identifies startup input
+end
+@enduml

@@ -1,0 +1,40 @@
+@startuml
+title Imagery applicability and initial focused image
+' Traces: OMCT-C11-L2-01.01, OMCT-C11-L2-01.02
+actor Operator
+participant "Angular Shell" as Shell
+participant "Imagery View Provider" as Provider
+participant "Telemetry Metadata" as Metadata
+participant "Imagery View" as View
+participant "Telemetry Gateway" as Telemetry
+participant "Image History" as History
+
+Operator -> Shell: evaluateViews(domainObject)
+activate Shell
+Shell -> Provider: appliesTo(domainObject)
+activate Provider
+Provider -> Metadata: readValues(domainObject)
+activate Metadata
+Metadata --> Provider: telemetry metadata
+deactivate Metadata
+alt metadata identifies image value
+    Provider --> Shell: imagery view offered
+    Shell -> View: mount(domainObject, activeBounds)
+    activate View
+    View -> Telemetry: requestImages(activeBounds)
+    activate Telemetry
+    Telemetry --> View: image telemetry
+    deactivate Telemetry
+    View -> History: selectMostRecentImage(imageTelemetry)
+    activate History
+    History --> View: focused image
+    deactivate History
+    View --> Shell: focused image displayed
+    deactivate View
+else metadata lacks image value
+    Provider --> Shell: imagery view not offered
+end
+deactivate Provider
+Shell --> Operator: applicable views shown
+deactivate Shell
+@enduml

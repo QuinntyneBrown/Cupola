@@ -1,0 +1,34 @@
+@startuml
+title C08 Latest-available-data table set rendering
+' Traces: OMCT-C08-L2-02.03
+
+participant "LAD Table Set View" as TableSetView
+participant "@cupola/core Composition Service" as CompositionService
+participant "@cupola/api Object Gateway" as ObjectGateway
+participant "Cupola.Api ObjectsController" as ObjectsController
+participant "Cupola.Core IObjectStore" as ObjectStore
+participant "LAD Table View" as LadTableView
+
+TableSetView -> CompositionService: getComposedTables(tableSetObject)
+activate CompositionService
+CompositionService -> ObjectGateway: GET /api/objects/{keyString}/composition
+activate ObjectGateway
+ObjectGateway -> ObjectsController: GetComposition(keyString)
+activate ObjectsController
+ObjectsController -> ObjectStore: GetComposition(keyString)
+activate ObjectStore
+ObjectStore --> ObjectsController: composed tables
+deactivate ObjectStore
+ObjectsController --> ObjectGateway: composed tables
+deactivate ObjectsController
+ObjectGateway --> CompositionService: composed tables
+deactivate ObjectGateway
+CompositionService --> TableSetView: table objects
+deactivate CompositionService
+loop each composed LAD table
+    TableSetView -> LadTableView: render table row or section
+    activate LadTableView
+    LadTableView --> TableSetView: table section rendered
+    deactivate LadTableView
+end
+@enduml

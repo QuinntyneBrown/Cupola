@@ -1,0 +1,35 @@
+@startuml
+title Time-list sorting and activity progress
+' Traces: OMCT-C12-L2-03.03, OMCT-C12-L2-03.04
+actor Operator
+participant "Time List View" as TimeList
+participant "Activity Sorter" as Sorter
+participant "Context Time Service" as Time
+participant "Expanded Activity Item" as Item
+participant "SVG Progress Renderer" as Progress
+
+Operator -> TimeList: selectSortableHeader(property, direction)
+activate TimeList
+TimeList -> Sorter: sort(visibleActivities, property, direction)
+activate Sorter
+Sorter --> TimeList: ordered activities
+deactivate Sorter
+Time -> TimeList: contextTimeChanged(now)
+activate Time
+TimeList -> Item: renderEachActivity(orderedActivities, now)
+activate Item
+loop each activity
+    Item -> Item: classifyTemporalState(start, end, now)
+    Item -> Item: formatDuration(start, end)
+    Item -> Progress: renderProgress(start, end, now)
+    activate Progress
+    Progress --> Item: progress graphic
+    deactivate Progress
+end
+Item --> TimeList: current future past states rendered
+deactivate Item
+TimeList --> Time: progress refresh complete
+deactivate Time
+TimeList --> Operator: sorted activity list shown
+deactivate TimeList
+@enduml

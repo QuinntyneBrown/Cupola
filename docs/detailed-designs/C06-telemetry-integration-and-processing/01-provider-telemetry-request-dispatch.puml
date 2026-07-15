@@ -1,0 +1,43 @@
+@startuml
+title C06 Provider telemetry request dispatch
+' Traces: OMCT-C06-L2-01.01, OMCT-C06-L2-01.02, OMCT-C06-L2-01.03
+
+actor "Consumer" as Consumer
+participant "@cupola/core Telemetry API" as TelemetryApi
+participant "@cupola/core Time API" as TimeApi
+participant "@cupola/core Telemetry Provider Registry" as ProviderRegistry
+participant "Telemetry Provider" as Provider
+
+Consumer -> TelemetryApi: requestOrSubscribe(object, options)
+activate TelemetryApi
+TelemetryApi -> TimeApi: getActiveBoundsAndTimeSystem()
+activate TimeApi
+TimeApi --> TelemetryApi: current time context
+deactivate TimeApi
+TelemetryApi -> TelemetryApi: add missing option defaults
+note right of TelemetryApi
+Explicit option values remain unchanged.
+end note
+TelemetryApi -> ProviderRegistry: providers in registration order
+activate ProviderRegistry
+ProviderRegistry --> TelemetryApi: providers
+deactivate ProviderRegistry
+loop provider list
+    TelemetryApi -> Provider: supports(object, operation)
+    activate Provider
+    Provider --> TelemetryApi: support result
+    deactivate Provider
+    alt provider supports operation
+        TelemetryApi -> Provider: invoke operation(object, options)
+        activate Provider
+        Provider --> TelemetryApi: telemetry result or subscription
+        deactivate Provider
+        TelemetryApi --> Consumer: provider result
+        TelemetryApi -> TelemetryApi: stop provider search
+    end
+end
+alt no provider supports operation
+    TelemetryApi --> Consumer: empty collection
+end
+deactivate TelemetryApi
+@enduml

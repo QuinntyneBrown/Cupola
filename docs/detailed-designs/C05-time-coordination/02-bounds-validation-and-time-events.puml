@@ -1,0 +1,34 @@
+@startuml
+title C05 Bounds validation and time events
+' Traces: OMCT-C05-L2-01.03, OMCT-C05-L2-01.04, OMCT-C05-L2-01.05
+
+actor "Consumer" as Consumer
+participant "@cupola/core Time API" as TimeApi
+participant "@cupola/core Time Context" as TimeContext
+participant "Time listener" as Listener
+
+Listener -> TimeApi: listen(eventName)
+activate TimeApi
+TimeApi --> Listener: unsubscribe handle
+deactivate TimeApi
+
+Consumer -> TimeApi: setBounds(start, end)
+activate TimeApi
+TimeApi -> TimeContext: validateBounds(start, end)
+activate TimeContext
+alt start and end form a valid range
+    TimeContext -> TimeContext: store bounds
+    alt time of interest is outside bounds
+        TimeContext -> TimeContext: clear time of interest
+        TimeContext -> Listener: emit timeOfInterestChanged(null)
+    end
+    TimeContext -> Listener: emit boundsChanged(bounds)
+    TimeContext --> TimeApi: bounds stored
+    TimeApi --> Consumer: accepted
+else range is invalid
+    TimeContext --> TimeApi: validation error
+    TimeApi --> Consumer: rejected
+end
+deactivate TimeContext
+deactivate TimeApi
+@enduml

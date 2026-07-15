@@ -1,0 +1,26 @@
+@startuml
+title C13 restricted notebook entry URL rendering
+' Traces: OMCT-C13-L2-02.06
+actor Operator
+participant "NotebookViewProvider" as ViewProvider
+participant "NotebookEntry" as Entry
+participant "RestrictedUrlPolicy" as Policy
+
+Operator -> ViewProvider: open restricted notebook
+activate ViewProvider
+ViewProvider -> Entry: render embedded entry URL
+activate Entry
+Entry -> Policy: evaluate whitelist(url)
+activate Policy
+alt URL permitted by whitelist
+  Policy --> Entry: permitted
+  Entry --> ViewProvider: render embedded URL
+else URL not permitted by whitelist
+  Policy --> Entry: rejected
+  Entry --> ViewProvider: omit embedded URL
+end
+deactivate Policy
+deactivate Entry
+ViewProvider --> Operator: display entry result
+deactivate ViewProvider
+@enduml

@@ -1,0 +1,63 @@
+@startuml
+title C13 annotation creation and validation
+' Traces: OMCT-C13-L2-04.01, OMCT-C13-L2-04.02, OMCT-C13-L2-04.03
+actor Operator
+participant "AnnotationInspectorView" as Inspector
+participant "@cupola/core AnnotationService" as AnnotationService
+participant "HttpObjectsGateway" as ObjectsGateway
+participant "Cupola.Api ObjectsController" as ObjectsController
+participant "Cupola.Core IObjectStore" as Store
+participant "RealtimeHub" as Hub
+
+Operator -> Inspector: create annotation
+activate Inspector
+Inspector -> AnnotationService: validate(type, targets, namespace)
+activate AnnotationService
+alt unknown type or unavailable namespace
+  AnnotationService --> Inspector: validation rejected
+  Inspector --> Operator: display rejection
+else immutable annotation namespace
+  AnnotationService --> Inspector: validation rejected
+  Inspector --> Operator: display rejection
+else immutable target with writable annotation namespace
+  AnnotationService --> Inspector: annotation stored separately
+  Inspector -> ObjectsGateway: saveAnnotation(namespace, annotation)
+  activate ObjectsGateway
+  ObjectsGateway -> ObjectsController: persist annotation object
+  activate ObjectsController
+  ObjectsController -> Store: save annotation without target mutation
+  activate Store
+  Store --> ObjectsController: persisted annotation
+  deactivate Store
+  ObjectsController -> Hub: emit objectChanged
+  activate Hub
+  Hub --> ObjectsController: broadcast accepted
+  deactivate Hub
+  ObjectsController --> ObjectsGateway: persisted annotation
+  deactivate ObjectsController
+  ObjectsGateway --> Inspector: persisted annotation
+  deactivate ObjectsGateway
+  Inspector --> Operator: display annotation
+else mutable target and writable namespace
+  AnnotationService --> Inspector: annotation accepted
+  Inspector -> ObjectsGateway: saveAnnotation(namespace, annotation)
+  activate ObjectsGateway
+  ObjectsGateway -> ObjectsController: persist annotation object
+  activate ObjectsController
+  ObjectsController -> Store: save annotation
+  activate Store
+  Store --> ObjectsController: persisted annotation
+  deactivate Store
+  ObjectsController -> Hub: emit objectChanged
+  activate Hub
+  Hub --> ObjectsController: broadcast accepted
+  deactivate Hub
+  ObjectsController --> ObjectsGateway: persisted annotation
+  deactivate ObjectsController
+  ObjectsGateway --> Inspector: persisted annotation
+  deactivate ObjectsGateway
+  Inspector --> Operator: display annotation
+end
+deactivate AnnotationService
+deactivate Inspector
+@enduml

@@ -1,0 +1,32 @@
+@startuml
+title Event telemetry track and extended lines
+' Traces: OMCT-C12-L2-02.04, OMCT-C12-L2-02.05
+participant "Telemetry Metadata" as Metadata
+participant "Event Timeline View Provider" as Provider
+participant "Time Strip View" as TimeStrip
+participant "Event Track View" as EventTrack
+participant "Extended Lines Bus" as Bus
+participant "Extended Lines Overlay" as Overlay
+
+Provider -> Metadata: readValues(telemetryObject)
+activate Metadata
+Metadata --> Provider: domain range and image hints
+deactivate Metadata
+alt domain exists and range and image hints are absent
+    Provider --> TimeStrip: event timeline view offered
+    TimeStrip -> EventTrack: renderEvents(telemetryObject)
+    activate EventTrack
+    EventTrack --> TimeStrip: event markers rendered
+    EventTrack -> Bus: publishExtendedLine(position)
+    activate Bus
+    Bus -> Overlay: renderAlignedMarker(position)
+    activate Overlay
+    Overlay --> Bus: marker rendered across participating rows
+    deactivate Overlay
+    Bus --> EventTrack: extended line coordinated
+    deactivate Bus
+    deactivate EventTrack
+else event metadata criteria not met
+    Provider --> TimeStrip: event timeline view not offered
+end
+@enduml

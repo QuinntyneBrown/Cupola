@@ -1,0 +1,29 @@
+@startuml
+title C06 Navigation cancellation
+' Traces: OMCT-C06-L2-01.04
+
+actor "Consumer" as Consumer
+participant "cupola Shell" as Shell
+participant "Telemetry Request Interceptor" as Interceptor
+participant "@cupola/core Telemetry API" as TelemetryApi
+participant "@cupola/api Telemetry Gateway" as TelemetryGateway
+
+Consumer -> TelemetryApi: request(object, options)
+activate TelemetryApi
+TelemetryApi -> Interceptor: attach cancellation to active path
+activate Interceptor
+Interceptor --> TelemetryApi: cancellable request options
+deactivate Interceptor
+TelemetryApi -> TelemetryGateway: GET /api/telemetry/{id}
+activate TelemetryGateway
+
+Shell -> Interceptor: active path changed
+activate Interceptor
+Interceptor -> TelemetryGateway: signal cancellation
+TelemetryGateway --> TelemetryApi: request aborted
+deactivate TelemetryGateway
+Interceptor --> Shell: cancellation signalled
+deactivate Interceptor
+TelemetryApi --> Consumer: cancellation result
+deactivate TelemetryApi
+@enduml

@@ -1,0 +1,23 @@
+@startuml
+title C01 deferred browser startup
+' Traces: OMCT-C01-L2-02.01, OMCT-C01-L2-02.06
+actor Host
+participant "cupola Shell" as Shell
+participant "Browser Document" as Document
+participant "Angular Bootstrap" as Bootstrap
+participant "Startup Listener" as Listener
+
+Host -> Shell ++: start(target)
+Shell -> Document ++: read readyState
+Document --> Shell --: loading
+Shell -> Document ++: add DOMContentLoaded listener
+Document --> Shell --: listener registered
+Shell --> Host --: startup deferred
+
+Document -> Shell ++: DOMContentLoaded
+Shell -> Bootstrap ++: bootstrap application layout
+Bootstrap --> Shell --: layout started
+Shell -> Listener ++: emit start
+Listener --> Shell --: event received
+Shell --> Document --: bootstrap completed
+@enduml

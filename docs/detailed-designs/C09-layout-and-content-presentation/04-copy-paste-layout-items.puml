@@ -1,0 +1,57 @@
+@startuml
+title Display layout clipboard transfer
+' Traces: OMCT-C09-L2-01.05
+actor Operator
+participant "Display Layout View" as View
+participant "Copy To Clipboard Action" as CopyAction
+participant "Layout Clipboard" as Clipboard
+participant "Layout Item Configuration" as Config
+participant "ObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+participant "RealtimeHub" as Hub
+
+Operator -> View: selectItems(items)
+activate View
+Operator -> CopyAction: copySelection()
+activate CopyAction
+CopyAction -> View: getSelectedLayoutItems()
+activate View
+View --> CopyAction: selected items
+deactivate View
+CopyAction -> Clipboard: store(items)
+activate Clipboard
+Clipboard --> CopyAction: items copied
+deactivate Clipboard
+CopyAction --> Operator: copy complete
+deactivate CopyAction
+Operator -> View: pasteClipboard()
+View -> Clipboard: read()
+activate Clipboard
+Clipboard --> View: copied items
+deactivate Clipboard
+loop each copied item
+    View -> Config: createItemWithValidReference(item)
+    activate Config
+    Config --> View: pasted item configuration
+    deactivate Config
+end
+View -> Gateway: PUT /api/objects/{id}
+activate Gateway
+Gateway -> Controller: PUT /api/objects/{id}
+activate Controller
+Controller -> Store: update(object)
+activate Store
+Store --> Controller: saved object
+deactivate Store
+Controller -> Hub: broadcast objectUpdated
+activate Hub
+Hub --> Controller: broadcast accepted
+deactivate Hub
+Controller --> Gateway: 200 OK
+deactivate Controller
+Gateway --> View: saved layout
+deactivate Gateway
+View --> Operator: pasted items shown
+deactivate View
+@enduml

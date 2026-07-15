@@ -1,0 +1,25 @@
+@startuml
+title C08 Bounds-change resume
+' Traces: OMCT-C08-L2-01.07
+
+actor "Operator" as Operator
+participant "Table Component" as TableComponent
+participant "@cupola/core Time API" as TimeApi
+participant "@cupola/core Telemetry API" as TelemetryApi
+
+TableComponent -> TableComponent: paused state active
+Operator -> TimeApi: setBounds(new bounds)
+activate TimeApi
+TimeApi -> TableComponent: emit boundsChanged(new bounds, userOriginated)
+activate TableComponent
+TableComponent -> TableComponent: clear paused state
+TableComponent -> TelemetryApi: request(object, new bounds)
+activate TelemetryApi
+TelemetryApi --> TableComponent: refreshed data
+deactivate TelemetryApi
+TableComponent -> TableComponent: render refreshed rows
+TableComponent --> TimeApi: bounds change handled
+deactivate TableComponent
+TimeApi --> Operator: bounds updated
+deactivate TimeApi
+@enduml

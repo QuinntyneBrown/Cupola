@@ -1,0 +1,30 @@
+@startuml
+title Gantt chart plan composition
+' Traces: OMCT-C12-L2-01.05
+actor Operator
+participant "Gantt Chart View" as Gantt
+participant "Gantt Chart Composition Policy" as Policy
+participant "Composition Service" as Composition
+participant "Plan View" as PlanView
+
+Operator -> Gantt: proposeChild(planObject)
+activate Gantt
+Gantt -> Policy: evaluateEligibility(planObject)
+activate Policy
+alt proposed child is a plan
+    Policy --> Gantt: allow plan
+    Gantt -> Composition: addChild(planObject)
+    activate Composition
+    Composition --> Gantt: plan composed
+    deactivate Composition
+    Gantt -> PlanView: render(planObject)
+    activate PlanView
+    PlanView --> Gantt: plan rendered in chart
+    deactivate PlanView
+else proposed child is not an eligible plan
+    Policy --> Gantt: reject child
+end
+deactivate Policy
+Gantt --> Operator: composition result shown
+deactivate Gantt
+@enduml

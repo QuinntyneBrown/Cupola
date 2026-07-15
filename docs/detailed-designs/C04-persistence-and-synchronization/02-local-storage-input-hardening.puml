@@ -1,0 +1,22 @@
+@startuml
+title C04 local-storage input hardening
+' Traces: OMCT-C04-L2-01.03
+actor Consumer
+participant "LocalStorageObjectProvider" as Provider
+participant "Browser localStorage" as Storage
+participant "Safe JSON Parser" as Parser
+participant "Global Object Prototype" as Prototype
+
+Consumer -> Provider ++: get(identifier)
+Provider -> Storage ++: read manipulated content
+Storage --> Provider --: content with prototype-control properties
+Provider -> Parser ++: parse and sanitize content
+alt prototype-control properties detected
+    Parser -> Prototype ++: leave unchanged
+    Prototype --> Parser --: unchanged
+    Parser --> Provider --: hardened object data
+else normal content
+    Parser --> Provider --: object data
+end
+Provider --> Consumer --: retrieved object data
+@enduml

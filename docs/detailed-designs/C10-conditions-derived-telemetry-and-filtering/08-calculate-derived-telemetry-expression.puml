@@ -1,0 +1,29 @@
+@startuml
+title Mathematical derived telemetry and sample windows
+' Traces: OMCT-C10-L2-03.01, OMCT-C10-L2-03.02
+participant "Derived Telemetry Provider" as Provider
+participant "Telemetry Service" as Telemetry
+participant "Comps Math Worker" as Worker
+participant "Derived Telemetry Stream" as Stream
+
+Provider -> Telemetry: requestOrSubscribe(sourceParameters)
+activate Telemetry
+Telemetry --> Provider: source telemetry by timestamp
+deactivate Telemetry
+Provider -> Worker: alignByReferenceTimestamp(sourceTelemetry)
+activate Worker
+loop each reference timestamp
+    Worker -> Worker: collectSourceValues(timestamp)
+    alt sample window is not full
+        Worker --> Provider: omit result
+    else sample window is full
+        Worker -> Worker: evaluateExpression(values)
+        Worker --> Provider: expression result at timestamp
+        Provider -> Stream: emit(result)
+        activate Stream
+        Stream --> Provider: result accepted
+        deactivate Stream
+    end
+end
+deactivate Worker
+@enduml

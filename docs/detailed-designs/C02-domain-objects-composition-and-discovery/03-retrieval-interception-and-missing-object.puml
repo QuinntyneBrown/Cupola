@@ -1,0 +1,24 @@
+@startuml
+title C02 retrieval interception and missing-object representation
+' Traces: OMCT-C02-L2-01.05, OMCT-C02-L2-01.06
+actor Consumer
+participant "@cupola/core Object Service" as Objects
+participant "Object Provider" as Provider
+participant "Interceptor Registry" as Interceptors
+participant "Missing Object Interceptor" as Missing
+
+Consumer -> Objects ++: get(identifier)
+Objects -> Provider ++: get(identifier)
+Provider --> Objects --: provider response
+Objects -> Interceptors ++: matching interceptors(response)
+Interceptors --> Objects --: applicable interceptors
+alt object returned
+    Objects -> Interceptors ++: apply(domain object)
+    Interceptors --> Objects --: intercepted domain object
+    Objects --> Consumer --: intercepted domain object
+else no domain object returned
+    Objects -> Missing ++: process(reference)
+    Missing --> Objects --: missing-object placeholder
+    Objects --> Consumer --: missing domain object
+end
+@enduml

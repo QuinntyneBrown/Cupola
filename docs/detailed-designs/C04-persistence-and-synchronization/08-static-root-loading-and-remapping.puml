@@ -1,0 +1,24 @@
+@startuml
+title C04 static root loading and identifier remapping
+' Traces: OMCT-C04-L2-03.01, OMCT-C04-L2-03.02
+actor Integrator
+participant "Static Root Plugin" as Plugin
+participant "StaticModelProvider" as Provider
+participant "Static JSON Resource" as Resource
+participant "Root Registry" as Roots
+participant "Object Provider Registry" as ObjectProviders
+
+Integrator -> Plugin ++: install(static root configuration)
+Plugin -> Provider ++: load(resource, namespace)
+Provider -> Resource ++: fetch JSON tree
+Resource --> Provider --: static tree
+loop each object and known internal reference
+    Provider -> Provider: remap identifiers, locations, compositions, layout references
+end
+Provider --> Plugin --: remapped root and children
+Plugin -> ObjectProviders ++: register provider objects
+ObjectProviders --> Plugin --: objects registered
+Plugin -> Roots ++: register remapped root
+Roots --> Plugin --: root registered
+Plugin --> Integrator --: static root available
+@enduml

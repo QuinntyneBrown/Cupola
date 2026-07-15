@@ -1,0 +1,58 @@
+@startuml
+title C07 Specialized chart eligibility and rendering
+' Traces: OMCT-C07-L2-04.01, OMCT-C07-L2-04.02, OMCT-C07-L2-04.03, OMCT-C07-L2-04.04
+
+actor "Operator" as Operator
+participant "@cupola/core Composition Service" as CompositionService
+participant "Bar Chart Composition Policy" as BarPolicy
+participant "Scatter Plot Composition Policy" as ScatterPolicy
+participant "@cupola/core Telemetry Metadata Manager" as MetadataManager
+participant "Bar Chart View" as BarView
+participant "Scatter Plot View" as ScatterView
+
+Operator -> CompositionService: add child to chart
+activate CompositionService
+alt parent is bar chart
+    CompositionService -> BarPolicy: allow(child)
+    activate BarPolicy
+    BarPolicy -> MetadataManager: getMetadata(child)
+    activate MetadataManager
+    MetadataManager --> BarPolicy: range metadata
+    deactivate MetadataManager
+    alt child has at least one range and is not a condition set
+        BarPolicy --> CompositionService: allowed
+        CompositionService -> BarView: renderTelemetry(datum)
+        activate BarView
+        alt scalar range value
+            BarView -> BarView: render scalar bar
+        else array range value
+            BarView -> BarView: render spectral bars
+        end
+        BarView --> CompositionService: chart rendered
+        deactivate BarView
+    else child is incompatible or a condition set
+        BarPolicy --> CompositionService: rejected
+    end
+    deactivate BarPolicy
+else parent is scatter plot
+    CompositionService -> ScatterPolicy: allow(child)
+    activate ScatterPolicy
+    ScatterPolicy -> MetadataManager: getMetadata(child)
+    activate MetadataManager
+    MetadataManager --> ScatterPolicy: range metadata
+    deactivate MetadataManager
+    alt metadata supplies at least two range values
+        ScatterPolicy --> CompositionService: allowed
+        CompositionService -> ScatterView: renderTelemetry(horizontalKey, verticalKey, datum)
+        activate ScatterView
+        ScatterView -> ScatterView: position point from selected ranges
+        ScatterView --> CompositionService: point rendered
+        deactivate ScatterView
+    else metadata supplies fewer than two range values
+        ScatterPolicy --> CompositionService: rejected
+    end
+    deactivate ScatterPolicy
+end
+CompositionService --> Operator: eligibility result
+deactivate CompositionService
+@enduml

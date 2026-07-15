@@ -1,0 +1,51 @@
+@startuml
+title C13 notebook creation
+' Traces: OMCT-C13-L2-01.01
+actor Operator
+participant "cupola Shell" as Shell
+participant "CreateMenu" as CreateMenu
+participant "NotebookPlugin" as Plugin
+participant "@cupola/core NotebookService" as NotebookService
+participant "HttpObjectsGateway" as ObjectsGateway
+participant "Cupola.Api ObjectsController" as ObjectsController
+participant "Cupola.Core IObjectStore" as Store
+participant "RealtimeHub" as Hub
+
+Operator -> Shell: open create menu
+activate Shell
+Shell -> CreateMenu: get creatable types
+activate CreateMenu
+CreateMenu -> Plugin: list installed notebook types
+activate Plugin
+Plugin --> CreateMenu: standard or restricted notebook type
+deactivate Plugin
+CreateMenu --> Shell: notebook menu item
+deactivate CreateMenu
+Shell --> Operator: display notebook type
+deactivate Shell
+
+Operator -> Shell: select notebook type
+activate Shell
+Shell -> NotebookService: initialize notebook structure
+activate NotebookService
+NotebookService --> Shell: notebook with section and page
+deactivate NotebookService
+Shell -> ObjectsGateway: saveNotebook(notebook)
+activate ObjectsGateway
+ObjectsGateway -> ObjectsController: create domain object
+activate ObjectsController
+ObjectsController -> Store: persist initialized notebook
+activate Store
+Store --> ObjectsController: persisted notebook
+deactivate Store
+ObjectsController -> Hub: emit objectChanged
+activate Hub
+Hub --> ObjectsController: broadcast accepted
+deactivate Hub
+ObjectsController --> ObjectsGateway: persisted notebook
+deactivate ObjectsController
+ObjectsGateway --> Shell: persisted notebook
+deactivate ObjectsGateway
+Shell --> Operator: show created notebook
+deactivate Shell
+@enduml

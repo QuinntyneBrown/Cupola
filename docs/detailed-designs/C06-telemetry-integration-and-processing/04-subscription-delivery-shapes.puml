@@ -1,0 +1,30 @@
+@startuml
+title C06 Subscription delivery shapes
+' Traces: OMCT-C06-L2-02.03, OMCT-C06-L2-02.04, OMCT-C06-L2-02.05
+
+actor "Consumer" as Consumer
+participant "@cupola/core Telemetry API" as TelemetryApi
+participant "Telemetry Provider" as Provider
+
+Consumer -> TelemetryApi: subscribe(object, strategy)
+activate TelemetryApi
+TelemetryApi -> Provider: subscribe(object, providerCallback)
+activate Provider
+Provider --> TelemetryApi: unsubscribe handle
+deactivate Provider
+TelemetryApi --> Consumer: consumer unsubscribe handle
+deactivate TelemetryApi
+
+Provider -> TelemetryApi: providerCallback(payload)
+activate TelemetryApi
+alt latest strategy with batch-capable provider
+    TelemetryApi -> TelemetryApi: select latest datum
+    TelemetryApi -> Consumer: callback(datum)
+else batch strategy
+    TelemetryApi -> TelemetryApi: normalize payload as array
+    TelemetryApi -> Consumer: callback(dataArray)
+else legacy provider without batching support
+    TelemetryApi -> Consumer: callback(singleDatum)
+end
+deactivate TelemetryApi
+@enduml

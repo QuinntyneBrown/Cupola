@@ -1,0 +1,36 @@
+@startuml
+title C03 JSON import integrity and prototype-pollution hardening
+' Traces: OMCT-C03-L2-03.04, OMCT-C03-L2-03.05, OMCT-C03-L2-03.06
+actor Operator
+participant "Import from JSON Action" as ImportAction
+participant "JSON Parser" as Parser
+participant "@cupola/core Object Service" as Objects
+participant "Composition Service" as Composition
+participant "@cupola/api HttpObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+
+Operator -> ImportAction ++: import(json, parent)
+ImportAction -> Parser ++: parse(json)
+alt prototype-pollution payload detected
+    Parser --> ImportAction --: rejected content
+    ImportAction --> Operator --: import rejected; prototypes unchanged
+else valid Open MCT JSON export
+    Parser --> ImportAction --: object tree
+    ImportAction -> Composition ++: supports(parent)
+    Composition --> ImportAction --: eligible parent
+    loop each imported object
+        ImportAction -> Objects ++: create with generated identifier
+        Objects --> ImportAction --: namespace and key preserved
+        ImportAction -> Gateway ++: POST /api/objects
+        Gateway -> Controller ++: POST /api/objects
+        Controller -> Store ++: create(remapped object)
+        Store --> Controller --: object created
+        Controller --> Gateway --: created object
+        Gateway --> ImportAction --: created object
+    end
+    ImportAction -> Composition ++: add(parent, imported root identifier)
+    Composition --> ImportAction --: imported root attached
+    ImportAction --> Operator --: import completed
+end
+@enduml

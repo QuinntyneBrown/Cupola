@@ -1,0 +1,31 @@
+@startuml
+title C06 Telemetry value formatting
+' Traces: OMCT-C06-L2-03.04
+
+actor "Consumer" as Consumer
+participant "@cupola/core Telemetry Value Formatter" as ValueFormatter
+participant "@cupola/core Format Registry" as FormatRegistry
+participant "Registered Format" as Format
+
+Consumer -> ValueFormatter: getFormatter(metadataValue)
+activate ValueFormatter
+ValueFormatter -> FormatRegistry: get(metadataValue.format)
+activate FormatRegistry
+FormatRegistry --> ValueFormatter: Registered Format
+deactivate FormatRegistry
+ValueFormatter --> Consumer: formatter adapter
+deactivate ValueFormatter
+
+Consumer -> ValueFormatter: formatParseValidate(value)
+activate ValueFormatter
+ValueFormatter -> Format: format(value)
+activate Format
+Format --> ValueFormatter: formatted value
+ValueFormatter -> Format: parse(input)
+Format --> ValueFormatter: parsed value
+ValueFormatter -> Format: validate(input)
+Format --> ValueFormatter: validation result
+deactivate Format
+ValueFormatter --> Consumer: conversion and validation result
+deactivate ValueFormatter
+@enduml

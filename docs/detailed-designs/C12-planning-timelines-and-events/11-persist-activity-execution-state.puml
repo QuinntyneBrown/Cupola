@@ -1,0 +1,38 @@
+@startuml
+title Activity execution-state persistence
+' Traces: OMCT-C12-L2-04.02
+actor Operator
+participant "Plan Activities Inspector" as Inspector
+participant "Plan Activity Status View" as Status
+participant "ObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+participant "RealtimeHub" as Hub
+
+Operator -> Inspector: selectActivity(activity)
+activate Inspector
+Inspector -> Status: render(activityIdentifier)
+activate Status
+Operator -> Status: changeExecutionState(state)
+Status -> Status: updateActivityEntry(activityIdentifier, state)
+Status -> Gateway: PUT /api/objects/{activityStatesId}
+activate Gateway
+Gateway -> Controller: PUT /api/objects/{activityStatesId}
+activate Controller
+Controller -> Store: update(activityStateObject)
+activate Store
+Store --> Controller: saved activity-state object
+deactivate Store
+Controller -> Hub: broadcast objectUpdated
+activate Hub
+Hub --> Controller: broadcast accepted
+deactivate Hub
+Controller --> Gateway: 200 OK
+deactivate Controller
+Gateway --> Status: saved execution state
+deactivate Gateway
+Status --> Inspector: state updated
+deactivate Status
+Inspector --> Operator: activity state shown
+deactivate Inspector
+@enduml

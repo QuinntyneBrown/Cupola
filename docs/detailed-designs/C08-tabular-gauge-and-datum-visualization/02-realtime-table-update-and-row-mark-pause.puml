@@ -1,0 +1,47 @@
+@startuml
+title C08 Realtime table update and row mark pause
+' Traces: OMCT-C08-L2-01.03, OMCT-C08-L2-01.06
+
+actor "Operator" as Operator
+participant "Table Component" as TableComponent
+participant "Telemetry Table" as TelemetryTable
+participant "@cupola/core Telemetry API" as TelemetryApi
+participant "@cupola/api Realtime Gateway" as RealtimeGateway
+participant "Cupola.Api RealtimeHub" as RealtimeHub
+
+TableComponent -> TelemetryApi: subscribe(object, latest)
+activate TelemetryApi
+TelemetryApi -> RealtimeGateway: connect /hubs/realtime
+activate RealtimeGateway
+RealtimeGateway -> RealtimeHub: SubscribeToTelemetry(keyString)
+activate RealtimeHub
+RealtimeHub --> RealtimeGateway: subscribed
+deactivate RealtimeHub
+RealtimeGateway --> TelemetryApi: subscription handle
+deactivate RealtimeGateway
+TelemetryApi --> TableComponent: unsubscribe handle
+deactivate TelemetryApi
+
+RealtimeHub -> RealtimeGateway: TelemetryReceived(datum)
+activate RealtimeGateway
+RealtimeGateway -> TelemetryApi: emit datum
+deactivate RealtimeGateway
+activate TelemetryApi
+TelemetryApi -> TelemetryTable: addRealtimeDatum(datum)
+deactivate TelemetryApi
+activate TelemetryTable
+alt datum shares configured in-place update key
+    TelemetryTable -> TelemetryTable: replace existing logical row
+else no matching in-place update key
+    TelemetryTable -> TelemetryTable: append row
+end
+TelemetryTable -> TableComponent: rowsChanged(rows)
+deactivate TelemetryTable
+
+Operator -> TableComponent: mark row
+activate TableComponent
+TableComponent -> TableComponent: retain marked row
+TableComponent -> TableComponent: pause visible realtime updates
+TableComponent --> Operator: row marked
+deactivate TableComponent
+@enduml

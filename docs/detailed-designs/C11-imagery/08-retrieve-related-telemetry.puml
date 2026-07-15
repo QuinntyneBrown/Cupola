@@ -1,0 +1,27 @@
+@startuml
+title Related telemetry retrieval for focused imagery
+' Traces: OMCT-C11-L2-03.01
+participant "Imagery View" as View
+participant "Focused Image" as Image
+participant "Related Telemetry Service" as Related
+participant "Telemetry Gateway" as Telemetry
+
+Image -> View: focusChanged(imageTime)
+activate View
+View -> Related: resolveRelatedSources(metadata)
+activate Related
+Related --> View: related historical telemetry sources
+deactivate Related
+loop each related source
+    View -> Telemetry: requestLatestAtOrBefore(source, imageTime)
+    activate Telemetry
+    Telemetry --> View: related value
+    deactivate Telemetry
+end
+View -> Related: exposeValues(relatedValues)
+activate Related
+Related --> View: values exposed
+deactivate Related
+View --> Image: related telemetry refreshed
+deactivate View
+@enduml

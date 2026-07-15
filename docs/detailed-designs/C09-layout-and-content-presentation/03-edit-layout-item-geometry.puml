@@ -1,0 +1,47 @@
+@startuml
+title Display layout item geometry editing
+' Traces: OMCT-C09-L2-01.03
+actor Operator
+participant "Display Layout View" as View
+participant "Display Layout Toolbar" as Toolbar
+participant "Layout Item Configuration" as Config
+participant "ObjectsGateway" as Gateway
+participant "Cupola.Api ObjectsController" as Controller
+participant "IObjectStore" as Store
+participant "RealtimeHub" as Hub
+
+Operator -> View: selectItems(items)
+activate View
+View --> Operator: selection handles shown
+Operator -> Toolbar: invokeGeometryControl(operation)
+activate Toolbar
+Toolbar -> View: apply(operation, selectedItems)
+activate View
+loop each selected item
+    View -> Config: setGeometry(position, dimensions, rotation, stackOrder)
+    activate Config
+    Config --> View: item geometry updated
+    deactivate Config
+end
+View -> Gateway: PUT /api/objects/{id}
+activate Gateway
+Gateway -> Controller: PUT /api/objects/{id}
+activate Controller
+Controller -> Store: update(object)
+activate Store
+Store --> Controller: saved object
+deactivate Store
+Controller -> Hub: broadcast objectUpdated
+activate Hub
+Hub --> Controller: broadcast accepted
+deactivate Hub
+Controller --> Gateway: 200 OK
+deactivate Controller
+Gateway --> View: saved geometry
+deactivate Gateway
+View --> Toolbar: edit applied
+deactivate View
+Toolbar --> Operator: updated canvas shown
+deactivate Toolbar
+deactivate View
+@enduml

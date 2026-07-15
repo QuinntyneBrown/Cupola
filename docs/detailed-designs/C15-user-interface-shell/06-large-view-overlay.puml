@@ -1,0 +1,39 @@
+@startuml
+title C15 large view overlay expansion
+' Traces: OMCT-C15-L2-02.06
+actor Operator
+participant "ViewLargeAction" as Action
+participant "PreviewService" as PreviewService
+participant "OverlayService" as OverlayService
+participant "PreviewComponent" as Preview
+
+Operator -> Action: run view-large action
+activate Action
+Action -> Action: check parent element and object path
+alt expansion applies
+  Action -> OverlayService: open large overlay
+  activate OverlayService
+  OverlayService --> Action: overlay reference
+  deactivate OverlayService
+  Action -> PreviewService: mount preview container
+  activate PreviewService
+  PreviewService -> Preview: render object view preview
+  activate Preview
+  Preview --> PreviewService: preview rendered
+  deactivate Preview
+  PreviewService --> Action: preview state active
+  deactivate PreviewService
+  Action --> Operator: display large overlay
+  Operator -> OverlayService: destroy overlay
+  activate OverlayService
+  OverlayService -> PreviewService: restore preview state
+  activate PreviewService
+  PreviewService --> OverlayService: state restored
+  deactivate PreviewService
+  OverlayService --> Operator: overlay destroyed
+  deactivate OverlayService
+else expansion does not apply
+  Action --> Operator: action unavailable
+end
+deactivate Action
+@enduml

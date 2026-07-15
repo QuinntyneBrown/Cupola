@@ -1,0 +1,22 @@
+@startuml
+title Compass rose and heads-up overlay rendering
+' Traces: OMCT-C11-L2-02.05
+participant "Imagery View" as View
+participant "Focused Image Metadata" as Metadata
+participant "Compass Component" as Compass
+participant "Compass Overlay Renderer" as Renderer
+
+View -> Metadata: readOrientation(focusedImage)
+activate Metadata
+Metadata --> View: heading and camera angle
+deactivate Metadata
+View -> Compass: render(metadata)
+activate Compass
+Compass -> Compass: calculateOrientation(heading, cameraAngle)
+Compass -> Renderer: renderRoseAndHeadsUpDisplay(orientation)
+activate Renderer
+Renderer --> Compass: overlays rendered
+deactivate Renderer
+Compass --> View: compass overlays displayed
+deactivate Compass
+@enduml

@@ -1,0 +1,27 @@
+@startuml
+title Conditional styles and condition widget output
+' Traces: OMCT-C10-L2-02.01, OMCT-C10-L2-02.02
+participant "Condition Set View" as ConditionSet
+participant "Condition Result Service" as Results
+participant "Styled Object View" as StyledView
+participant "Style Rule Manager" as Styles
+participant "Condition Widget View" as Widget
+
+ConditionSet -> Results: publish(activeOutput)
+activate Results
+Results -> StyledView: outputChanged(activeOutput)
+activate StyledView
+StyledView -> Styles: replaceConditionalStyles(activeOutput.styles)
+activate Styles
+Styles --> StyledView: styles applied
+deactivate Styles
+StyledView --> Results: styled object refreshed
+deactivate StyledView
+Results -> Widget: outputChanged(activeOutput)
+activate Widget
+Widget -> Widget: render(label, url, styles)
+Widget --> Results: widget content refreshed
+deactivate Widget
+Results --> ConditionSet: subscribers updated
+deactivate Results
+@enduml

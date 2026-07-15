@@ -1,0 +1,39 @@
+@startuml
+title C13 annotation tag and target operations
+' Traces: OMCT-C13-L2-04.04, OMCT-C13-L2-04.05, OMCT-C13-L2-04.06
+actor Extension
+participant "@cupola/core AnnotationService" as AnnotationService
+participant "TagRegistry" as Tags
+participant "TargetComparatorRegistry" as Comparators
+
+Extension -> AnnotationService: perform annotation support operation
+activate AnnotationService
+alt tag lifecycle operation
+  AnnotationService -> Tags: add, delete, clear, or list
+  activate Tags
+  Tags --> AnnotationService: updated available tags
+  deactivate Tags
+  AnnotationService --> Extension: available-tag set
+else tag search with nonempty term
+  AnnotationService -> Tags: findMatching(term)
+  activate Tags
+  Tags --> AnnotationService: matching tags
+  deactivate Tags
+  AnnotationService --> Extension: matching tags
+else tag search with empty term
+  AnnotationService --> Extension: no tags
+else target comparison
+  AnnotationService -> Comparators: find comparator(targets)
+  activate Comparators
+  alt comparator applies
+    Comparators --> AnnotationService: comparator
+    AnnotationService -> AnnotationService: compare with comparator
+  else no comparator applies
+    Comparators --> AnnotationService: no comparator
+    AnnotationService -> AnnotationService: compare with deep equality
+  end
+  deactivate Comparators
+  AnnotationService --> Extension: comparison result
+end
+deactivate AnnotationService
+@enduml
