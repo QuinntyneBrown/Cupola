@@ -12,6 +12,7 @@ import {
   CUPOLA_CONFIG,
   DeviceClassifierService,
   ObjectsGateway,
+  NotificationService,
   RealtimeGateway,
   RouteEventsService,
   SearchGateway,
@@ -20,6 +21,8 @@ import {
 } from '@cupola/core';
 import {
   FakeRealtimeGateway,
+  FakeNotificationService,
+  CouchObjectsGateway,
   HttpBrandingGateway,
   HttpObjectsGateway,
   HttpSearchGateway,
@@ -39,10 +42,15 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withHashLocation()),
     provideHttpClient(),
-    { provide: CUPOLA_CONFIG, useValue: { apiBaseUrl: environment.apiBaseUrl, hubUrl: environment.hubUrl } },
-    { provide: ObjectsGateway, useClass: HttpObjectsGateway },
+    {
+      provide: CUPOLA_CONFIG,
+      useValue: { apiBaseUrl: environment.apiBaseUrl, hubUrl: environment.hubUrl },
+    },
+    HttpObjectsGateway,
+    { provide: ObjectsGateway, useClass: CouchObjectsGateway },
     { provide: SearchGateway, useClass: HttpSearchGateway },
     { provide: BrandingGateway, useClass: HttpBrandingGateway },
+    { provide: NotificationService, useClass: FakeNotificationService },
     {
       provide: RealtimeGateway,
       useClass: environment.e2e ? FakeRealtimeGateway : SignalRRealtimeGateway,

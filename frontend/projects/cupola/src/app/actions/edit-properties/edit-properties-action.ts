@@ -1,4 +1,4 @@
-import { Action, ActionContext, ObjectUpdatesService, ObjectsGateway } from '@cupola/core';
+import { Action, ActionContext, ObjectPersistenceService } from '@cupola/core';
 import { FormsService } from '@cupola/components';
 
 /**
@@ -14,8 +14,7 @@ export class EditPropertiesAction implements Action {
 
   constructor(
     private readonly forms: FormsService,
-    private readonly objects: ObjectsGateway,
-    private readonly objectUpdates: ObjectUpdatesService,
+    private readonly persistence: ObjectPersistenceService,
   ) {}
 
   appliesTo(context: ActionContext): boolean {
@@ -43,9 +42,7 @@ export class EditPropertiesAction implements Action {
       .then((values) => {
         const name = values['name'];
         if (typeof name === 'string' && name.trim()) {
-          this.objects
-            .updateObject(object.keyString, { name })
-            .subscribe((updated) => this.objectUpdates.emitLocal(updated));
+          this.persistence.save({ ...object, name: name.trim() }).subscribe();
         }
       })
       .catch(() => {

@@ -3,6 +3,8 @@
  */
 
 export * from './lib/objects/http-objects-gateway';
+export * from './lib/objects/couch-object-queue';
+export * from './lib/objects/couch-objects-gateway';
 export * from './lib/search/http-search-gateway';
 export * from './lib/branding/http-branding-gateway';
 export * from './lib/realtime/cupola-e2e-hook';

@@ -6,7 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { RealtimeGateway } from '@cupola/core';
+import { PersistenceStatusService } from '@cupola/core';
 
 @Component({
   selector: 'cp-status-bar',
@@ -15,10 +15,10 @@ import { RealtimeGateway } from '@cupola/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StatusBarComponent {
-  private readonly realtime = inject(RealtimeGateway);
+  private readonly persistence = inject(PersistenceStatusService);
 
   protected readonly clock = signal(formatUtc(new Date()));
-  protected readonly connectionState = this.realtime.connectionState;
+  protected readonly connectionState = this.persistence.connectionState;
   protected readonly connectionLabel = computed(() => {
     switch (this.connectionState()) {
       case 'connected':

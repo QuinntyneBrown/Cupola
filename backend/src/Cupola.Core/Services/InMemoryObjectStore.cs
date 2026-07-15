@@ -88,7 +88,13 @@ public class InMemoryObjectStore : IObjectStore
         {
             if (!_objects.TryGetValue(domainObject.KeyString, out var existing))
             {
-                var created = domainObject with { Version = 1, Modified = DateTimeOffset.UtcNow };
+                var now = DateTimeOffset.UtcNow;
+                var created = domainObject with
+                {
+                    Created = domainObject.Created == default ? now : domainObject.Created,
+                    Modified = now,
+                    Version = 1,
+                };
                 if (_objects.TryAdd(domainObject.KeyString, created))
                 {
                     return new ObjectSaveResult(domainObject.KeyString, ObjectSaveOutcome.Created, created);
@@ -104,6 +110,8 @@ public class InMemoryObjectStore : IObjectStore
 
             var updated = domainObject with
             {
+                Created = existing.Created,
+                CreatedBy = existing.CreatedBy,
                 Version = existing.Version + 1,
                 Modified = DateTimeOffset.UtcNow,
             };

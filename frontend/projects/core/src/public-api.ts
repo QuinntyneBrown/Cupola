@@ -61,6 +61,15 @@ export * from './lib/gateways/realtime-gateway';
 
 export * from './lib/objects/object-updates.service';
 
+export * from './lib/persistence/safe-json';
+export * from './lib/persistence/object-utils';
+export * from './lib/persistence/object-migration.service';
+export * from './lib/persistence/local-storage-object-provider';
+export * from './lib/persistence/persistence-status.service';
+export * from './lib/persistence/object-persistence.service';
+export * from './lib/persistence/couch-search-folder-provider';
+export * from './lib/persistence/static-model-provider';
+
 export * from './lib/adaptive/device-agent';
 export * from './lib/adaptive/device-agent.service';
 export * from './lib/adaptive/device-matchers';

@@ -44,8 +44,25 @@ public class ObjectStorePersistenceTests
         {
             Assert.That(result.Outcome, Is.EqualTo(ObjectSaveOutcome.Created));
             Assert.That(result.Object!.Version, Is.EqualTo(1));
+            Assert.That(result.Object.Created, Is.Not.EqualTo(default(DateTimeOffset)));
+            Assert.That(result.Object.Modified, Is.Not.EqualTo(default(DateTimeOffset)));
             Assert.That(_store.GetByKeyString("new-folder")!.Name, Is.EqualTo("New folder"));
         });
+    }
+
+    [Test]
+    [Requirement("OMCT-C04-L2-03.03")]
+    public void Save_SearchFolder_PreservesConfiguredQuery()
+    {
+        var incoming = NewObject("search-folder", "Power search") with
+        {
+            Type = "couch-search-folder",
+            Query = "power",
+        };
+
+        var result = _store.Save(incoming);
+
+        Assert.That(result.Object!.Query, Is.EqualTo("power"));
     }
 
     [Test]
@@ -60,6 +77,8 @@ public class ObjectStorePersistenceTests
         {
             Assert.That(result.Outcome, Is.EqualTo(ObjectSaveOutcome.Updated));
             Assert.That(result.Object!.Version, Is.EqualTo(existing.Version + 1));
+            Assert.That(result.Object.Created, Is.EqualTo(existing.Created));
+            Assert.That(result.Object.Modified, Is.GreaterThanOrEqualTo(existing.Modified));
             Assert.That(_store.GetByKeyString("ops-notebook")!.Name, Is.EqualTo("Ops notebook (rev)"));
         });
     }

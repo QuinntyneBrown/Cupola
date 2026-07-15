@@ -12,6 +12,8 @@ public record DomainObject
     public required string Type { get; init; }
     public string? Location { get; init; }
     public IReadOnlyList<string> Composition { get; init; } = Array.Empty<string>();
+    /// <summary>Configured query for a database-backed search folder.</summary>
+    public string? Query { get; init; }
     public TelemetryMetadata? Telemetry { get; init; }
     public DateTimeOffset Created { get; init; }
     public DateTimeOffset Modified { get; init; }
