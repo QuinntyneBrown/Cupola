@@ -76,3 +76,32 @@ describe('OMCT-C02-L2-02.07 Transaction commit and cancel', () => {
     expect(manager.isActive()).toBe(false);
   });
 });
+
+describe('OMCT-C03-L2-01.05 Failed-save retention', () => {
+  it('keeps the transaction active with dirty objects when a save fails', async () => {
+    class ObjectsGatewayStub extends ObjectsGateway {
+      getObject = jest.fn();
+      getComposition = jest.fn();
+      getAnnotations = jest.fn();
+      updateObject = jest.fn();
+      saveObject = jest.fn();
+      getObjects = jest.fn();
+      saveObjects = jest.fn();
+    }
+    TestBed.configureTestingModule({
+      providers: [TransactionManager, { provide: ObjectsGateway, useClass: ObjectsGatewayStub }],
+    });
+    const manager = TestBed.inject(TransactionManager);
+    const api = TestBed.inject(ObjectApi);
+    jest.spyOn(api, 'save').mockRejectedValue(new Error('save failed'));
+
+    const transaction = manager.start();
+    transaction.add(domainObject('a'));
+
+    await expect(manager.commit()).rejects.toThrow('save failed');
+
+    expect(manager.isActive()).toBe(true);
+    expect(manager.getActiveTransaction()).toBe(transaction);
+    expect(transaction.getDirty().map((object) => object.keyString)).toEqual(['a']);
+  });
+});
