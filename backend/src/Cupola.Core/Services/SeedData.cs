@@ -61,6 +61,7 @@ public static class SeedData
             Created = Created,
             Modified = Modified,
             CreatedBy = CreatedBy,
+            Version = 1,
         };
     }
 
@@ -80,6 +81,7 @@ public static class SeedData
             Created = Created,
             Modified = Modified,
             CreatedBy = CreatedBy,
+            Version = 1,
         };
     }
 }
