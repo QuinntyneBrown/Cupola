@@ -17,6 +17,7 @@ import {
   RealtimeGateway,
   RouteEventsService,
   SearchGateway,
+  TelemetryGateway,
   ThemeService,
   TimeContext,
   UrlParamsService,
@@ -29,6 +30,7 @@ import {
   HttpBrandingGateway,
   HttpObjectsGateway,
   HttpSearchGateway,
+  HttpTelemetryGateway,
   SignalRRealtimeGateway,
 } from '@cupola/api';
 import { FORMS_CONTROL_SOURCE, FormsService } from '@cupola/components';
@@ -38,6 +40,7 @@ import { routes } from './app.routes';
 import { registerDefaultActions } from './actions/register-default-actions';
 import { registerStandardInspectorViews } from './inspector/register-standard-inspector-views';
 import { registerDefaultObjects } from './objects/register-default-objects';
+import { registerDefaultTelemetry } from './telemetry/register-default-telemetry';
 import { registerDefaultTime } from './time/register-default-time';
 import { registerTimeViews } from './time/register-time-views';
 import { registerDefaultToolbars } from './toolbars/register-default-toolbars';
@@ -55,6 +58,8 @@ export const appConfig: ApplicationConfig = {
     HttpObjectsGateway,
     { provide: ObjectsGateway, useClass: CouchObjectsGateway },
     { provide: SearchGateway, useClass: HttpSearchGateway },
+    HttpTelemetryGateway,
+    { provide: TelemetryGateway, useClass: HttpTelemetryGateway },
     { provide: BrandingGateway, useClass: HttpBrandingGateway },
     { provide: NotificationService, useClass: FakeNotificationService },
     {
@@ -72,6 +77,8 @@ export const appConfig: ApplicationConfig = {
       inject(UrlParamsService);
       // C02 domain objects: register types, interceptors, composition, and search providers.
       registerDefaultObjects();
+      // C06 telemetry: register the default provider, metadata, formats, limits, staleness.
+      registerDefaultTelemetry();
       registerDefaultViews();
       registerStandardInspectorViews();
       registerDefaultActions();

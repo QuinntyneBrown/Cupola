@@ -26,24 +26,23 @@ internal sealed class TelemetrySimulator : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var phase = 0.0;
-
         try
         {
             while (!stoppingToken.IsCancellationRequested)
             {
                 var timestamp = DateTimeOffset.UtcNow;
-                for (var i = 0; i < _telemetryKeys.Count; i++)
+                foreach (var key in _telemetryKeys)
                 {
-                    var value = Math.Sin(phase + i);
-                    await _hub.Clients.Group(RealtimeHub.TelemetryGroup(_telemetryKeys[i]))
+                    // Same pure source as the historical route, so realtime continues the
+                    // curve GET /api/telemetry returns (B06).
+                    var value = SineTelemetry.Sample(key, timestamp);
+                    await _hub.Clients.Group(RealtimeHub.TelemetryGroup(key))
                         .SendAsync(
                             "TelemetryReceived",
-                            new TelemetryValue(_telemetryKeys[i], timestamp, value),
+                            new TelemetryValue(key, timestamp, value),
                             stoppingToken);
                 }
 
-                phase += 0.1;
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
             }
         }
