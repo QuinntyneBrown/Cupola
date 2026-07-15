@@ -77,6 +77,27 @@ export * from './lib/gateways/branding-gateway';
 export * from './lib/gateways/realtime-gateway';
 
 export * from './lib/objects/object-updates.service';
+export * from './lib/objects/object-type';
+export * from './lib/objects/type-registry.service';
+export * from './lib/objects/object-provider';
+export * from './lib/objects/gateway-object-provider';
+export * from './lib/objects/interceptor-registry';
+export * from './lib/objects/missing-object-interceptor';
+export * from './lib/objects/object-api.service';
+export * from './lib/objects/mutable-domain-object';
+export * from './lib/objects/transaction';
+export * from './lib/objects/transaction-manager.service';
+export * from './lib/objects/composition-provider';
+export * from './lib/objects/composition-policy';
+export * from './lib/objects/composition-collection';
+export * from './lib/objects/composition-api.service';
+export * from './lib/objects/default-composition-provider';
+export * from './lib/objects/root-registry.service';
+export * from './lib/objects/root-composition-provider';
+export * from './lib/objects/search-provider';
+export * from './lib/objects/search-api.service';
+export * from './lib/objects/in-memory-search-provider';
+export * from './lib/objects/gateway-search-provider';
 
 export * from './lib/persistence/safe-json';
 export * from './lib/persistence/object-utils';
