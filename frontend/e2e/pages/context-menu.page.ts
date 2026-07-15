@@ -17,7 +17,10 @@ export class ContextMenuPage {
   }
 
   item(name: string): Locator {
-    return this.items.filter({ hasText: name });
+    // Exact match on the item label, so e.g. 'Open' does not also match
+    // 'Open in a new tab' (menus grew with C03 authoring actions).
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return this.items.filter({ hasText: new RegExp(`^\\s*${escaped}\\s*$`) });
   }
 
   superItem(name: string): Locator {
