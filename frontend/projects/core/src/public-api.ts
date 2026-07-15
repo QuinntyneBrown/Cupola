@@ -15,6 +15,22 @@ export * from './lib/models/build-info';
 export * from './lib/models/connection-state';
 export * from './lib/models/search-results';
 export * from './lib/models/object-glyph';
+export * from './lib/models/time';
+export * from './lib/models/user';
+export * from './lib/models/telemetry-filter';
+export * from './lib/models/conditional-style';
+
+export * from './lib/time/time-context';
+
+export * from './lib/telemetry/telemetry-request';
+export * from './lib/telemetry/limits';
+
+export * from './lib/user/user.service';
+
+export * from './lib/notifications/notification.service';
+export * from './lib/notifications/indicator';
+
+export * from './lib/security/sanitizers';
 
 export * from './lib/routing/abort-registry';
 export * from './lib/routing/route-events.service';
