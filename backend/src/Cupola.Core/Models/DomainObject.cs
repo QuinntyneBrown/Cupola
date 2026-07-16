@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Cupola.Core.Models;
 
 /// <summary>
@@ -34,4 +36,11 @@ public record DomainObject
 
     /// <summary>Save provenance (open contract item #1, resolved for B04).</summary>
     public string? ModifiedBy { get; init; }
+
+    /// <summary>
+    /// Type-specific view and behavior configuration persisted with the object
+    /// (B01, wave-4 extension). Opaque passthrough: the store never inspects it,
+    /// and it round-trips save/retrieve unchanged.
+    /// </summary>
+    public JsonElement? Configuration { get; init; }
 }

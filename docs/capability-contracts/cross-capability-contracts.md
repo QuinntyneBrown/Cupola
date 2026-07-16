@@ -86,8 +86,14 @@ export interface DomainObject {
   createdBy?: string;
   version?: number;                   // optimistic-concurrency version, bumped per accepted save (B04)
   modifiedBy?: string;                // save provenance (open item 1, resolved for B04)
+  configuration?: Record<string, unknown>; // type-specific view/behavior configuration (wave-4 extension)
 }
 ```
+
+The `configuration` bag joins the shared shape in wave 4: it carries type-specific view
+and behavior configuration (plot/table options, condition sets, plan data, notebook
+structure) and round-trips the store as an opaque passthrough — the backend mirrors it as
+a nullable `JsonElement` and never inspects it.
 
 The C# records in `backend/src/Cupola.Core/Models/` mirror these shapes field for field and
 serialize to camelCase JSON. `modifiedBy` and `version` join the shared shape for B04

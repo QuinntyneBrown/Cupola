@@ -2,10 +2,12 @@ import { Injectable, inject } from '@angular/core';
 
 import { AbortRegistry } from '../routing/abort-registry';
 import { DomainObject } from '../models/domain-object';
+import { TelemetryFilter } from '../models/telemetry-filter';
 import { TelemetryValue } from '../models/telemetry-value';
 import { TimeContext } from '../time/time-context';
 import { MetadataRegistry } from './metadata-registry.service';
 import { TelemetryCollection } from './telemetry-collection';
+import { canonicalFilterKey } from './telemetry-filtering';
 import { TelemetryDatum, TelemetryProvider } from './telemetry-provider';
 import { TelemetryRequest, TelemetryRequestOptions } from './telemetry-request';
 import { SubscriptionCache } from './subscription-cache';
@@ -66,21 +68,25 @@ export class TelemetryApiService {
    * Subscribes to realtime telemetry, sharing one provider subscription per object
    * (02.01/02.02) and shaping delivery: `latest` yields one datum (02.03), `batch`
    * yields an array (02.04); legacy single-datum providers relay unchanged (02.05).
+   * Active filters forward to the provider and fork the shared subscription per
+   * canonical filter set (B08, OMCT-C10-L2-04.03).
    */
   subscribe(
     object: DomainObject,
     callback: (datum: TelemetryDatum) => void,
-    options?: { strategy?: Strategy },
+    options?: { strategy?: Strategy; filters?: TelemetryFilter[] },
   ): () => void {
     const provider = this.providers.find((candidate) => candidate.supportsSubscribe(object));
     if (!provider) {
       return () => {};
     }
     const strategy = options?.strategy ?? 'latest';
+    const filters = options?.filters;
+    const filterKey = canonicalFilterKey(filters);
     const shaped = (raw: TelemetryDatum) => callback(this.shape(raw, strategy));
     return this.cache.subscribe(
-      object.keyString,
-      (emit) => provider.subscribe(object, emit),
+      filterKey ? `${object.keyString}::${filterKey}` : object.keyString,
+      (emit) => provider.subscribe(object, emit, filters?.length ? { filters } : undefined),
       shaped,
     );
   }

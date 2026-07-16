@@ -37,6 +37,7 @@ export class DefaultMetadataProvider implements TelemetryMetadataProvider {
         priority: 1,
         unit: object.telemetry?.unit,
         format: 'number',
+        filters: object.telemetry?.filters,
       },
     ];
   }

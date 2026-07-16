@@ -7,7 +7,7 @@ import { ClockOffsets, TimeBounds, TimeMode, TimeSystem } from '../models/time';
 import { TelemetryValue } from '../models/telemetry-value';
 import { TimeContext } from '../time/time-context';
 import { TelemetryApiService } from './telemetry-api.service';
-import { TelemetryDatum, TelemetryProvider } from './telemetry-provider';
+import { TelemetryDatum, TelemetryProvider, TelemetrySubscribeOptions } from './telemetry-provider';
 import { TelemetryRequest } from './telemetry-request';
 
 function telemetryObject(key = 'pt'): DomainObject {
@@ -55,12 +55,18 @@ class FakeProvider implements TelemetryProvider {
   emit?: (datum: TelemetryDatum) => void;
   unsubscribed = false;
   request = jest.fn(async (_object: DomainObject, _request: TelemetryRequest): Promise<TelemetryValue[]> => []);
-  subscribe = jest.fn((_object: DomainObject, emit: (datum: TelemetryDatum) => void) => {
-    this.emit = emit;
-    return () => {
-      this.unsubscribed = true;
-    };
-  });
+  subscribe = jest.fn(
+    (
+      _object: DomainObject,
+      emit: (datum: TelemetryDatum) => void,
+      _options?: TelemetrySubscribeOptions,
+    ) => {
+      this.emit = emit;
+      return () => {
+        this.unsubscribed = true;
+      };
+    },
+  );
   constructor(private readonly supports: boolean) {}
   supportsRequest(): boolean {
     return this.supports;
@@ -173,5 +179,34 @@ describe('OMCT-C06-L2-02.05 Legacy subscription compatibility', () => {
     provider.emit!(datum(7));
 
     expect(received).toEqual([datum(7)]);
+  });
+});
+
+describe('OMCT-C10-L2-04.03 Filter subscription propagation', () => {
+  it('forwards active filters to the provider subscription', () => {
+    const api = setup();
+    const provider = new FakeProvider(true);
+    api.addProvider(provider);
+    const filters = [{ key: 'value', comparator: 'equals' as const, values: [3] }];
+
+    api.subscribe(telemetryObject(), () => {}, { filters });
+
+    expect(provider.subscribe.mock.calls[0][2]).toEqual({ filters });
+  });
+
+  it('shares one provider subscription for identical filters and forks for different ones', () => {
+    const api = setup();
+    const provider = new FakeProvider(true);
+    api.addProvider(provider);
+    const equalsThree = [{ key: 'value', comparator: 'equals' as const, values: [3] }];
+    const equalsFour = [{ key: 'value', comparator: 'equals' as const, values: [4] }];
+
+    api.subscribe(telemetryObject(), () => {}, { filters: equalsThree });
+    api.subscribe(telemetryObject(), () => {}, { filters: [...equalsThree] });
+    expect(provider.subscribe).toHaveBeenCalledTimes(1);
+
+    api.subscribe(telemetryObject(), () => {}, { filters: equalsFour });
+    api.subscribe(telemetryObject(), () => {});
+    expect(provider.subscribe).toHaveBeenCalledTimes(3);
   });
 });

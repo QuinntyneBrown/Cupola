@@ -39,6 +39,7 @@ export * from './lib/time/time-api.service';
 export * from './lib/time/url-time-sync.service';
 
 export * from './lib/telemetry/telemetry-request';
+export * from './lib/telemetry/telemetry-filtering';
 export * from './lib/telemetry/limits';
 export * from './lib/telemetry/telemetry-provider';
 export * from './lib/telemetry/subscription-cache';
