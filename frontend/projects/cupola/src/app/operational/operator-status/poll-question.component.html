@@ -1,0 +1,13 @@
+<span class="poll-question" data-testid="poll-question">{{ question() }}</span>
+<input
+  class="poll-input"
+  type="text"
+  data-testid="poll-question-input"
+  placeholder="New poll question"
+  aria-label="New poll question"
+  [value]="draft()"
+  (input)="onDraftInput($any($event.target).value)"
+/>
+<button type="button" class="cp-button" data-testid="poll-question-submit" (click)="submit()">
+  Set
+</button>

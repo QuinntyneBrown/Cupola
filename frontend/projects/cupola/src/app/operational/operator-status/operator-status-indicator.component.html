@@ -1,0 +1,18 @@
+<span class="cp-indicator operator-status" data-testid="operator-status-indicator">
+  <span class="status-current" data-testid="operator-status-current">
+    {{ current()?.label ?? '–' }}
+  </span>
+  <select
+    class="status-select"
+    data-testid="operator-status-select"
+    aria-label="Operator status"
+    (change)="onStatusChange($any($event.target).value)"
+  >
+    @for (status of statuses; track status.key) {
+      <option [value]="status.key" [selected]="status.key === current()?.key">
+        {{ status.label }}
+      </option>
+    }
+  </select>
+  <cp-poll-question />
+</span>

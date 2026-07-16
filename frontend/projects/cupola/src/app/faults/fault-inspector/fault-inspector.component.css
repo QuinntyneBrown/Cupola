@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.fault-detail {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--cp-space-2) var(--cp-space-4);
+  font: var(--cp-type-body-s);
+  margin: 0;
+}
+
+.fault-detail dt {
+  color: var(--cp-color-ink-3);
+  font: var(--cp-type-label);
+}
+
+.fault-detail dd {
+  margin: 0;
+}
+
+.no-selection {
+  font: var(--cp-type-body-s);
+  color: var(--cp-color-ink-3);
+}

@@ -1,0 +1,69 @@
+:host {
+  display: block;
+}
+
+.fault-table {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--cp-type-body-s);
+}
+
+.fault-table th {
+  text-align: left;
+  padding: var(--cp-space-2) var(--cp-space-3);
+  color: var(--cp-color-ink-3);
+  font: var(--cp-type-label);
+}
+
+.fault-row td {
+  padding: var(--cp-space-2) var(--cp-space-3);
+  border-top: 1px solid var(--cp-color-line);
+  vertical-align: top;
+}
+
+.fault-row {
+  cursor: pointer;
+}
+
+.fault-row[s-selected] {
+  background: var(--cp-color-primary-dim);
+}
+
+.severity {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cp-space-2);
+  white-space: nowrap;
+}
+
+.severity-critical {
+  color: var(--cp-color-critical, #e0483e);
+}
+
+.severity-warning {
+  color: var(--cp-color-caution, #d9a514);
+}
+
+.severity-watch {
+  color: var(--cp-color-ink-2);
+}
+
+.fault-name {
+  font-weight: 600;
+}
+
+.fault-description,
+.fault-time {
+  color: var(--cp-color-ink-3);
+}
+
+.fault-actions {
+  display: flex;
+  gap: var(--cp-space-2);
+  white-space: nowrap;
+}
+
+.no-faults {
+  font: var(--cp-type-body-s);
+  color: var(--cp-color-ink-3);
+}

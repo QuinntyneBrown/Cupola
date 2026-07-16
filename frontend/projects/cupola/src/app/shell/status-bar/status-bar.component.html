@@ -1,16 +1,18 @@
 <div class="cp-statusbar" data-testid="status-bar">
-  <span class="cp-indicator cp-indicator--mono">
-    <svg class="cp-icon"><use href="#i-clock" /></svg>
-    {{ clock() }} UTC
-  </span>
-  <button class="cp-indicator" type="button" data-testid="connection-indicator">
-    <span
-      class="cp-dot"
-      [class.cp-dot--ok]="connectionState() === 'connected'"
-      [class.cp-dot--caution]="connectionState() === 'pending'"
-      [class.cp-dot--critical]="connectionState() === 'disconnected'"
-    ></span>
-    {{ connectionLabel() }}
-  </button>
+  @for (indicator of indicators(); track indicator.key) {
+    @if (indicator.component) {
+      <ng-container *ngComponentOutlet="indicator.component" />
+    } @else {
+      <span class="cp-indicator" [attr.data-testid]="indicator.testId ?? null">
+        @if (indicator.glyph) {
+          <svg class="cp-icon"><use [attr.href]="'#' + indicator.glyph" /></svg>
+        }
+        @if (indicator.cssClass) {
+          <span [class]="'cp-dot ' + indicator.cssClass()"></span>
+        }
+        {{ indicator.textSignal ? indicator.textSignal() : (indicator.text ?? '') }}
+      </span>
+    }
+  }
   <span class="cp-toolbar-spacer"></span>
 </div>

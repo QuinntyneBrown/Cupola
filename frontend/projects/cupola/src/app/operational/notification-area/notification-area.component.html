@@ -1,0 +1,27 @@
+@for (banner of banners(); track banner.notification.id) {
+  <div class="banner" [class]="'banner ' + banner.severityClass" data-testid="notification-banner">
+    <span class="banner-message">{{ banner.notification.message }}</span>
+    @if (banner.notification.progress) {
+      <span class="banner-progress">
+        <progress
+          class="progress-bar"
+          data-testid="notification-progress"
+          max="100"
+          [attr.value]="banner.percent"
+        ></progress>
+        @if (banner.progressText) {
+          <span class="progress-text">{{ banner.progressText }}</span>
+        }
+      </span>
+    }
+    <button
+      type="button"
+      class="banner-dismiss"
+      data-testid="notification-dismiss"
+      aria-label="Dismiss notification"
+      (click)="dismiss(banner.notification.id)"
+    >
+      <svg class="cp-icon"><use href="#i-close" /></svg>
+    </button>
+  </div>
+}

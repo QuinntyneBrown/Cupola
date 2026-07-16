@@ -1,0 +1,28 @@
+@if (fault(); as selected) {
+  <dl class="fault-detail" data-testid="fault-inspector">
+    <dt>Fault</dt>
+    <dd>{{ selected.name }}</dd>
+    <dt>Namespace</dt>
+    <dd>{{ selected.namespace }}</dd>
+    <dt>Severity</dt>
+    <dd>{{ selected.severity }}</dd>
+    <dt>Trigger time</dt>
+    <dd>{{ selected.triggerTime }}</dd>
+    <dt>State</dt>
+    <dd>{{ state() }}</dd>
+    @if (selected.shortDescription) {
+      <dt>Description</dt>
+      <dd>{{ selected.shortDescription }}</dd>
+    }
+    @if (selected.triggerValueInfo; as trigger) {
+      <dt>Trigger value</dt>
+      <dd>{{ trigger.value }} {{ trigger.monitoringResult }}</dd>
+    }
+    @if (selected.currentValueInfo; as current) {
+      <dt>Current value</dt>
+      <dd>{{ current.value }} {{ current.monitoringResult }}</dd>
+    }
+  </dl>
+} @else {
+  <p class="no-selection" data-testid="fault-inspector-empty">No fault selected.</p>
+}

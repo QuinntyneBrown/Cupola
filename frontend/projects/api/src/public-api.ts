@@ -10,6 +10,8 @@ export * from './lib/branding/http-branding-gateway';
 export * from './lib/realtime/cupola-e2e-hook';
 export * from './lib/realtime/fake-realtime-gateway';
 export * from './lib/realtime/signalr-realtime-gateway';
+export * from './lib/realtime/http-telemetry-gateway';
 export * from './lib/time/fake-time-context';
 export * from './lib/user/fake-user.service';
 export * from './lib/notifications/fake-notification.service';
+export * from './lib/faults/fake-fault-provider';

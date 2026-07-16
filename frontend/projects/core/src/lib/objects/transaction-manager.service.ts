@@ -31,14 +31,19 @@ export class TransactionManager {
     return this.active;
   }
 
-  /** Commits and ends the active transaction. */
+  /**
+   * Commits the active transaction, ending it only on success. A failed save
+   * rejects and leaves the transaction active with its dirty objects retained,
+   * so the edit can be retried (OMCT-C03-L2-01.05).
+   */
   async commit(): Promise<ObjectSaveResult[]> {
     if (!this.active) {
       return [];
     }
     const transaction = this.active;
+    const results = await transaction.commit();
     this.active = null;
-    return transaction.commit();
+    return results;
   }
 
   /** Cancels and ends the active transaction without saving. */

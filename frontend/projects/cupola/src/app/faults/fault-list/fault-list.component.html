@@ -1,0 +1,59 @@
+@if (rows().length > 0) {
+  <table class="fault-table" data-testid="fault-list">
+    <thead>
+      <tr>
+        <th scope="col">Severity</th>
+        <th scope="col">Fault</th>
+        <th scope="col">Trigger time</th>
+        <th scope="col">State</th>
+        <th scope="col"><span class="cp-visually-hidden">Actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.key) {
+        <tr
+          class="fault-row"
+          data-testid="fault-row"
+          [attr.data-key]="row.key"
+          (click)="selectFault(row.fault, $event)"
+        >
+          <td>
+            <span class="severity" [class]="row.severityClass">
+              <svg class="cp-icon"><use href="#i-alert-triangle" /></svg>
+              {{ row.fault.severity }}
+            </span>
+          </td>
+          <td>
+            <div class="fault-name">{{ row.fault.name }}</div>
+            @if (row.fault.shortDescription) {
+              <div class="fault-description">{{ row.fault.shortDescription }}</div>
+            }
+          </td>
+          <td class="fault-time">{{ row.fault.triggerTime }}</td>
+          <td data-testid="fault-state">{{ row.state }}</td>
+          <td class="fault-actions">
+            <button
+              type="button"
+              class="cp-button"
+              data-testid="fault-acknowledge"
+              [disabled]="row.fault.acknowledged"
+              (click)="acknowledge(row.fault, $event)"
+            >
+              Acknowledge
+            </button>
+            <button
+              type="button"
+              class="cp-button"
+              data-testid="fault-shelve"
+              (click)="shelve(row.fault, $event)"
+            >
+              {{ row.shelveLabel }}
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+} @else {
+  <p class="no-faults" data-testid="no-faults">No faults reported.</p>
+}

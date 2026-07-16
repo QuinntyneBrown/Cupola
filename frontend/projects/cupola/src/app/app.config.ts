@@ -10,6 +10,8 @@ import {
   BrandingGateway,
   BrandingService,
   CUPOLA_CONFIG,
+  DefaultNotificationService,
+  DefaultUserService,
   DeviceClassifierService,
   GlobalTimeContext,
   ObjectsGateway,
@@ -17,18 +19,20 @@ import {
   RealtimeGateway,
   RouteEventsService,
   SearchGateway,
+  TelemetryGateway,
   ThemeService,
   TimeContext,
   UrlParamsService,
   UrlTimeSyncService,
+  UserService,
 } from '@cupola/core';
 import {
   FakeRealtimeGateway,
-  FakeNotificationService,
   CouchObjectsGateway,
   HttpBrandingGateway,
   HttpObjectsGateway,
   HttpSearchGateway,
+  HttpTelemetryGateway,
   SignalRRealtimeGateway,
 } from '@cupola/api';
 import { FORMS_CONTROL_SOURCE, FormsService } from '@cupola/components';
@@ -36,8 +40,11 @@ import { FORMS_CONTROL_SOURCE, FormsService } from '@cupola/components';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
 import { registerDefaultActions } from './actions/register-default-actions';
+import { registerFaults } from './faults/register-faults';
 import { registerStandardInspectorViews } from './inspector/register-standard-inspector-views';
+import { registerOperationalAwareness } from './operational/register-operational-awareness';
 import { registerDefaultObjects } from './objects/register-default-objects';
+import { registerDefaultTelemetry } from './telemetry/register-default-telemetry';
 import { registerDefaultTime } from './time/register-default-time';
 import { registerTimeViews } from './time/register-time-views';
 import { registerDefaultToolbars } from './toolbars/register-default-toolbars';
@@ -55,8 +62,11 @@ export const appConfig: ApplicationConfig = {
     HttpObjectsGateway,
     { provide: ObjectsGateway, useClass: CouchObjectsGateway },
     { provide: SearchGateway, useClass: HttpSearchGateway },
+    HttpTelemetryGateway,
+    { provide: TelemetryGateway, useClass: HttpTelemetryGateway },
     { provide: BrandingGateway, useClass: HttpBrandingGateway },
-    { provide: NotificationService, useClass: FakeNotificationService },
+    { provide: NotificationService, useExisting: DefaultNotificationService },
+    { provide: UserService, useExisting: DefaultUserService },
     {
       provide: RealtimeGateway,
       useClass: environment.e2e ? FakeRealtimeGateway : SignalRRealtimeGateway,
@@ -72,10 +82,15 @@ export const appConfig: ApplicationConfig = {
       inject(UrlParamsService);
       // C02 domain objects: register types, interceptors, composition, and search providers.
       registerDefaultObjects();
+      // C06 telemetry: register the default provider, metadata, formats, limits, staleness.
+      registerDefaultTelemetry();
       registerDefaultViews();
       registerStandardInspectorViews();
       registerDefaultActions();
       registerDefaultToolbars();
+      // C14 operational awareness: user/status providers, indicators, notifications, faults.
+      registerOperationalAwareness();
+      registerFaults();
       // C05 time coordination: register defaults, then start URL sync last so
       // startup defaults are not written back over existing URL state.
       registerDefaultTime();

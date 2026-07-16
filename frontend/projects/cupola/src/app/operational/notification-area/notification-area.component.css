@@ -1,0 +1,60 @@
+:host {
+  position: fixed;
+  top: var(--cp-space-4);
+  right: var(--cp-space-4);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cp-space-2);
+  /* The area itself never intercepts clicks; only the banners do. */
+  pointer-events: none;
+}
+
+.banner {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--cp-space-3);
+  padding: var(--cp-space-2) var(--cp-space-3);
+  border-radius: var(--cp-radius-m, 4px);
+  border: 1px solid var(--cp-color-line);
+  background: var(--cp-color-surface-2, var(--cp-color-surface, #222));
+  font: var(--cp-type-body-s);
+  max-width: 26rem;
+}
+
+.banner--info {
+  border-left: 3px solid var(--cp-color-primary);
+}
+
+.banner--alert {
+  border-left: 3px solid var(--cp-color-caution, #d9a514);
+}
+
+.banner--error {
+  border-left: 3px solid var(--cp-color-critical, #e0483e);
+}
+
+.banner--progress {
+  border-left: 3px solid var(--cp-color-primary);
+}
+
+.banner-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cp-space-2);
+}
+
+.progress-text {
+  color: var(--cp-color-ink-3);
+  white-space: nowrap;
+}
+
+.banner-dismiss {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--cp-color-ink-2);
+  display: inline-flex;
+}
