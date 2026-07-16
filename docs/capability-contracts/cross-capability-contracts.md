@@ -401,18 +401,26 @@ Owner: C13 · Consumers: C02 (search envelope), C11 (image annotations), C15 (in
 
 ```ts
 // frontend/projects/core/src/lib/models/annotation.ts
+export interface AnnotationTarget {
+  keyString: string;                 // keyString of the annotated object
+  detail?: Record<string, unknown>;  // type-specific payload, e.g. image pixel coordinates
+}
 export interface Annotation {
   keyString: string;
   text: string;
-  targets: string[];           // keyStrings of annotated objects
+  targets: string[];                 // keyStrings of annotated objects (wire-compatible)
   tags: string[];
-  modified?: string;           // ISO 8601
+  modified?: string;                 // ISO 8601
+  annotationType?: string;           // selects the registered target comparator
+  targetDetails?: AnnotationTarget[]; // typed detail per target, parallel to targets
 }
 ```
 
-Open: pixel-spatial target coordinates for image annotations (OMCT-C11-L2-03.02/03.03) and
-tag comparator registration (OMCT-C13-L2-04.06) — `<TO SUPPLY: typed annotation target
-schema per annotation type>`.
+Resolved (open item #10): the typed target schema is additive. `targets` keeps the
+original keyString list so seeded fixtures and the store's target matching stay wire
+compatible; `targetDetails` carries per-target typed detail — C11's pixel-spatial image
+coordinates (OMCT-C11-L2-03.02/03.03) ride in `detail` — and `annotationType` selects the
+comparator registered per type, with deep equality as the fallback (OMCT-C13-L2-04.06).
 
 ### B11 — Time-strip child-view contract
 
@@ -915,7 +923,6 @@ has been invented here.
 | 1 | Save provenance `persisted` timestamp in the shared object shape (`modifiedBy` and `version` resolved under B01/B04) | B01 | C02 |
 | 2 | Authoring transaction and composition-mutation routes | B02 | C03 |
 | 5 | Time-of-interest and telemetry-derived clock surfaces | B05 | C05/C06 |
-| 10 | Typed annotation target schema (including image pixel coordinates) | B10 | C11, C13 |
 | 12 | Route schema for non-browse views | B16 | C09, C15 |
 | 13 | Plugin-install abstraction beyond Angular DI | B18 | C01 |
 
@@ -923,6 +930,7 @@ Items 3 (connection-state vocabulary) and 4 (persistence change-feed event shape
 resolved in the B04 contract; items 6 (historical telemetry route + datum/collection envelope)
 and 7 (limit/staleness shapes) are resolved in the B06/B07 contracts by C06; items 8
 (telemetry filter definition schema) and 9 (conditional style schema) are resolved in the
-B08/B09 contracts by C10; item 11 (fault
+B08/B09 contracts by C10; item 10 (typed annotation target schema) is resolved in the B10
+contract by C13; item 11 (fault
 object shape and fault-provider interface) is resolved in the B13 contract by C14. Item
 numbering is stable, so the resolved rows are removed without renumbering the rest.
