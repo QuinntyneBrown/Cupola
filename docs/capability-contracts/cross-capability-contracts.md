@@ -357,9 +357,21 @@ Path: `frontend/projects/core/src/lib/models/telemetry-filter.ts` (new)
 Owner: C10 · Consumers: C06 (request options), C07, C08 · Stability: medium
 
 The specifications establish that filter definitions travel with telemetry requests and
-persist per scope (OMCT-C10-L2-04.01–04.03) but do not enumerate the definition schema.
-Open contract: `<TO SUPPLY: telemetry filter definition schema>`. Committed as a typed
-placeholder referenced by `TelemetryRequestOptions` (B06).
+persist per scope (OMCT-C10-L2-04.01–04.03). Resolved (open item #8): `telemetry-filter.ts`
+exports the shapes crossing the boundary —
+
+```ts
+export type TelemetryFilterComparator = 'equals' | 'notEquals' | 'contains';
+export interface TelemetryFilter { key: string; comparator: TelemetryFilterComparator; values: (string | number)[]; }
+export interface TelemetryFilterValue { label: string; value: string | number; }
+export interface TelemetryFilterDefinition { key: string; name?: string; comparator: TelemetryFilterComparator; possibleValues?: TelemetryFilterValue[]; singleSelection?: boolean; }
+```
+
+`TelemetryFilterDefinition` entries are declared by telemetry metadata and drive the C10
+filter inspector controls; active `TelemetryFilter` values travel in
+`TelemetryRequestOptions.filters` (B06) on historical requests and subscriptions. Filter
+persistence scopes and the inspector are C10-owned (`app/conditions/filters/**`), not part
+of the boundary.
 
 ### B09 — Conditional styles
 
@@ -678,7 +690,7 @@ and tests before the provider finishes.
 | `frontend/projects/core/src/lib/models/build-info.ts` | existing | B18 | `frontend/e2e/fixtures/build-info.json` |
 | `frontend/projects/core/src/lib/models/branding-info.ts` | existing | B19 | `frontend/e2e/fixtures/branding.json` |
 | `frontend/projects/core/src/lib/models/time.ts` | new | B05 | `FakeTimeContext` (below) |
-| `frontend/projects/core/src/lib/models/telemetry-filter.ts` | new | B08 placeholder | n/a until resolved |
+| `frontend/projects/core/src/lib/models/telemetry-filter.ts` | new | B08 (resolved) | seeded metadata `filters` definitions |
 | `frontend/projects/core/src/lib/models/conditional-style.ts` | new | B09 placeholder | n/a until resolved |
 | `frontend/projects/core/src/lib/models/user.ts` | new | B12 | `FakeUserService` (below) |
 | `frontend/projects/core/src/lib/gateways/objects-gateway.ts` | existing | B02 | `frontend/e2e/support/fake-backend.ts` |
@@ -891,7 +903,6 @@ has been invented here.
 | 1 | Save provenance `persisted` timestamp in the shared object shape (`modifiedBy` and `version` resolved under B01/B04) | B01 | C02 |
 | 2 | Authoring transaction and composition-mutation routes | B02 | C03 |
 | 5 | Time-of-interest and telemetry-derived clock surfaces | B05 | C05/C06 |
-| 8 | Telemetry filter definition schema | B08 | C10 |
 | 9 | Conditional style schema | B09 | C09, C10 |
 | 10 | Typed annotation target schema (including image pixel coordinates) | B10 | C11, C13 |
 | 12 | Route schema for non-browse views | B16 | C09, C15 |
@@ -899,6 +910,7 @@ has been invented here.
 
 Items 3 (connection-state vocabulary) and 4 (persistence change-feed event shape) are
 resolved in the B04 contract; items 6 (historical telemetry route + datum/collection envelope)
-and 7 (limit/staleness shapes) are resolved in the B06/B07 contracts by C06; item 11 (fault
+and 7 (limit/staleness shapes) are resolved in the B06/B07 contracts by C06; item 8
+(telemetry filter definition schema) is resolved in the B08 contract by C10; item 11 (fault
 object shape and fault-provider interface) is resolved in the B13 contract by C14. Item
 numbering is stable, so the resolved rows are removed without renumbering the rest.
