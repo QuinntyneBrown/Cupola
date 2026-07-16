@@ -65,7 +65,7 @@
     "name": "My Items",
     "type": "folder",
     "location": "ROOT",
-    "composition": ["station-displays", "ops-notebook"],
+    "composition": ["station-displays", "ops-notebook", "conditions-lab"],
     "telemetry": null,
     "created": "2026-07-02T14:51:08Z",
     "modified": "2026-07-13T09:12:44Z",
@@ -151,6 +151,218 @@
     "location": "comms",
     "composition": [],
     "telemetry": { "hints": ["image"] },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "conditions-lab" },
+    "keyString": "conditions-lab",
+    "name": "Conditions lab",
+    "type": "folder",
+    "location": "mine",
+    "composition": ["bus-monitor", "bus-status", "bus-style", "power-summary", "derived-power", "bus-mean", "iv-correlation"],
+    "telemetry": null,
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "pwr.mode" },
+    "keyString": "pwr.mode",
+    "name": "Bus mode",
+    "type": "telemetry",
+    "location": "conditions-lab",
+    "composition": [],
+    "telemetry": {
+      "hints": ["range"],
+      "unit": "",
+      "filters": [
+        {
+          "key": "mode",
+          "name": "Mode",
+          "comparator": "equals",
+          "singleSelection": true,
+          "possibleValues": [
+            { "label": "Safe", "value": "SAFE" },
+            { "label": "Nominal", "value": "NOMINAL" }
+          ]
+        },
+        {
+          "key": "quality",
+          "name": "Quality",
+          "comparator": "equals",
+          "possibleValues": [
+            { "label": "Good", "value": "GOOD" },
+            { "label": "Suspect", "value": "SUSPECT" }
+          ]
+        },
+        { "key": "label", "name": "Label", "comparator": "contains" }
+      ]
+    },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "bus-monitor" },
+    "keyString": "bus-monitor",
+    "name": "Bus monitor",
+    "type": "condition-set",
+    "location": "conditions-lab",
+    "composition": ["pwr.bus_v", "pwr.mode"],
+    "telemetry": null,
+    "configuration": {
+      "conditions": [
+        {
+          "id": "stale",
+          "name": "No data",
+          "trigger": "all",
+          "output": "NO DATA",
+          "criteria": [
+            { "id": "s1", "telemetryKeyString": "pwr.bus_v", "metadataKey": "value", "operation": "isOlderThan", "input": [1000] }
+          ]
+        },
+        {
+          "id": "undervolt",
+          "name": "Undervoltage",
+          "trigger": "all",
+          "output": "UNDERVOLTAGE",
+          "criteria": [
+            { "id": "u1", "telemetryKeyString": "pwr.bus_v", "metadataKey": "value", "operation": "lessThan", "input": [28] }
+          ]
+        },
+        {
+          "id": "nominal",
+          "name": "Nominal",
+          "trigger": "all",
+          "output": "NOMINAL",
+          "criteria": [
+            { "id": "n1", "telemetryKeyString": "pwr.bus_v", "metadataKey": "value", "operation": "greaterThanOrEqualTo", "input": [28] }
+          ]
+        },
+        { "id": "default", "name": "Default", "trigger": "all", "output": "DEFAULT", "criteria": [], "isDefault": true }
+      ]
+    },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "bus-status" },
+    "keyString": "bus-status",
+    "name": "Bus status widget",
+    "type": "condition-widget",
+    "location": "conditions-lab",
+    "composition": [],
+    "telemetry": null,
+    "configuration": {
+      "conditionWidget": {
+        "conditionSetKeyString": "bus-monitor",
+        "outputs": [
+          { "conditionId": "stale", "severity": "caution", "label": "NO DATA" },
+          { "conditionId": "undervolt", "severity": "critical", "label": "UNDERVOLTAGE", "url": "https://status.example.com/bus" },
+          { "conditionId": "nominal", "severity": "ok", "label": "NOMINAL" }
+        ]
+      }
+    },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "bus-style" },
+    "keyString": "bus-style",
+    "name": "Bus styled widget",
+    "type": "condition-widget",
+    "location": "conditions-lab",
+    "composition": [],
+    "telemetry": null,
+    "configuration": {
+      "conditionWidget": { "conditionSetKeyString": "bus-monitor" },
+      "objectStyles": {
+        "conditionSetKeyString": "bus-monitor",
+        "enabled": true,
+        "styles": [
+          { "conditionId": "undervolt", "style": { "backgroundColor": "rgb(240, 82, 74)", "color": "rgb(255, 255, 255)" } },
+          { "conditionId": "nominal", "style": { "backgroundColor": "rgb(63, 185, 80)", "color": "rgb(11, 14, 20)" } }
+        ],
+        "defaultStyle": { "backgroundColor": "rgb(20, 26, 36)" }
+      }
+    },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "power-summary" },
+    "keyString": "power-summary",
+    "name": "Power margin summary",
+    "type": "summary-widget",
+    "location": "conditions-lab",
+    "composition": ["pwr.bus_v", "pwr.array_out"],
+    "telemetry": null,
+    "configuration": {
+      "summaryWidget": {
+        "rules": [
+          { "id": "critical", "name": "Power critical", "scope": "any", "metadataKey": "value", "operation": "greaterThan", "input": [90], "label": "CRITICAL", "color": "var(--cp-color-critical)", "icon": "i-alert-circle" },
+          { "id": "default", "name": "Nominal", "scope": "any", "metadataKey": "value", "operation": "equalTo", "input": [0], "isDefault": true, "label": "NOMINAL", "color": "var(--cp-color-ok)" }
+        ]
+      }
+    },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "derived-power" },
+    "keyString": "derived-power",
+    "name": "Derived bus power",
+    "type": "derived-telemetry",
+    "location": "conditions-lab",
+    "composition": [],
+    "telemetry": null,
+    "configuration": {
+      "derived": {
+        "kind": "expression",
+        "expression": "a * b",
+        "sampleSize": 2,
+        "parameters": [
+          { "name": "a", "keyString": "pwr.array_out" },
+          { "name": "b", "keyString": "pwr.bus_v" }
+        ]
+      }
+    },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "bus-mean" },
+    "keyString": "bus-mean",
+    "name": "Bus voltage mean",
+    "type": "derived-telemetry",
+    "location": "conditions-lab",
+    "composition": [],
+    "telemetry": null,
+    "configuration": {
+      "derived": { "kind": "mean", "sourceKeyString": "pwr.bus_v", "sampleCount": 3 }
+    },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "iv-correlation" },
+    "keyString": "iv-correlation",
+    "name": "Current-voltage correlation",
+    "type": "derived-telemetry",
+    "location": "conditions-lab",
+    "composition": [],
+    "telemetry": null,
+    "configuration": {
+      "derived": { "kind": "correlation", "horizontalKeyString": "pwr.array_out", "verticalKeyString": "pwr.bus_v" }
+    },
     "created": "2026-07-02T14:51:08Z",
     "modified": "2026-07-13T09:12:44Z",
     "createdBy": "j.reyes"

@@ -2,20 +2,57 @@
   display: block;
 }
 
-.inspector-section {
+.styles-inspector {
   padding: var(--cp-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cp-space-4);
 }
 
 .sh-overline {
   margin-bottom: var(--cp-space-3);
 }
 
-.swatch {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-  margin-right: var(--cp-space-2);
-  vertical-align: middle;
-  border: 1px solid var(--cp-color-hairline);
+.styles-grid {
+  display: grid;
+  grid-template-columns: 1fr 44px 44px 44px 72px;
+  gap: 6px 10px;
+  align-items: center;
+}
+
+.styles-grid .h {
+  font: var(--cp-type-overline);
+  text-transform: uppercase;
+  letter-spacing: var(--cp-tracking-caps, 0.06em);
+  color: var(--cp-color-ink-3);
+  text-align: center;
+}
+
+.styles-grid .h:first-child {
+  text-align: left;
+}
+
+.styles-grid .n {
+  font: var(--cp-type-body-s);
+  color: var(--cp-color-ink-2);
+}
+
+.mini-sw {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  flex: none;
+  padding: 0;
+  cursor: pointer;
+  justify-self: center;
+}
+
+.style-prev {
+  justify-self: stretch;
+  text-align: center;
+  padding: 3px 0;
+  border-radius: 3px;
+  border: 1px solid;
+  font: var(--cp-type-data-s);
 }

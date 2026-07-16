@@ -1,0 +1,131 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow: auto;
+  padding: var(--cp-space-5);
+}
+
+.condset {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.cp-pane-head {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-space-3);
+}
+
+.condset-active {
+  margin-left: auto;
+  font: var(--cp-type-data-s);
+  color: var(--cp-color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cp-pane-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cp-space-3);
+  padding: var(--cp-space-4);
+}
+
+.cond {
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-m);
+  background: var(--cp-color-surface-2);
+}
+
+.cond.is-active {
+  background: linear-gradient(var(--cp-color-primary-dim), var(--cp-color-primary-dim)) var(--cp-color-surface-2);
+  border-color: var(--cp-color-primary-border);
+}
+
+.cond--default {
+  background: var(--cp-color-surface-1);
+}
+
+.cond-head {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-space-3);
+  padding: var(--cp-space-3) var(--cp-space-4);
+  flex-wrap: wrap;
+}
+
+.cond-grip {
+  color: var(--cp-color-ink-3);
+  cursor: grab;
+}
+
+.cond-grip--disabled {
+  color: var(--cp-color-ink-disabled);
+  cursor: default;
+}
+
+.cond-name {
+  font: var(--cp-type-label);
+  color: var(--cp-color-ink);
+}
+
+.cond-name--default {
+  color: var(--cp-color-ink-2);
+}
+
+.cond-when {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: var(--cp-type-body-s);
+  color: var(--cp-color-ink-3);
+}
+
+.cond-out {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: var(--cp-type-caption);
+  color: var(--cp-color-ink-3);
+}
+
+.condset-output {
+  width: 120px;
+}
+
+.active-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 7px;
+  border-radius: var(--cp-radius-s);
+  background: var(--cp-color-primary);
+  color: var(--cp-color-ink-inverse);
+  font: 600 10px/18px var(--cp-font-cond, var(--cp-font-ui));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cond-body {
+  padding: 0 var(--cp-space-4) var(--cp-space-4) 42px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cp-space-3);
+  align-items: flex-start;
+}
+
+.crit-row {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-space-3);
+  flex-wrap: wrap;
+  font: var(--cp-type-body-s);
+  color: var(--cp-color-ink-3);
+}
+
+.crit-row .cp-select,
+.crit-row .cp-input {
+  height: var(--cp-size-control-s);
+  width: auto;
+}

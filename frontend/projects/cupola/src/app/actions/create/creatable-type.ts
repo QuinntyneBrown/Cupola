@@ -25,4 +25,28 @@ export const CREATABLE_TYPES: CreatableType[] = [
     glyph: 'i-notebook',
     description: 'A timestamped log for operator notes and annotations.',
   },
+  {
+    type: 'condition-set',
+    name: 'Condition Set',
+    glyph: 'i-alert-circle',
+    description: 'Evaluates ordered conditions over composed telemetry and publishes the selected output.',
+  },
+  {
+    type: 'condition-widget',
+    name: 'Condition Widget',
+    glyph: 'i-alert-circle',
+    description: 'Displays the active output of a condition set with its label, link, and styling.',
+  },
+  {
+    type: 'summary-widget',
+    name: 'Summary Widget',
+    glyph: 'i-alert-triangle',
+    description: 'Selects a visual rule from telemetry conditions over composed objects.',
+  },
+  {
+    type: 'derived-telemetry',
+    name: 'Derived Telemetry',
+    glyph: 'i-plot',
+    description: 'Calculates a new telemetry stream from source-combination operations.',
+  },
 ];

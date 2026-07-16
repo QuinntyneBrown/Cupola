@@ -1,0 +1,52 @@
+<div class="sumw" data-testid="summary-widget-view">
+  <div class="sumw-toolbar">
+    <button class="cp-btn cp-btn--text cp-btn--small" data-testid="summary-widget-edit" (click)="toggleEdit()">
+      {{ editMode() ? 'Done' : 'Edit' }}
+    </button>
+  </div>
+
+  @if (matched(); as rule) {
+    <div
+      class="condw sumw-preview"
+      data-testid="summary-widget-preview"
+      [style.color]="rule.color"
+      [style.borderColor]="rule.border ?? rule.color"
+    >
+      @if (rule.icon) {
+        <svg class="cp-icon cp-icon--s"><use [attr.href]="'#' + rule.icon"></use></svg>
+      }
+      <span>{{ rule.label ?? rule.name }}</span>
+    </div>
+  } @else {
+    <div class="condw sumw-preview" data-testid="summary-widget-preview">No matching rule</div>
+  }
+
+  @if (editMode()) {
+    <fieldset class="cp-fieldset sumw-testdata" data-testid="summary-test-fieldset">
+      <legend>Test data</legend>
+      <label class="cp-switch" [class.is-on]="testEnabled()">
+        <input
+          type="checkbox"
+          data-testid="summary-test-toggle"
+          [checked]="testEnabled()"
+          (change)="toggleTestData()"
+        />
+        <span class="cp-switch-track"></span>
+        Preview with test values
+      </label>
+      @for (source of composedKeys(); track source) {
+        <div class="cp-field cp-field--inline">
+          <span class="cp-field-label">{{ source }}</span>
+          <input
+            class="cp-input cp-input--data"
+            data-testid="summary-test-input"
+            [attr.data-key]="source"
+            [disabled]="!testEnabled()"
+            (input)="setTestValue(source, $any($event.target).value)"
+          />
+        </div>
+      }
+      <p class="cp-field-help">Test values preview rules without changing source telemetry.</p>
+    </fieldset>
+  }
+</div>

@@ -2,6 +2,7 @@ import { test as base } from '@playwright/test';
 
 import { AboutDialogPage } from '../pages/about-dialog.page';
 import { AppShellPage } from '../pages/app-shell.page';
+import { ConditionSetPage } from '../pages/condition-set.page';
 import { ContextMenuPage } from '../pages/context-menu.page';
 import { FormDialogPage } from '../pages/form-dialog.page';
 import { GrandSearchPage } from '../pages/grand-search.page';
@@ -26,6 +27,7 @@ interface CupolaFixtures {
   grandSearch: GrandSearchPage;
   aboutDialog: AboutDialogPage;
   licenses: LicensesPage;
+  conditionSet: ConditionSetPage;
 }
 
 /**
@@ -74,6 +76,9 @@ export const test = base.extend<CupolaFixtures>({
   },
   licenses: async ({ page }, use) => {
     await use(new LicensesPage(page));
+  },
+  conditionSet: async ({ page }, use) => {
+    await use(new ConditionSetPage(page));
   },
 });
 

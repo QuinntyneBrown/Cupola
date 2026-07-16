@@ -39,6 +39,7 @@ import { FORMS_CONTROL_SOURCE, FormsService } from '@cupola/components';
 
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
+import { registerConditions } from './conditions/register-conditions';
 import { registerDefaultActions } from './actions/register-default-actions';
 import { registerFaults } from './faults/register-faults';
 import { registerStandardInspectorViews } from './inspector/register-standard-inspector-views';
@@ -86,6 +87,10 @@ export const appConfig: ApplicationConfig = {
       registerDefaultTelemetry();
       registerDefaultViews();
       registerStandardInspectorViews();
+      // C10 conditions: register condition/widget/derived types and views, the
+      // composition policy, the filter inspector, and derived providers before
+      // create actions are minted from the creatable types.
+      registerConditions();
       registerDefaultActions();
       registerDefaultToolbars();
       // C14 operational awareness: user/status providers, indicators, notifications, faults.

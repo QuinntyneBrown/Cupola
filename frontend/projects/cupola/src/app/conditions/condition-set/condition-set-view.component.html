@@ -1,0 +1,129 @@
+<div class="cp-pane condset" data-testid="condition-set-view">
+  <div class="cp-pane-head">
+    <span>Conditions</span>
+    <span class="condset-active" data-testid="condition-active-output">{{ activeOutput() }}</span>
+    <button class="cp-btn cp-btn--tonal cp-btn--small" data-testid="condition-add" (click)="addCondition()">
+      <svg class="cp-icon cp-icon--s"><use href="#i-plus"></use></svg>
+      Add condition
+    </button>
+  </div>
+
+  <div class="cp-pane-body">
+    @for (condition of editableConditions(); track condition.id) {
+      <div
+        class="cond"
+        [class.is-active]="isActive(condition)"
+        data-testid="condition-row"
+        [attr.data-key]="condition.id"
+      >
+        <div class="cond-head">
+          <svg class="cp-icon cp-icon--s cond-grip" aria-label="Drag to reorder"><use href="#i-grip"></use></svg>
+          <span class="cond-name">{{ condition.name }}</span>
+          @if (isActive(condition)) {
+            <span class="active-badge" data-testid="condition-active-badge">Active</span>
+          }
+          <span class="cond-when">
+            when
+            <select
+              class="cp-select"
+              data-testid="condition-trigger"
+              [value]="condition.trigger"
+              (change)="setTrigger(condition.id, $any($event.target).value)"
+            >
+              <option value="all">ALL</option>
+              <option value="any">ANY</option>
+            </select>
+            of:
+          </span>
+          <span class="cond-out">
+            output
+            <input
+              class="cp-input cp-input--data condset-output"
+              data-testid="condition-output"
+              [attr.data-key]="condition.id"
+              [value]="condition.output"
+              (change)="setOutput(condition.id, $any($event.target).value)"
+            />
+          </span>
+          <button
+            class="cp-icon-btn cp-icon-btn--s"
+            aria-label="Delete condition"
+            data-testid="condition-remove"
+            (click)="removeCondition(condition.id)"
+          >
+            <svg class="cp-icon cp-icon--s"><use href="#i-trash"></use></svg>
+          </button>
+        </div>
+
+        <div class="cond-body">
+          @for (criterion of condition.criteria; track criterion.id) {
+            <div class="crit-row" data-testid="criterion-row" [attr.data-key]="criterion.id">
+              <select
+                class="cp-select"
+                data-testid="criterion-source"
+                [value]="criterion.telemetryKeyString"
+                (change)="setCriterionSource(condition.id, criterion.id, $any($event.target).value)"
+              >
+                @for (source of sources(); track source) {
+                  <option [value]="source">{{ source }}</option>
+                }
+              </select>
+              <select
+                class="cp-select"
+                data-testid="criterion-operation"
+                [value]="criterion.operation"
+                (change)="setCriterionOperation(condition.id, criterion.id, $any($event.target).value)"
+              >
+                @for (operation of operations; track operation.operation) {
+                  <option [value]="operation.operation">{{ operation.label }}</option>
+                }
+              </select>
+              <input
+                class="cp-input cp-input--data"
+                data-testid="criterion-input"
+                [value]="criterion.input[0]"
+                (change)="setCriterionInput(condition.id, criterion.id, 0, $any($event.target).value)"
+              />
+            </div>
+          }
+          <button
+            class="cp-btn cp-btn--text cp-btn--small"
+            data-testid="criterion-add"
+            (click)="addCriterion(condition.id)"
+          >
+            <svg class="cp-icon"><use href="#i-plus"></use></svg>
+            Add criterion
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (defaultCondition(); as fallback) {
+      <div
+        class="cond cond--default"
+        [class.is-active]="isActive(fallback)"
+        data-testid="condition-row"
+        [attr.data-key]="fallback.id"
+      >
+        <div class="cond-head">
+          <svg class="cp-icon cp-icon--s cond-grip cond-grip--disabled"><use href="#i-grip"></use></svg>
+          <span class="cond-name cond-name--default">Default</span>
+          @if (isActive(fallback)) {
+            <span class="active-badge" data-testid="condition-active-badge">Active</span>
+          }
+          <span class="cond-when">when no condition above is true</span>
+          <span class="cond-out">
+            output
+            <input
+              class="cp-input cp-input--data condset-output"
+              data-testid="condition-output"
+              [attr.data-key]="fallback.id"
+              [value]="fallback.output"
+              (change)="setOutput(fallback.id, $any($event.target).value)"
+            />
+          </span>
+        </div>
+      </div>
+    }
+  </div>
+</div>

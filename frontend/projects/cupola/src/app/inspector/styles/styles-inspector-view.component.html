@@ -1,11 +1,64 @@
-<div class="inspector-section" data-testid="styles-inspector">
+<div class="inspector-section styles-inspector" data-testid="styles-inspector">
   <div class="sh-overline">Styles</div>
-  <dl class="cp-props">
-    <dt>Background</dt>
-    <dd><span class="swatch" style="background: var(--cp-color-void)"></span>Void</dd>
-    <dt>Border</dt>
-    <dd><span class="swatch" style="background: var(--cp-color-hairline)"></span>Hairline</dd>
-    <dt>Accent</dt>
-    <dd><span class="swatch" style="background: var(--cp-color-primary)"></span>Earthlight</dd>
-  </dl>
+
+  <div class="cp-field cp-field--inline">
+    <span class="cp-field-label">Condition set</span>
+    <input
+      class="cp-input cp-input--data"
+      data-testid="styles-condition-set"
+      [value]="config().conditionSetKeyString"
+      (change)="bindConditionSet($any($event.target).value)"
+    />
+  </div>
+
+  <label class="cp-switch" [class.is-on]="config().enabled">
+    <input type="checkbox" data-testid="styles-enabled" [checked]="config().enabled" (change)="toggleEnabled()" />
+    <span class="cp-switch-track"></span>
+    Use conditional styling
+  </label>
+
+  <div class="styles-grid">
+    <span class="h">Condition</span>
+    <span class="h">BG</span>
+    <span class="h">Border</span>
+    <span class="h">Text</span>
+    <span class="h">Preview</span>
+
+    @for (condition of conditions(); track condition.id) {
+      <span class="n" data-testid="style-row-name">{{ condition.name }}</span>
+      <button
+        class="mini-sw"
+        aria-label="Background"
+        data-testid="style-swatch-bg"
+        [attr.data-key]="condition.id"
+        [style.background]="styleFor(condition.id).backgroundColor || 'var(--cp-color-surface-3)'"
+        (click)="cycleStyle(condition.id, 'backgroundColor')"
+      ></button>
+      <button
+        class="mini-sw"
+        aria-label="Border"
+        data-testid="style-swatch-border"
+        [attr.data-key]="condition.id"
+        [style.background]="styleFor(condition.id).borderColor || 'var(--cp-color-surface-3)'"
+        (click)="cycleStyle(condition.id, 'borderColor')"
+      ></button>
+      <button
+        class="mini-sw"
+        aria-label="Text"
+        data-testid="style-swatch-text"
+        [attr.data-key]="condition.id"
+        [style.background]="styleFor(condition.id).color || 'var(--cp-color-surface-3)'"
+        (click)="cycleStyle(condition.id, 'color')"
+      ></button>
+      <span
+        class="style-prev"
+        data-testid="style-preview"
+        [attr.data-key]="condition.id"
+        [style.background]="styleFor(condition.id).backgroundColor"
+        [style.border-color]="styleFor(condition.id).borderColor || 'var(--cp-color-line)'"
+        [style.color]="styleFor(condition.id).color || 'var(--cp-color-ink-2)'"
+        >{{ condition.output }}</span
+      >
+    }
+  </div>
 </div>
