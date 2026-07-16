@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Text.Json;
 using Cupola.Core.Models;
 
 namespace Cupola.Core.Services;
@@ -48,7 +49,7 @@ public class InMemoryObjectStore : IObjectStore
             return null;
         }
 
-        return _annotations.Where(a => a.Targets.Contains(keyString)).ToList();
+        return AllAnnotations().Where(a => a.Targets.Contains(keyString)).ToList();
     }
 
     public DomainObject? UpdateName(string keyString, string name)
@@ -138,11 +139,68 @@ public class InMemoryObjectStore : IObjectStore
             .Where(o => o.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
             .ToList();
 
-        var annotations = _annotations
+        var annotations = AllAnnotations()
             .Where(a => a.Text.Contains(term, StringComparison.OrdinalIgnoreCase)
                         || a.Tags.Any(tag => tag.Contains(term, StringComparison.OrdinalIgnoreCase)))
             .ToList();
 
         return new SearchResult(objects, annotations);
+    }
+
+    /// <summary>
+    /// Seeded annotations plus annotation-typed domain objects saved through the
+    /// generic persistence routes, projected onto the B10 annotation shape
+    /// (wave-4 C13 enabler).
+    /// </summary>
+    private IEnumerable<Annotation> AllAnnotations()
+    {
+        foreach (var annotation in _annotations)
+        {
+            yield return annotation;
+        }
+
+        foreach (var domainObject in _objects.Values)
+        {
+            if (TryMapAnnotation(domainObject) is { } mapped)
+            {
+                yield return mapped;
+            }
+        }
+    }
+
+    private static Annotation? TryMapAnnotation(DomainObject domainObject)
+    {
+        if (domainObject.Type != "annotation" ||
+            domainObject.Configuration is not { ValueKind: JsonValueKind.Object } configuration ||
+            !configuration.TryGetProperty("annotation", out var payload) ||
+            payload.ValueKind != JsonValueKind.Object)
+        {
+            return null;
+        }
+
+        var text = payload.TryGetProperty("text", out var textElement)
+                   && textElement.ValueKind == JsonValueKind.String
+            ? textElement.GetString()!
+            : string.Empty;
+
+        return new Annotation(
+            domainObject.KeyString,
+            text,
+            ReadStrings(payload, "targets"),
+            ReadStrings(payload, "tags"),
+            domainObject.Modified);
+    }
+
+    private static IReadOnlyList<string> ReadStrings(JsonElement element, string property)
+    {
+        if (!element.TryGetProperty(property, out var array) || array.ValueKind != JsonValueKind.Array)
+        {
+            return Array.Empty<string>();
+        }
+
+        return array.EnumerateArray()
+            .Where(item => item.ValueKind == JsonValueKind.String)
+            .Select(item => item.GetString()!)
+            .ToList();
     }
 }

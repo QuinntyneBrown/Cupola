@@ -19,7 +19,7 @@ public class ObjectStoreCompositionTests
 
         Assert.That(children, Is.Not.Null);
         Assert.That(children!, Is.Not.Empty);
-        Assert.That(children.Select(c => c.KeyString), Is.EqualTo(new[] { "station", "mine" }));
+        Assert.That(children.Select(c => c.KeyString), Is.EqualTo(new[] { "station", "operations", "mine" }));
         Assert.That(children[^1].KeyString, Is.EqualTo("mine"));
     }
 

@@ -24,12 +24,17 @@ export class RealtimeDriver {
     }, object);
   }
 
-  async pushTelemetry(keyString: string, value: number, timestamp?: string): Promise<void> {
+  async pushTelemetry(
+    keyString: string,
+    value: number,
+    timestamp?: string,
+    extra?: Record<string, unknown>,
+  ): Promise<void> {
     await this.page.evaluate(
       (telemetry) => {
         (window as E2eWindow).__cupolaE2E!.pushTelemetry(telemetry);
       },
-      { keyString, value, timestamp: timestamp ?? new Date().toISOString() },
+      { keyString, value, timestamp: timestamp ?? new Date().toISOString(), ...extra },
     );
   }
 
