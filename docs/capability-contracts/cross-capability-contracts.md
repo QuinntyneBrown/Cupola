@@ -378,8 +378,20 @@ of the boundary.
 Path: `frontend/projects/core/src/lib/models/conditional-style.ts` (new)
 Owner: C10 · Consumers: C09, C15 (inspector styles pane) · Stability: medium
 
-Open contract per OMCT-C10-L2-02.01/02.02: `<TO SUPPLY: conditional style properties
-(background, border, text, visibility) and condition-output binding>`.
+Resolved (open item #9) per OMCT-C10-L2-02.01/02.02: `conditional-style.ts` exports the
+shapes crossing the boundary —
+
+```ts
+export interface StyleProperties { backgroundColor?: string; borderColor?: string; color?: string; visibility?: 'visible' | 'hidden'; }
+export interface ConditionalStyle { conditionId: string; style: StyleProperties; }
+export interface ObjectStyleConfiguration { conditionSetKeyString: string; enabled: boolean; styles: ConditionalStyle[]; defaultStyle?: StyleProperties; }
+```
+
+`ObjectStyleConfiguration` persists under a stylable object's
+`configuration.objectStyles`; `conditionId` binds each rule to a condition in the driving
+condition set, and `defaultStyle` applies when the set's default condition is active or no
+rule matches. Style evaluation (the style rule manager) is C10-owned
+(`app/conditions/presentation/**`), not part of the boundary.
 
 ### B10 — Annotations
 
@@ -691,7 +703,7 @@ and tests before the provider finishes.
 | `frontend/projects/core/src/lib/models/branding-info.ts` | existing | B19 | `frontend/e2e/fixtures/branding.json` |
 | `frontend/projects/core/src/lib/models/time.ts` | new | B05 | `FakeTimeContext` (below) |
 | `frontend/projects/core/src/lib/models/telemetry-filter.ts` | new | B08 (resolved) | seeded metadata `filters` definitions |
-| `frontend/projects/core/src/lib/models/conditional-style.ts` | new | B09 placeholder | n/a until resolved |
+| `frontend/projects/core/src/lib/models/conditional-style.ts` | new | B09 (resolved) | `configuration.objectStyles` on seeded objects |
 | `frontend/projects/core/src/lib/models/user.ts` | new | B12 | `FakeUserService` (below) |
 | `frontend/projects/core/src/lib/gateways/objects-gateway.ts` | existing | B02 | `frontend/e2e/support/fake-backend.ts` |
 | `frontend/projects/core/src/lib/gateways/search-gateway.ts` | existing | B03 | same |
@@ -903,14 +915,14 @@ has been invented here.
 | 1 | Save provenance `persisted` timestamp in the shared object shape (`modifiedBy` and `version` resolved under B01/B04) | B01 | C02 |
 | 2 | Authoring transaction and composition-mutation routes | B02 | C03 |
 | 5 | Time-of-interest and telemetry-derived clock surfaces | B05 | C05/C06 |
-| 9 | Conditional style schema | B09 | C09, C10 |
 | 10 | Typed annotation target schema (including image pixel coordinates) | B10 | C11, C13 |
 | 12 | Route schema for non-browse views | B16 | C09, C15 |
 | 13 | Plugin-install abstraction beyond Angular DI | B18 | C01 |
 
 Items 3 (connection-state vocabulary) and 4 (persistence change-feed event shape) are
 resolved in the B04 contract; items 6 (historical telemetry route + datum/collection envelope)
-and 7 (limit/staleness shapes) are resolved in the B06/B07 contracts by C06; item 8
-(telemetry filter definition schema) is resolved in the B08 contract by C10; item 11 (fault
+and 7 (limit/staleness shapes) are resolved in the B06/B07 contracts by C06; items 8
+(telemetry filter definition schema) and 9 (conditional style schema) are resolved in the
+B08/B09 contracts by C10; item 11 (fault
 object shape and fault-provider interface) is resolved in the B13 contract by C14. Item
 numbering is stable, so the resolved rows are removed without renumbering the rest.
