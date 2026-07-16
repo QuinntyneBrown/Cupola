@@ -61,12 +61,21 @@ export * from './lib/telemetry/telemetry-collection';
 export * from './lib/telemetry/telemetry-api.service';
 
 export * from './lib/user/user.service';
+export * from './lib/user/user-provider';
+export * from './lib/user/default-user.service';
+export * from './lib/user/active-role-synchronizer';
+export * from './lib/user/status.service';
+export * from './lib/user/status-provider';
+export * from './lib/user/user-status.service';
 
 export * from './lib/notifications/notification.service';
 export * from './lib/notifications/indicator';
+export * from './lib/notifications/indicator.service';
+export * from './lib/notifications/default-notification.service';
 
 export * from './lib/faults/fault';
 export * from './lib/faults/fault-provider';
+export * from './lib/faults/fault-management.service';
 
 export * from './lib/security/sanitizers';
 export * from './lib/security/image-url';

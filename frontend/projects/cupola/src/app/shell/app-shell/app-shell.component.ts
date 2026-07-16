@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SplitterComponent } from '@cupola/components';
 
+import { NotificationAreaComponent } from '../../operational/notification-area/notification-area.component';
 import { AppBarComponent } from '../app-bar/app-bar.component';
 import { ConductorComponent } from '../conductor/conductor.component';
 import { InspectorPaneComponent } from '../inspector-pane/inspector-pane.component';
@@ -26,6 +27,7 @@ const INSPECTOR_MAX = 360;
     InspectorPaneComponent,
     ConductorComponent,
     StatusBarComponent,
+    NotificationAreaComponent,
   ],
 })
 export class AppShellComponent {

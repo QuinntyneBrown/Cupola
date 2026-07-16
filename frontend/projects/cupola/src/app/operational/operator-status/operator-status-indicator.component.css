@@ -1,0 +1,14 @@
+:host {
+  display: inline-flex;
+}
+
+.operator-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cp-space-2);
+}
+
+.status-current {
+  font-weight: 600;
+  white-space: nowrap;
+}

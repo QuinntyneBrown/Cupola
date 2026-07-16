@@ -1,0 +1,14 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cp-space-2);
+}
+
+.poll-question {
+  color: var(--cp-color-ink-2);
+  white-space: nowrap;
+}
+
+.poll-input {
+  max-width: 14rem;
+}

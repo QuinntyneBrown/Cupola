@@ -10,6 +10,8 @@ import {
   BrandingGateway,
   BrandingService,
   CUPOLA_CONFIG,
+  DefaultNotificationService,
+  DefaultUserService,
   DeviceClassifierService,
   GlobalTimeContext,
   ObjectsGateway,
@@ -22,10 +24,10 @@ import {
   TimeContext,
   UrlParamsService,
   UrlTimeSyncService,
+  UserService,
 } from '@cupola/core';
 import {
   FakeRealtimeGateway,
-  FakeNotificationService,
   CouchObjectsGateway,
   HttpBrandingGateway,
   HttpObjectsGateway,
@@ -38,7 +40,9 @@ import { FORMS_CONTROL_SOURCE, FormsService } from '@cupola/components';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
 import { registerDefaultActions } from './actions/register-default-actions';
+import { registerFaults } from './faults/register-faults';
 import { registerStandardInspectorViews } from './inspector/register-standard-inspector-views';
+import { registerOperationalAwareness } from './operational/register-operational-awareness';
 import { registerDefaultObjects } from './objects/register-default-objects';
 import { registerDefaultTelemetry } from './telemetry/register-default-telemetry';
 import { registerDefaultTime } from './time/register-default-time';
@@ -61,7 +65,8 @@ export const appConfig: ApplicationConfig = {
     HttpTelemetryGateway,
     { provide: TelemetryGateway, useClass: HttpTelemetryGateway },
     { provide: BrandingGateway, useClass: HttpBrandingGateway },
-    { provide: NotificationService, useClass: FakeNotificationService },
+    { provide: NotificationService, useExisting: DefaultNotificationService },
+    { provide: UserService, useExisting: DefaultUserService },
     {
       provide: RealtimeGateway,
       useClass: environment.e2e ? FakeRealtimeGateway : SignalRRealtimeGateway,
@@ -83,6 +88,9 @@ export const appConfig: ApplicationConfig = {
       registerStandardInspectorViews();
       registerDefaultActions();
       registerDefaultToolbars();
+      // C14 operational awareness: user/status providers, indicators, notifications, faults.
+      registerOperationalAwareness();
+      registerFaults();
       // C05 time coordination: register defaults, then start URL sync last so
       // startup defaults are not written back over existing URL state.
       registerDefaultTime();
