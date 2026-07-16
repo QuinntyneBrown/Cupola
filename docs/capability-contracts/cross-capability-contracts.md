@@ -430,7 +430,9 @@ export abstract class UserService {
 ### B13 — Notifications and indicators
 
 Path: `frontend/projects/core/src/lib/notifications/notification.service.ts` (new),
-`frontend/projects/core/src/lib/notifications/indicator.ts` (new)
+`frontend/projects/core/src/lib/notifications/indicator.ts` (new),
+`frontend/projects/core/src/lib/faults/fault.ts` (new),
+`frontend/projects/core/src/lib/faults/fault-provider.ts` (new)
 Owner: C14 · Consumers: C15 (status bar) · Stability: medium
 
 ```ts
@@ -460,8 +462,51 @@ export interface Indicator {
 }
 ```
 
-Open: fault-management surface (OMCT-C14-L2-03.01–03.04) —
-`<TO SUPPLY: fault object shape and fault-provider interface>`.
+```ts
+// frontend/projects/core/src/lib/faults/fault.ts
+export type FaultSeverity = 'CRITICAL' | 'WARNING' | 'WATCH';
+
+export interface FaultValueInfo {
+  value: number | string | null;
+  rangeCondition?: string;
+  monitoringResult?: string;
+}
+
+export interface Fault {
+  id: string;                  // unique within its namespace
+  name: string;
+  namespace: string;
+  triggerTime: string;         // ISO 8601
+  severity: FaultSeverity;
+  acknowledged: boolean;
+  shelved: boolean;
+  shortDescription?: string;
+  seqNum?: number;
+  currentValueInfo?: FaultValueInfo;
+  triggerValueInfo?: FaultValueInfo;
+}
+
+export interface AcknowledgeOptions { comment?: string; }
+export interface ShelveOptions { shelved: boolean; comment?: string; shelveDuration?: number; }
+```
+
+```ts
+// frontend/projects/core/src/lib/faults/fault-provider.ts
+export interface FaultProvider {
+  supportsRequest(): boolean;
+  supportsSubscribe(): boolean;
+  request(): Promise<Fault[]>;                              // OMCT-C14-L2-03.01
+  subscribe(onChange: (fault: Fault) => void): () => void;  // returns unsubscribe
+  acknowledgeFault(fault: Fault, options?: AcknowledgeOptions): Promise<void>; // 03.03
+  shelveFault(fault: Fault, options: ShelveOptions): Promise<void>;            // 03.04
+}
+```
+
+Resolved: fault-management surface (OMCT-C14-L2-03.01–03.04) — a single provider serves a
+single fault-management root, so `request`/`subscribe` are parameterless (Open MCT passes
+the fault root domain object; with one root the parameter carries no information). Stubbed
+behind `FakeFaultProvider` (`frontend/projects/api/src/lib/faults/fake-fault-provider.ts`,
+delivered with C14).
 
 ### B14 — View, inspector, toolbar, and action registries
 
@@ -646,6 +691,8 @@ and tests before the provider finishes.
 | `frontend/projects/core/src/lib/user/user.service.ts` | new | B12 | `FakeUserService` |
 | `frontend/projects/core/src/lib/notifications/notification.service.ts` | new | B13 | `FakeNotificationService` |
 | `frontend/projects/core/src/lib/notifications/indicator.ts` | new | B13 | same |
+| `frontend/projects/core/src/lib/faults/fault.ts` | new | B13 | `FakeFaultProvider` (`frontend/projects/api/src/lib/faults/fake-fault-provider.ts`, delivered with C14) |
+| `frontend/projects/core/src/lib/faults/fault-provider.ts` | new | B13 | same |
 | `frontend/projects/core/src/lib/security/sanitizers.ts` | new | B17 | pass-through test doubles in unit tests |
 | `frontend/projects/core/src/lib/views/view-provider.ts` | existing | B14 | registry fakes in existing specs |
 | `frontend/projects/core/src/lib/views/inspector-view-provider.ts` | existing | B14 | same |
@@ -744,6 +791,8 @@ ancestor.
 | `frontend/projects/core/src/lib/user/**` (rest) | C14 |
 | `frontend/projects/core/src/lib/notifications/notification.service.ts`, `.../indicator.ts` | Skeleton |
 | `frontend/projects/core/src/lib/notifications/**` (rest) | C14 |
+| `frontend/projects/core/src/lib/faults/fault.ts`, `.../fault-provider.ts` | Skeleton |
+| `frontend/projects/core/src/lib/faults/**` (rest) | C14 |
 | `frontend/projects/core/src/lib/security/**` | C16 |
 | `frontend/projects/core/src/lib/views/view-provider.ts`, `inspector-view-provider.ts`, `cupola-view.ts` | Skeleton |
 | `frontend/projects/core/src/lib/views/**` (registries) | C15 |
@@ -760,6 +809,7 @@ ancestor.
 | `frontend/projects/api/src/lib/realtime/fake-realtime-gateway.ts`, `cupola-e2e-hook.ts` | Skeleton |
 | `frontend/projects/api/src/lib/branding/**` | C15 |
 | `frontend/projects/api/src/lib/time/**`, `.../user/**`, `.../notifications/**` (fakes) | Skeleton |
+| `frontend/projects/api/src/lib/faults/**` | C14 |
 | `frontend/projects/api/src/public-api.ts` | Skeleton |
 | `frontend/projects/components/**` | C15 |
 | `frontend/projects/cupola/src/app/shell/**` | C15 |
@@ -777,6 +827,7 @@ ancestor.
 | `frontend/projects/cupola/src/app/views/folder/**` | C09 |
 | `frontend/projects/cupola/src/app/views/generic/**` | C15 |
 | New feature directories, one per capability (e.g. `app/plans/**` C12, `app/notebook/**` C13, `app/conditions/**` C10, `app/faults/**` C14, `app/layouts/**` C09) | The named capability |
+| `frontend/projects/cupola/src/app/operational/**` (C14 non-fault UI: indicators, operator status, notification area) | C14 |
 | `backend/src/Cupola.Core/Models/**` | Skeleton |
 | `backend/src/Cupola.Core/Services/IObjectStore.cs`, `SearchResult.cs`, `ObjectSaveResult.cs` | Skeleton |
 | `backend/src/Cupola.Core/Services/InMemoryObjectStore.cs`, `SeedData.cs` | C04 |
@@ -843,11 +894,11 @@ has been invented here.
 | 8 | Telemetry filter definition schema | B08 | C10 |
 | 9 | Conditional style schema | B09 | C09, C10 |
 | 10 | Typed annotation target schema (including image pixel coordinates) | B10 | C11, C13 |
-| 11 | Fault object shape and fault-provider interface | B13 | C14 |
 | 12 | Route schema for non-browse views | B16 | C09, C15 |
 | 13 | Plugin-install abstraction beyond Angular DI | B18 | C01 |
 
 Items 3 (connection-state vocabulary) and 4 (persistence change-feed event shape) are
 resolved in the B04 contract; items 6 (historical telemetry route + datum/collection envelope)
-and 7 (limit/staleness shapes) are resolved in the B06/B07 contracts by C06. Item numbering is
-stable, so the resolved rows are removed without renumbering the rest.
+and 7 (limit/staleness shapes) are resolved in the B06/B07 contracts by C06; item 11 (fault
+object shape and fault-provider interface) is resolved in the B13 contract by C14. Item
+numbering is stable, so the resolved rows are removed without renumbering the rest.

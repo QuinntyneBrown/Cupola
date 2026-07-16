@@ -65,6 +65,9 @@ export * from './lib/user/user.service';
 export * from './lib/notifications/notification.service';
 export * from './lib/notifications/indicator';
 
+export * from './lib/faults/fault';
+export * from './lib/faults/fault-provider';
+
 export * from './lib/security/sanitizers';
 export * from './lib/security/image-url';
 export * from './lib/security/safe-object';
