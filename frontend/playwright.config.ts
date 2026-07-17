@@ -5,7 +5,7 @@ export default defineConfig({
   // The visual-accessibility, mobile, and performance suites run under their
   // own configs (npm run e2e:a11y / e2e:mobile / e2e:perf); keep the default
   // functional run from picking them up.
-  testIgnore: ['**/visual-a11y/**', '**/mobile/**', '**/performance/**'],
+  testIgnore: ['**/visual-a11y/**', '**/mobile/**', '**/performance/**', '**/marketing/**'],
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,

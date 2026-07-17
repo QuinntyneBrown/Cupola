@@ -1,0 +1,7 @@
+# Marketing screenshot masters. The high-resolution PNG masters are captured
+# locally via `npm run shots` and are not committed; only the optimized AVIF/WebP
+# derivatives in marketing/assets/shots/ and the Open Graph PNG are versioned.
+/marketing/assets/shots/src/
+
+# playwright-cli session artifacts (interactive browser sessions, not tests)
+.playwright-cli/

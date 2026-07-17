@@ -1,0 +1,751 @@
+/* ==========================================================================
+   Cupola marketing site
+   --------------------------------------------------------------------------
+   Layers on top of tokens.css (verbatim copy of
+   docs/mocks/design-system/assets/tokens.css — keep in sync with source).
+   Class namespace: .mk-*  (the app owns .cp-*, the design-system docs .ds-*).
+
+   Motion follows the token sheet's philosophy — quick and mechanical, ops
+   UIs never bounce. Entrances are longer (400–700ms) but use the standard
+   ease and modest travel. All motion is gated on html.js and disabled under
+   prefers-reduced-motion; without JS the page renders complete and static.
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+
+body {
+  margin: 0;
+  background: var(--cp-color-void);
+  color: var(--cp-color-ink);
+  font: 400 16px/1.6 var(--cp-font-ui);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--cp-color-primary-dim);
+  color: var(--cp-color-ink);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--cp-color-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--cp-radius-s);
+}
+
+.mk-icon {
+  width: var(--cp-size-icon);
+  height: var(--cp-size-icon);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+}
+
+/* --------------------------------------------------------------------------
+   Skip link
+   -------------------------------------------------------------------------- */
+.mk-skip {
+  position: fixed;
+  top: -48px;
+  left: var(--cp-space-5);
+  z-index: calc(var(--cp-z-tooltip) + 1);
+  padding: var(--cp-space-3) var(--cp-space-5);
+  background: var(--cp-color-surface-3);
+  border: 1px solid var(--cp-color-line);
+  border-radius: var(--cp-radius-s);
+  font: var(--cp-type-label);
+  transition: top var(--cp-motion-base) var(--cp-ease-standard);
+}
+
+.mk-skip:focus-visible {
+  top: var(--cp-space-5);
+}
+
+/* --------------------------------------------------------------------------
+   Nav
+   -------------------------------------------------------------------------- */
+.mk-nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: var(--cp-z-menu);
+  transition:
+    background-color var(--cp-motion-base) var(--cp-ease-standard),
+    border-color var(--cp-motion-base) var(--cp-ease-standard);
+  border-bottom: 1px solid transparent;
+}
+
+.mk-nav.is-scrolled {
+  background: rgba(7, 10, 16, 0.72);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom-color: var(--cp-color-hairline);
+}
+
+.mk-nav-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-space-7);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--cp-space-4) var(--cp-space-7);
+}
+
+.mk-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cp-space-3);
+  font: 600 18px/1 var(--cp-font-ui);
+  letter-spacing: -0.01em;
+}
+
+.mk-wordmark .mk-icon {
+  color: var(--cp-color-primary);
+}
+
+.mk-nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-space-6);
+  margin-left: auto;
+}
+
+.mk-nav-links a {
+  font: var(--cp-type-label);
+  color: var(--cp-color-ink-2);
+  transition: color var(--cp-motion-fast) var(--cp-ease-standard);
+}
+
+.mk-nav-links a:hover {
+  color: var(--cp-color-ink);
+}
+
+/* --------------------------------------------------------------------------
+   Buttons
+   -------------------------------------------------------------------------- */
+.mk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 var(--cp-space-6);
+  border-radius: var(--cp-radius-s);
+  font: var(--cp-type-label);
+  font-size: 14px;
+  white-space: nowrap;
+  transition:
+    background-color var(--cp-motion-fast) var(--cp-ease-standard),
+    border-color var(--cp-motion-fast) var(--cp-ease-standard),
+    transform var(--cp-motion-fast) var(--cp-ease-standard);
+}
+
+.mk-btn:hover {
+  transform: translateY(-1px);
+}
+
+.mk-btn-primary {
+  background: var(--cp-color-primary);
+  color: var(--cp-color-ink-inverse);
+}
+
+.mk-btn-primary:hover {
+  background: var(--cp-color-primary-hover);
+}
+
+.mk-btn-primary:active {
+  background: var(--cp-color-primary-pressed);
+  transform: none;
+}
+
+.mk-btn-ghost {
+  border: 1px solid var(--cp-color-line);
+  color: var(--cp-color-ink);
+  background: transparent;
+}
+
+.mk-btn-ghost:hover {
+  border-color: var(--cp-color-line-strong);
+  background: var(--cp-color-surface-hover);
+}
+
+.mk-nav-cta {
+  height: 32px;
+  padding: 0 var(--cp-space-5);
+}
+
+/* --------------------------------------------------------------------------
+   Shared: eyebrows, screenshot frames
+   -------------------------------------------------------------------------- */
+.mk-eyebrow {
+  font: var(--cp-type-overline);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cp-color-primary);
+}
+
+.mk-shot {
+  margin: 0;
+  background: var(--cp-color-surface-1);
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-l);
+  box-shadow: var(--cp-shadow-3);
+  overflow: hidden;
+}
+
+.mk-shot img {
+  display: block;
+  width: 100%;
+  background: var(--cp-color-surface-1);
+}
+
+.mk-shot-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-space-3);
+  height: 32px;
+  padding: 0 var(--cp-space-4);
+  background: var(--cp-color-surface-2);
+  border-bottom: 1px solid var(--cp-color-hairline);
+  font: var(--cp-type-data-s);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cp-color-ink-3);
+}
+
+.mk-shot-bar .mk-icon {
+  width: var(--cp-size-icon-s);
+  height: var(--cp-size-icon-s);
+  color: var(--cp-color-primary);
+}
+
+/* Top-weighted captures (e.g. the time strip) crop away empty lower canvas. */
+.mk-shot--crop img {
+  aspect-ratio: 2880 / 1200;
+  object-fit: cover;
+  object-position: top;
+}
+
+/* --------------------------------------------------------------------------
+   Hero
+   -------------------------------------------------------------------------- */
+.mk-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 168px var(--cp-space-7) var(--cp-space-10);
+}
+
+.mk-hero-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 820px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.mk-hero h1 {
+  margin-top: var(--cp-space-5);
+  font: 600 clamp(40px, 6.5vw, 74px) / 1.04 var(--cp-font-ui);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.mk-hero-sub {
+  max-width: 640px;
+  margin: var(--cp-space-6) auto 0;
+  font-size: 18px;
+  line-height: 1.65;
+  color: var(--cp-color-ink-2);
+  text-wrap: pretty;
+}
+
+.mk-hero-ctas {
+  display: flex;
+  justify-content: center;
+  gap: var(--cp-space-4);
+  margin-top: var(--cp-space-8);
+}
+
+.mk-hero-meta {
+  margin-top: var(--cp-space-6);
+  font: var(--cp-type-data-s);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cp-color-ink-3);
+}
+
+/* Hero stage: main shot + two offset cards over the Earthlight limb        */
+.mk-hero-stage {
+  position: relative;
+  max-width: 1080px;
+  margin: 88px auto 0;
+}
+
+/* Signature: the limb of the Earth, seen from the cupola. A vast circle
+   whose upper arc rises behind the console — the "Earthlight" the accent
+   color is named for.                                                      */
+.mk-earthlimb {
+  position: absolute;
+  left: 50%;
+  top: -72px;
+  width: max(160vw, 1800px);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  border-top: 1px solid rgba(88, 183, 236, 0.45);
+  background: radial-gradient(
+    closest-side at 50% 0%,
+    rgba(88, 183, 236, 0.14),
+    rgba(88, 183, 236, 0.05) 18%,
+    transparent 38%
+  );
+  box-shadow: 0 -48px 140px rgba(88, 183, 236, 0.18);
+  pointer-events: none;
+}
+
+.mk-hero-shot {
+  position: relative;
+  z-index: 1;
+}
+
+.mk-hero-card {
+  position: absolute;
+  z-index: 2;
+  width: clamp(240px, 30%, 340px);
+  box-shadow: var(--cp-shadow-3), 0 0 0 1px rgba(88, 183, 236, 0.08);
+}
+
+.mk-hero-card-1 {
+  left: -64px;
+  bottom: -56px;
+}
+
+.mk-hero-card-2 {
+  right: -64px;
+  top: -48px;
+}
+
+/* --------------------------------------------------------------------------
+   Feature pillars
+   -------------------------------------------------------------------------- */
+.mk-pillars {
+  display: grid;
+  gap: 128px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 144px var(--cp-space-7) 0;
+}
+
+.mk-pillar {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  align-items: center;
+  gap: var(--cp-space-10);
+  content-visibility: auto;
+  contain-intrinsic-width: auto none;
+  contain-intrinsic-height: auto 560px;
+}
+
+.mk-pillar:nth-child(even) .mk-pillar-copy {
+  order: 2;
+}
+
+.mk-pillar h2 {
+  margin-top: var(--cp-space-4);
+  font: 600 clamp(26px, 3vw, 34px) / 1.2 var(--cp-font-ui);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.mk-pillar-copy > p:last-child {
+  margin-top: var(--cp-space-5);
+  font-size: 16px;
+  color: var(--cp-color-ink-2);
+  text-wrap: pretty;
+}
+
+/* --------------------------------------------------------------------------
+   Small-features grid
+   -------------------------------------------------------------------------- */
+.mk-more {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 160px var(--cp-space-7) 0;
+  content-visibility: auto;
+  contain-intrinsic-width: auto none;
+  contain-intrinsic-height: auto 640px;
+}
+
+.mk-more h2 {
+  font: 600 clamp(24px, 2.6vw, 30px) / 1.25 var(--cp-font-ui);
+  letter-spacing: -0.015em;
+  text-align: center;
+}
+
+.mk-more-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--cp-space-5);
+  list-style: none;
+  margin: var(--cp-space-9) 0 0;
+  padding: 0;
+}
+
+.mk-more-grid li {
+  padding: var(--cp-space-7);
+  background: var(--cp-color-surface-1);
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-m);
+  transition: border-color var(--cp-motion-fast) var(--cp-ease-standard);
+}
+
+.mk-more-grid li:hover {
+  border-color: var(--cp-color-line-strong);
+}
+
+.mk-more-grid .mk-icon {
+  color: var(--cp-color-primary);
+}
+
+.mk-more-grid h3 {
+  margin-top: var(--cp-space-4);
+  font: var(--cp-type-title-s);
+}
+
+.mk-more-grid p {
+  margin-top: var(--cp-space-2);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--cp-color-ink-2);
+}
+
+/* --------------------------------------------------------------------------
+   Built in the open
+   -------------------------------------------------------------------------- */
+.mk-open {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 160px var(--cp-space-7) 0;
+  content-visibility: auto;
+  contain-intrinsic-width: auto none;
+  contain-intrinsic-height: auto 520px;
+}
+
+.mk-open-copy {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.mk-open h2 {
+  margin-top: var(--cp-space-4);
+  font: 600 clamp(26px, 3vw, 34px) / 1.2 var(--cp-font-ui);
+  letter-spacing: -0.015em;
+}
+
+.mk-open-copy > p:last-child {
+  margin-top: var(--cp-space-5);
+  color: var(--cp-color-ink-2);
+  text-wrap: pretty;
+}
+
+.mk-open-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--cp-space-5);
+  list-style: none;
+  margin: var(--cp-space-9) 0 0;
+  padding: 0;
+}
+
+.mk-open-cards a {
+  display: block;
+  height: 100%;
+  padding: var(--cp-space-7);
+  background: var(--cp-color-surface-1);
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-m);
+  transition:
+    border-color var(--cp-motion-fast) var(--cp-ease-standard),
+    transform var(--cp-motion-fast) var(--cp-ease-standard);
+}
+
+.mk-open-cards a:hover {
+  border-color: var(--cp-color-primary-border);
+  transform: translateY(-2px);
+}
+
+.mk-open-cards h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-space-3);
+  font: var(--cp-type-title-s);
+}
+
+.mk-open-cards h3 .mk-icon {
+  width: var(--cp-size-icon-s);
+  height: var(--cp-size-icon-s);
+  color: var(--cp-color-ink-3);
+}
+
+.mk-open-cards p {
+  margin-top: var(--cp-space-3);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--cp-color-ink-2);
+}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+.mk-footer {
+  margin-top: 160px;
+  border-top: 1px solid var(--cp-color-hairline);
+  background: var(--cp-color-surface-1);
+}
+
+.mk-footer-inner {
+  display: flex;
+  gap: var(--cp-space-10);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--cp-space-10) var(--cp-space-7) var(--cp-space-8);
+}
+
+.mk-footer-brand p {
+  margin-top: var(--cp-space-3);
+  font: var(--cp-type-body-s);
+  color: var(--cp-color-ink-3);
+}
+
+.mk-footer-cols {
+  display: flex;
+  gap: var(--cp-space-10);
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.mk-footer-cols h3 {
+  font: var(--cp-type-pane-head);
+  letter-spacing: var(--cp-tracking-caps);
+  text-transform: uppercase;
+  color: var(--cp-color-ink-3);
+}
+
+.mk-footer-cols a {
+  display: block;
+  margin-top: var(--cp-space-4);
+  font-size: 14px;
+  color: var(--cp-color-ink-2);
+  transition: color var(--cp-motion-fast) var(--cp-ease-standard);
+}
+
+.mk-footer-cols a:hover {
+  color: var(--cp-color-ink);
+}
+
+.mk-footer-fine {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--cp-space-7) var(--cp-space-8);
+  font: var(--cp-type-data-s);
+  color: var(--cp-color-ink-3);
+}
+
+/* --------------------------------------------------------------------------
+   Motion — every rule below is gated on html.js (set by marketing.js) so a
+   no-JS visit renders the complete static page, and all of it is cancelled
+   under prefers-reduced-motion.
+   -------------------------------------------------------------------------- */
+@keyframes mk-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mk-shot-in {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) rotateX(6deg) translateY(32px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+html.js .mk-hero-seq {
+  animation: mk-fade-up 500ms var(--cp-ease-standard) both;
+  animation-delay: calc(var(--seq) * 80ms);
+}
+
+html.js .mk-hero-shot {
+  animation: mk-shot-in 700ms var(--cp-ease-standard) both;
+  animation-delay: 240ms;
+  will-change: transform, opacity;
+}
+
+html.js .mk-hero-card-1 {
+  animation: mk-shot-in 700ms var(--cp-ease-standard) both;
+  animation-delay: 400ms;
+  will-change: transform, opacity;
+}
+
+html.js .mk-hero-card-2 {
+  animation: mk-shot-in 700ms var(--cp-ease-standard) both;
+  animation-delay: 500ms;
+  will-change: transform, opacity;
+}
+
+html.js .mk-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 600ms var(--cp-ease-standard),
+    transform 600ms var(--cp-ease-standard);
+}
+
+html.js .mk-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+html.js [data-stagger].is-in > * {
+  animation: mk-fade-up 500ms var(--cp-ease-standard) both;
+  animation-delay: var(--stagger-delay, 0ms);
+}
+
+/* Parallax on the hero offset cards (JS writes --parallax-y)              */
+html.js .mk-hero-card {
+  translate: 0 var(--parallax-y, 0px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  html.js .mk-hero-seq,
+  html.js .mk-hero-shot,
+  html.js .mk-hero-card,
+  html.js .mk-hero-card-1,
+  html.js .mk-hero-card-2,
+  html.js .mk-reveal,
+  html.js [data-stagger].is-in > * {
+    animation: none;
+    transition: none;
+    opacity: 1;
+    transform: none;
+    translate: none;
+    will-change: auto;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+@media (max-width: 1180px) {
+  .mk-hero-card-1 {
+    left: -16px;
+  }
+
+  .mk-hero-card-2 {
+    right: -16px;
+  }
+}
+
+@media (max-width: 960px) {
+  .mk-hero-card {
+    display: none;
+  }
+
+  .mk-pillar {
+    grid-template-columns: 1fr;
+    gap: var(--cp-space-8);
+  }
+
+  .mk-pillar:nth-child(even) .mk-pillar-copy {
+    order: 0;
+  }
+
+  .mk-pillars {
+    gap: 96px;
+  }
+
+  .mk-more-grid,
+  .mk-open-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .mk-footer-inner {
+    flex-direction: column;
+    gap: var(--cp-space-8);
+  }
+
+  .mk-footer-cols {
+    margin-left: 0;
+    gap: var(--cp-space-9);
+  }
+}
+
+@media (max-width: 720px) {
+  .mk-nav-links {
+    display: none;
+  }
+
+  .mk-nav-cta {
+    margin-left: auto;
+  }
+
+  .mk-hero {
+    padding-top: 128px;
+  }
+
+  .mk-hero-ctas {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mk-pillars,
+  .mk-more,
+  .mk-open {
+    padding-top: 112px;
+  }
+
+  .mk-more-grid,
+  .mk-open-cards {
+    grid-template-columns: 1fr;
+  }
+}

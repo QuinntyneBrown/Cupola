@@ -18,3 +18,32 @@ export interface TimeFormat {
 export function padNumber(value: number, width = 2): string {
   return String(value).padStart(width, '0');
 }
+
+const DATED_LABEL = /^(\d{4}-\d{2}-\d{2})[T ]/;
+
+/**
+ * Condenses a run of timestamp labels for horizontal axes, where full
+ * `YYYY-MM-DD HH:mm:ss.SSS` renderings overlap at typical tick densities:
+ * when every label carries the same date the axis goes time-only (the dated
+ * bounds remain visible in the conductor and independent-time badges), and
+ * uniform `.000` millisecond tails are dropped. Labels that are not
+ * shared-date timestamps pass through unchanged, so non-time formatters are
+ * unaffected.
+ */
+export function condenseTimeLabels(labels: string[]): string[] {
+  if (labels.length < 2) {
+    return stripUniformZeroMillis(labels);
+  }
+  const dates = labels.map((label) => DATED_LABEL.exec(label)?.[1]);
+  const shared = dates[0];
+  if (!shared || dates.some((date) => date !== shared)) {
+    return stripUniformZeroMillis(labels);
+  }
+  return stripUniformZeroMillis(labels.map((label) => label.slice(shared.length + 1)));
+}
+
+function stripUniformZeroMillis(labels: string[]): string[] {
+  return labels.length > 0 && labels.every((label) => label.endsWith('.000'))
+    ? labels.map((label) => label.slice(0, -'.000'.length))
+    : labels;
+}

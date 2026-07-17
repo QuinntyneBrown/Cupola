@@ -1,0 +1,155 @@
+# Deploy the whole product to a single Azure App Service (Linux F1).
+#
+# One artifact serves three things from one origin: the marketing site at `/`,
+# the Angular console at `/app/` (built with --base-href /app/), and the .NET 8
+# API + SignalR at /api and /hubs/realtime. The build job tests and compiles all
+# three, assembles them into the API's wwwroot, and uploads the publish folder;
+# deploy pushes it via OIDC; smoke asserts each surface answers after cold start.
+#
+# Gated on the repo variable AZURE_WEBAPP_NAME: until it is set (see
+# infra/README.md), the build job is skipped so forks and pre-provision pushes
+# are no-ops rather than failures.
+name: Deploy app to Azure App Service
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'marketing/**'
+      - 'infra/app.bicep'
+      - '.github/workflows/deploy-app.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-app
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build, test, and assemble artifact
+    if: vars.AZURE_WEBAPP_NAME != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Backend tests
+        run: dotnet test backend/Cupola.sln
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Frontend install
+        run: npm ci
+        working-directory: frontend
+
+      - name: Frontend unit tests
+        run: npm run test
+        working-directory: frontend
+
+      - name: Build Angular console (served under /app/)
+        run: npx ng build cupola --base-href /app/
+        working-directory: frontend
+
+      - name: Publish API host
+        run: dotnet publish backend/src/Cupola.Api/Cupola.Api.csproj -c Release -o publish
+
+      - name: Assemble wwwroot (marketing at /, console at /app/)
+        run: |
+          if [ ! -f marketing/index.html ]; then
+            echo "::error::marketing/index.html is missing — cannot assemble the site root."
+            exit 1
+          fi
+          mkdir -p publish/wwwroot/app
+          cp -r marketing/. publish/wwwroot/
+          cp -r frontend/dist/cupola/browser/. publish/wwwroot/app/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: webapp
+          path: publish
+
+  deploy:
+    name: Deploy to Azure
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    outputs:
+      hostname: ${{ steps.host.outputs.hostname }}
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: webapp
+          path: publish
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy package
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          package: publish
+
+      - name: Resolve default hostname
+        id: host
+        run: |
+          host=$(az webapp show \
+            -g "${{ vars.AZURE_RESOURCE_GROUP || 'cupola-rg' }}" \
+            -n "${{ vars.AZURE_WEBAPP_NAME }}" \
+            --query defaultHostName -o tsv)
+          echo "hostname=$host" >> "$GITHUB_OUTPUT"
+
+  smoke:
+    name: Smoke test
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for health (tolerating F1 cold start)
+        run: |
+          host="${{ needs.deploy.outputs.hostname }}"
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "https://$host/health" || true)
+            if [ "$code" = "200" ]; then
+              echo "healthy after $i attempt(s)"
+              exit 0
+            fi
+            echo "attempt $i: /health returned $code — retrying in 10s"
+            sleep 10
+          done
+          echo "::error::/health never returned 200 after 30 attempts (~5 min)."
+          exit 1
+
+      - name: Assert marketing site at /
+        run: |
+          host="${{ needs.deploy.outputs.hostname }}"
+          curl -s "https://$host/" | grep -qi 'cupola-marketing'
+
+      - name: Assert Angular console at /app/
+        run: |
+          host="${{ needs.deploy.outputs.hostname }}"
+          curl -s "https://$host/app/" | grep -q '<cp-root'
+
+      - name: Assert API responds at /api/branding
+        run: |
+          host="${{ needs.deploy.outputs.hostname }}"
+          curl -s "https://$host/api/branding" | grep -qi 'cupola'

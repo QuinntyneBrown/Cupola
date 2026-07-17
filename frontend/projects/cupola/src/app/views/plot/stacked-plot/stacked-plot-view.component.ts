@@ -17,6 +17,7 @@ import {
   TelemetryApiService,
   TimeBounds,
   TimeContext,
+  condenseTimeLabels,
 } from '@cupola/core';
 
 import { CompositionMembers } from '../../../telemetry-view/composition-members';
@@ -230,7 +231,9 @@ export class StackedPlotViewComponent {
 
     const xAxisY = TOP + rows.length * ROW_H;
     const xTickValues = timeTickValues(bounds, 6);
-    const xTicks = buildTicks(xTickValues, xScale, this.timeFormatter()).map((tick) => ({ x: tick.offset, label: tick.label }));
+    const xTicksRaw = buildTicks(xTickValues, xScale, this.timeFormatter());
+    const xLabels = condenseTimeLabels(xTicksRaw.map((tick) => tick.label));
+    const xTicks = xTicksRaw.map((tick, index) => ({ x: tick.offset, label: xLabels[index] }));
 
     return {
       viewBox: `0 0 ${width} ${height}`,

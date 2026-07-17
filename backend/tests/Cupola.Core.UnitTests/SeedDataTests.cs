@@ -50,6 +50,29 @@ public class SeedDataTests
     }
 
     [Test]
+    [Requirement("OMCT-C15-L2-01.04")]
+    public void MarqueeObjects_AreSeededWithPresentationConfiguration()
+    {
+        // Curated views whose demo value depends on a persisted configuration payload.
+        string[] configured = ["power-dashboard", "eclipse-stack", "bus-monitor", "ops-notebook"];
+
+        Assert.Multiple(() =>
+        {
+            foreach (var key in configured)
+            {
+                var seeded = _store.GetByKeyString(key);
+                Assert.That(seeded, Is.Not.Null, $"marquee object '{key}' is not seeded");
+                Assert.That(seeded!.Configuration, Is.Not.Null,
+                    $"marquee object '{key}' is missing its presentation configuration");
+            }
+
+            // ops-gantt derives its view purely from the composed plan, so it carries no configuration.
+            Assert.That(_store.GetByKeyString("ops-gantt"), Is.Not.Null,
+                "marquee object 'ops-gantt' is not seeded");
+        });
+    }
+
+    [Test]
     [Requirement("OMCT-C11-L2-02.04")]
     public void CupolaCamera_CarriesImageryLayerAndRelatedSourceDeclarations()
     {

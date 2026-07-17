@@ -60,6 +60,7 @@ export class LadTableViewComponent {
   private readonly viewDatum = inject(ViewDatumService);
 
   readonly object = input.required<DomainObject>();
+  readonly objectPath = input<DomainObject[]>([]);
   readonly timeContext = input<TimeContext>();
 
   private readonly membersCtl = signal<CompositionMembers | null>(null);
