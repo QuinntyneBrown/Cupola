@@ -15,7 +15,9 @@
     "e2e:a11y": "playwright test --config playwright-visual-a11y.config.ts",
     "e2e:mobile": "playwright test --config playwright-mobile.config.ts",
     "e2e:perf": "playwright test --config playwright-performance-prod.config.ts",
-    "e2e:perf:dev": "playwright test --config playwright-performance-dev.config.ts"
+    "e2e:perf:dev": "playwright test --config playwright-performance-dev.config.ts",
+    "shots": "playwright test --config playwright-marketing.config.ts",
+    "shots:optimize": "node e2e/marketing/optimize-shots.mjs"
   },
   "private": true,
   "packageManager": "npm@10.9.4",
@@ -50,6 +52,7 @@
     "jsdom": "^26.1.0",
     "ng-packagr": "^21.2.0",
     "prettier": "^3.8.1",
+    "sharp": "^0.35.3",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.64.0"
   }

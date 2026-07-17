@@ -30,6 +30,7 @@ export class LadTableSetViewComponent {
   protected readonly globalTime = inject(TimeContext);
 
   readonly object = input.required<DomainObject>();
+  readonly objectPath = input<DomainObject[]>([]);
   readonly timeContext = input<TimeContext>();
 
   private readonly membersCtl = signal<CompositionMembers | null>(null);

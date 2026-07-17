@@ -21,7 +21,7 @@ import {
 
 import { CompositionMembers } from '../../../telemetry-view/composition-members';
 import { TelemetryStream } from '../../../telemetry-view/telemetry-stream';
-import { buildTicks, timeTickValues } from '../axes';
+import { buildTicks, buildTimeTicks, timeTickValues } from '../axes';
 import { chartColor, readPlotConfig } from '../plot-config';
 import { extent, linearScale, niceTicks } from '../scale';
 import { linePath, projectSeries } from '../series-path';
@@ -230,7 +230,7 @@ export class StackedPlotViewComponent {
 
     const xAxisY = TOP + rows.length * ROW_H;
     const xTickValues = timeTickValues(bounds, 6);
-    const xTicks = buildTicks(xTickValues, xScale, this.timeFormatter()).map((tick) => ({ x: tick.offset, label: tick.label }));
+    const xTicks = buildTimeTicks(xTickValues, xScale, this.timeFormatter()).map((tick) => ({ x: tick.offset, label: tick.label }));
 
     return {
       viewBox: `0 0 ${width} ${height}`,

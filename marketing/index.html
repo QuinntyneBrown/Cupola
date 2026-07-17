@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Cupola — Mission operations console</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Cupola is an open-source mission-operations console: real-time telemetry plots, imagery, dashboards, planning timelines, and operator notebooks in one place."
+    />
+    <meta name="theme-color" content="#070A10" />
+    <link rel="canonical" href="https://cupola-app.azurewebsites.net/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Cupola" />
+    <meta property="og:title" content="Cupola — Mission operations console" />
+    <meta
+      property="og:description"
+      content="Live telemetry, imagery, timelines, and operator notebooks in a single real-time console. Open source, MIT licensed."
+    />
+    <meta property="og:url" content="https://cupola-app.azurewebsites.net/" />
+    <meta property="og:image" content="https://cupola-app.azurewebsites.net/assets/og/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Async so first paint isn't blocked on the font CSS; display=swap covers the swap-in. -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+    <link rel="stylesheet" href="assets/css/tokens.css" />
+    <link rel="stylesheet" href="assets/css/marketing.css" />
+  </head>
+  <body data-site="cupola-marketing">
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none" aria-hidden="true">
+      <!-- Subset of the app's icon sprite (frontend/projects/cupola/src/index.html) -->
+      <symbol id="i-crosshair" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></symbol>
+      <symbol id="i-table" viewBox="0 0 24 24"><path d="M3 5h18v14H3zM3 10h18M9 5v14M15 5v14"/></symbol>
+      <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5zM3 13.5l9 5 9-5"/></symbol>
+      <symbol id="i-activity" viewBox="0 0 24 24"><path d="M2 12h4l3-8 6 16 3-8h4"/></symbol>
+      <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+      <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M19 13v6a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/></symbol>
+    </svg>
+
+    <a class="mk-skip" href="#main">Skip to content</a>
+
+    <header class="mk-nav" id="nav">
+      <div class="mk-nav-inner">
+        <a class="mk-wordmark" href="#top" aria-label="Cupola — home">
+          <svg class="mk-icon" aria-hidden="true"><use href="#i-crosshair" /></svg>
+          <span>Cupola</span>
+        </a>
+        <nav class="mk-nav-links" aria-label="Site">
+          <a href="#features">Features</a>
+          <a href="#open">Open source</a>
+          <a href="https://victorious-plant-02a23150f.7.azurestaticapps.net" rel="external">Design system</a>
+          <a href="https://github.com/QuinntyneBrown/Cupola" rel="external">GitHub</a>
+        </nav>
+        <a class="mk-btn mk-btn-primary mk-nav-cta" href="app/">Open app</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- ================================================================ -->
+      <section class="mk-hero" id="top" aria-labelledby="hero-title">
+        <div class="mk-hero-copy">
+          <p class="mk-eyebrow mk-hero-seq" style="--seq: 0">Mission operations frontend</p>
+          <h1 id="hero-title" class="mk-hero-seq" style="--seq: 1">Fly your mission from one&nbsp;console.</h1>
+          <p class="mk-hero-sub mk-hero-seq" style="--seq: 2">
+            Cupola brings live telemetry, imagery, timelines, and operator notebooks into a single
+            real-time console — browse the mission as a tree, compose it into dashboards, and watch
+            it execute.
+          </p>
+          <div class="mk-hero-ctas mk-hero-seq" style="--seq: 3">
+            <a class="mk-btn mk-btn-primary" href="app/">Open the app</a>
+            <a class="mk-btn mk-btn-ghost" href="https://victorious-plant-02a23150f.7.azurestaticapps.net" rel="external">
+              Explore the design system
+            </a>
+          </div>
+          <p class="mk-hero-meta mk-hero-seq" style="--seq: 4">MIT licensed&ensp;·&ensp;Angular 21&ensp;·&ensp;ASP.NET Core 8&ensp;·&ensp;SignalR</p>
+        </div>
+
+        <div class="mk-hero-stage">
+          <div class="mk-earthlimb" aria-hidden="true"></div>
+          <figure class="mk-shot mk-hero-shot">
+            <figcaption class="mk-shot-bar">
+              <svg class="mk-icon" aria-hidden="true"><use href="#i-crosshair" /></svg>
+              <span>mine / station displays / power dashboard</span>
+            </figcaption>
+            <picture>
+              <source type="image/avif" srcset="assets/shots/dashboard.avif" />
+              <img
+                src="assets/shots/dashboard.webp"
+                width="2880"
+                height="1800"
+                alt="Cupola power dashboard: a display layout composing a solar-array gauge, an overlay plot of array power and bus voltage, latest-value telemetry, and the cupola camera feed"
+                fetchpriority="high"
+                decoding="async"
+              />
+            </picture>
+          </figure>
+          <figure class="mk-shot mk-hero-card mk-hero-card-1 mk-shot--crop">
+            <figcaption class="mk-shot-bar"><span>operations / daily plan</span></figcaption>
+            <picture>
+              <source type="image/avif" srcset="assets/shots/timeline.avif" />
+              <img
+                src="assets/shots/timeline.webp"
+                width="2880"
+                height="1800"
+                alt="Time strip of the ISS daily plan with activity bars and event markers on the mission clock"
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+          </figure>
+          <figure class="mk-shot mk-hero-card mk-hero-card-2">
+            <figcaption class="mk-shot-bar"><span>station / comms / cupola camera</span></figcaption>
+            <picture>
+              <source type="image/avif" srcset="assets/shots/imagery.avif" />
+              <img
+                src="assets/shots/imagery.webp"
+                width="2880"
+                height="1800"
+                alt="Imagery view of the cupola camera with reticle overlay and a filmstrip of recent frames"
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+          </figure>
+        </div>
+      </section>
+
+      <!-- ================================================================ -->
+      <section class="mk-pillars" id="features" aria-label="Features">
+        <article class="mk-pillar mk-reveal" aria-labelledby="p-layouts">
+          <div class="mk-pillar-copy">
+            <p class="mk-eyebrow">C09 · Layouts</p>
+            <h2 id="p-layouts">Build the console your mission needs.</h2>
+            <p>
+              Compose telemetry, imagery, and widgets on a snap-to-grid canvas. Display layouts,
+              flexible layouts, and tabs turn any object in the tree into an operator screen —
+              saved and shared like any other object.
+            </p>
+          </div>
+          <figure class="mk-shot">
+            <figcaption class="mk-shot-bar"><span>mine / layouts lab / station layout</span></figcaption>
+            <picture>
+              <source type="image/avif" srcset="assets/shots/layout.avif" />
+              <img src="assets/shots/layout.webp" width="2880" height="1800"
+                alt="Station display layout mixing a telemetry table, camera feed, text panels, and shapes on a snap grid"
+                loading="lazy" decoding="async" />
+            </picture>
+          </figure>
+        </article>
+
+        <article class="mk-pillar mk-reveal" aria-labelledby="p-plots">
+          <div class="mk-pillar-copy">
+            <p class="mk-eyebrow">C07 · Plots</p>
+            <h2 id="p-plots">Plot anything the downlink sends.</h2>
+            <p>
+              Overlay, stacked, bar, and scatter plots with synchronized cursors, limit lines, and
+              alarm markers. Every view follows the time conductor, so every plot answers the same
+              question: what happened, when.
+            </p>
+          </div>
+          <figure class="mk-shot">
+            <figcaption class="mk-shot-bar"><span>mine / plots lab / eclipse stack</span></figcaption>
+            <picture>
+              <source type="image/avif" srcset="assets/shots/stacked-plot.avif" />
+              <img src="assets/shots/stacked-plot.webp" width="2880" height="1800"
+                alt="Stacked plot with aligned time axes comparing solar-array output and bus voltage through an eclipse pass"
+                loading="lazy" decoding="async" />
+            </picture>
+          </figure>
+        </article>
+
+        <article class="mk-pillar mk-reveal" aria-labelledby="p-imagery">
+          <div class="mk-pillar-copy">
+            <p class="mk-eyebrow">C11 · Imagery</p>
+            <h2 id="p-imagery">Inspect every frame.</h2>
+            <p>
+              Scrub camera history on a filmstrip, zoom into the frame, and flip on reticle and
+              horizon overlays. Brightness, contrast, a compass HUD, and in-image annotations —
+              built for photo ops, not photo apps.
+            </p>
+          </div>
+          <figure class="mk-shot">
+            <figcaption class="mk-shot-bar"><span>station / comms / cupola camera</span></figcaption>
+            <picture>
+              <source type="image/avif" srcset="assets/shots/imagery.avif" />
+              <img src="assets/shots/imagery.webp" width="2880" height="1800"
+                alt="Cupola camera imagery with reticle overlay, image controls, and related bus-voltage telemetry"
+                loading="lazy" decoding="async" />
+            </picture>
+          </figure>
+        </article>
+
+        <article class="mk-pillar mk-reveal" aria-labelledby="p-planning">
+          <div class="mk-pillar-copy">
+            <p class="mk-eyebrow">C12 · Planning</p>
+            <h2 id="p-planning">Plan the day. Watch it execute.</h2>
+            <p>
+              Activity plans render as Gantt charts, time strips, and time lists that share the
+              mission clock — track execution against plan while telemetry and events scroll on
+              the same axis.
+            </p>
+          </div>
+          <figure class="mk-shot mk-shot--crop">
+            <figcaption class="mk-shot-bar"><span>operations / planning lab / ops time strip</span></figcaption>
+            <picture>
+              <source type="image/avif" srcset="assets/shots/timeline.avif" />
+              <img src="assets/shots/timeline.webp" width="2880" height="1800"
+                alt="Time strip of the ISS daily plan: eclipse preparation, array repointing, and photo-survey activities beside an activity-log event lane"
+                loading="lazy" decoding="async" />
+            </picture>
+          </figure>
+        </article>
+
+        <article class="mk-pillar mk-reveal" aria-labelledby="p-conditions">
+          <div class="mk-pillar-copy">
+            <p class="mk-eyebrow">C10 · Conditions</p>
+            <h2 id="p-conditions">Know nominal from no-go.</h2>
+            <p>
+              Condition sets evaluate live telemetry into named states, and widgets restyle
+              themselves the moment a limit trips. Derived telemetry computes what the spacecraft
+              doesn't send.
+            </p>
+          </div>
+          <figure class="mk-shot">
+            <figcaption class="mk-shot-bar"><span>mine / conditions lab / bus monitor</span></figcaption>
+            <picture>
+              <source type="image/avif" srcset="assets/shots/conditions.avif" />
+              <img src="assets/shots/conditions.webp" width="2880" height="1800"
+                alt="Condition set evaluating bus voltage against limits, with named states and live criteria results"
+                loading="lazy" decoding="async" />
+            </picture>
+          </figure>
+        </article>
+
+        <article class="mk-pillar mk-reveal" aria-labelledby="p-notebooks">
+          <div class="mk-pillar-copy">
+            <p class="mk-eyebrow">C13 · Notebooks</p>
+            <h2 id="p-notebooks">The shift log, built in.</h2>
+            <p>
+              Capture entries with embedded snapshots of any view, tag them, and search them beside
+              the objects they describe. Restricted notebooks keep flight logs append-only.
+            </p>
+          </div>
+          <figure class="mk-shot">
+            <figcaption class="mk-shot-bar"><span>mine / ops notebook</span></figcaption>
+            <picture>
+              <source type="image/avif" srcset="assets/shots/notebook.avif" />
+              <img src="assets/shots/notebook.webp" width="2880" height="1800"
+                alt="Operations notebook with dated entries, tags, and an embedded bus-voltage plot snapshot"
+                loading="lazy" decoding="async" />
+            </picture>
+          </figure>
+        </article>
+      </section>
+
+      <!-- ================================================================ -->
+      <section class="mk-more" aria-labelledby="more-title">
+        <h2 id="more-title" class="mk-reveal">…and everything around them.</h2>
+        <ul class="mk-more-grid mk-reveal" data-stagger>
+          <li>
+            <svg class="mk-icon" aria-hidden="true"><use href="#i-clock" /></svg>
+            <h3>Time conductor</h3>
+            <p>One clock rules every view — fixed windows for analysis, real-time for ops.</p>
+          </li>
+          <li>
+            <svg class="mk-icon" aria-hidden="true"><use href="#i-search" /></svg>
+            <h3>Grand search</h3>
+            <p>Search objects and annotations from anywhere; jump straight to the result.</p>
+          </li>
+          <li>
+            <svg class="mk-icon" aria-hidden="true"><use href="#i-table" /></svg>
+            <h3>Tables, LAD &amp; gauges</h3>
+            <p>Dense telemetry tables, latest-available-data views, meters, and autoflow.</p>
+          </li>
+          <li>
+            <svg class="mk-icon" aria-hidden="true"><use href="#i-layers" /></svg>
+            <h3>Three themes</h3>
+            <p>Darkmatter for the console at night, Espresso for warmth, Snow for daylight.</p>
+          </li>
+          <li>
+            <svg class="mk-icon" aria-hidden="true"><use href="#i-activity" /></svg>
+            <h3>Real-time sync</h3>
+            <p>Object edits and telemetry stream over SignalR to every open console.</p>
+          </li>
+          <li>
+            <svg class="mk-icon" aria-hidden="true"><use href="#i-folder" /></svg>
+            <h3>Object tree</h3>
+            <p>Everything is an object with composition — folders, plots, plans, and cameras alike.</p>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ================================================================ -->
+      <section class="mk-open" id="open" aria-labelledby="open-title">
+        <div class="mk-open-copy mk-reveal">
+          <p class="mk-eyebrow">Open source</p>
+          <h2 id="open-title">Built in the open.</h2>
+          <p>
+            Cupola is MIT-licensed and spec-driven: an Angular 21 frontend, an ASP.NET Core 8
+            backend, real-time SignalR — with every requirement traced to an acceptance test. The
+            design system that styles it is documented and deployed on its own.
+          </p>
+        </div>
+        <ul class="mk-open-cards mk-reveal" data-stagger>
+          <li>
+            <a href="https://github.com/QuinntyneBrown/Cupola" rel="external">
+              <h3>GitHub<svg class="mk-icon" aria-hidden="true"><use href="#i-external" /></svg></h3>
+              <p>Source, issues, and pull requests. MIT licensed.</p>
+            </a>
+          </li>
+          <li>
+            <a href="https://victorious-plant-02a23150f.7.azurestaticapps.net" rel="external">
+              <h3>Design system<svg class="mk-icon" aria-hidden="true"><use href="#i-external" /></svg></h3>
+              <p>Foundations, components, and patterns — the console's visual contract, live.</p>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/QuinntyneBrown/Cupola/tree/main/docs" rel="external">
+              <h3>Specs &amp; ADRs<svg class="mk-icon" aria-hidden="true"><use href="#i-external" /></svg></h3>
+              <p>Capability specs C01–C16, decision records, and detailed designs.</p>
+            </a>
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <!-- ================================================================== -->
+    <footer class="mk-footer">
+      <div class="mk-footer-inner">
+        <div class="mk-footer-brand">
+          <a class="mk-wordmark" href="#top">
+            <svg class="mk-icon" aria-hidden="true"><use href="#i-crosshair" /></svg>
+            <span>Cupola</span>
+          </a>
+          <p>Mission operations frontend</p>
+        </div>
+        <nav class="mk-footer-cols" aria-label="Footer">
+          <div>
+            <h3>Product</h3>
+            <a href="app/">Open app</a>
+            <a href="https://victorious-plant-02a23150f.7.azurestaticapps.net" rel="external">Design system</a>
+            <a href="https://github.com/QuinntyneBrown/Cupola/blob/main/CHANGELOG.md" rel="external">Changelog</a>
+          </div>
+          <div>
+            <h3>Project</h3>
+            <a href="https://github.com/QuinntyneBrown/Cupola" rel="external">GitHub</a>
+            <a href="https://github.com/QuinntyneBrown/Cupola/blob/main/CONTRIBUTING.md" rel="external">Contributing</a>
+            <a href="https://github.com/QuinntyneBrown/Cupola/blob/main/SECURITY.md" rel="external">Security</a>
+            <a href="https://github.com/QuinntyneBrown/Cupola/blob/main/SUPPORT.md" rel="external">Support</a>
+          </div>
+          <div>
+            <h3>License</h3>
+            <a href="https://github.com/QuinntyneBrown/Cupola/blob/main/LICENSE" rel="external">MIT</a>
+          </div>
+        </nav>
+      </div>
+      <p class="mk-footer-fine">© 2026 Cupola contributors · Inspired by NASA's Open MCT</p>
+    </footer>
+
+    <script src="assets/js/marketing.js"></script>
+  </body>
+</html>

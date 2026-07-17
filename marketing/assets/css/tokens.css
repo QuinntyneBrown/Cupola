@@ -1,0 +1,210 @@
+/* ==========================================================================
+   Cupola Design System — Design Tokens
+   --------------------------------------------------------------------------
+   Dark-theme mission-control token set for the Cupola frontend
+   (Angular 17.2.2 + Angular Material 17 + Angular CDK + chart.js +
+   angular-gridster2). Single theme: dark ("Console").
+
+   In the Angular implementation these become the values of a custom
+   Material theme (mat.define-dark-theme) plus CSS custom properties
+   published on :root. Token names here are authoritative.
+
+   Contrast: every ink/status/accent token was checked against every
+   surface token (WCAG 2.1). Text tokens >= 4.5:1 on all surfaces
+   (disabled ink is intentionally exempt). Chart categorical palette
+   validated with the six-check palette validator (CVD floor band —
+   plots always pair color with a legend and direct labels).
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* --------------------------------------------------------------------
+     COLOR — surfaces (4 elevation layers, blue-black "console at night")
+     -------------------------------------------------------------------- */
+  --cp-color-void:            #070A10;  /* app canvas behind panes          */
+  --cp-color-surface-1:       #0E1219;  /* panes: tree, main view, inspector */
+  --cp-color-surface-2:       #141A24;  /* cards, table headers, toolbars    */
+  --cp-color-surface-3:       #1B2230;  /* menus, dialogs, popups, tooltips  */
+  --cp-color-surface-hover:   rgba(139, 168, 204, 0.07);
+  --cp-color-surface-active:  rgba(139, 168, 204, 0.11);
+  --cp-color-scrim:           rgba(4, 6, 10, 0.64);   /* modal backdrop      */
+
+  /* Lines */
+  --cp-color-hairline:        #232B3A;  /* pane splits, table rules          */
+  --cp-color-line:            #384357;  /* input borders, emphasized rules   */
+  --cp-color-line-strong:     #4E5B74;  /* hover borders                     */
+
+  /* --------------------------------------------------------------------
+     COLOR — ink (text & icons)
+     -------------------------------------------------------------------- */
+  --cp-color-ink:             #E9EDF5;  /* primary text        >= 13.5:1     */
+  --cp-color-ink-2:           #A7B0C0;  /* secondary text      >=  7.2:1     */
+  --cp-color-ink-3:           #8290A9;  /* muted: captions, units >= 4.9:1   */
+  --cp-color-ink-disabled:    #4A5366;  /* disabled only — exempt from AA    */
+  --cp-color-ink-inverse:     #0B0E14;  /* text on filled status/accent      */
+
+  /* --------------------------------------------------------------------
+     COLOR — accent ("Earthlight" — the cupola looks at Earth)
+     -------------------------------------------------------------------- */
+  --cp-color-primary:         #58B7EC;
+  --cp-color-primary-hover:   #7CC9F5;
+  --cp-color-primary-pressed: #3EA5E0;
+  --cp-color-primary-dim:     rgba(88, 183, 236, 0.14); /* selected fills    */
+  --cp-color-primary-border:  rgba(88, 183, 236, 0.45);
+  --cp-color-focus-ring:      #7CC9F5;  /* 2px outline, 2px offset           */
+
+  /* Edit mode is a *mode*, not a status — violet, never alarm-colored      */
+  --cp-color-edit:            #C6A2FF;
+  --cp-color-edit-dim:        rgba(198, 162, 255, 0.14);
+  --cp-color-edit-border:     rgba(198, 162, 255, 0.55);
+
+  /* --------------------------------------------------------------------
+     COLOR — status & limit semantics (reserved; never used decoratively)
+     ok       = nominal / go / connected / within limits
+     caution  = watch / yellow limit / degraded
+     critical = warning-red limit / fault / error / no-go
+     info     = neutral notice (uses primary hue)
+     stale    = telemetry no longer fresh (always italic + badge, not
+                color alone)
+     -------------------------------------------------------------------- */
+  --cp-color-ok:              #3FB950;
+  --cp-color-caution:         #F0B429;
+  --cp-color-critical:        #F0524A;
+  --cp-color-info:            #58B7EC;
+  --cp-color-stale:           #8B99B0;
+
+  /* Filled variants (chips, table cells, banners) take dark ink           */
+  --cp-color-ok-dim:          rgba(63, 185, 80, 0.15);
+  --cp-color-caution-dim:     rgba(240, 180, 41, 0.15);
+  --cp-color-critical-dim:    rgba(240, 82, 74, 0.15);
+  --cp-color-info-dim:        rgba(88, 183, 236, 0.14);
+  --cp-color-ok-border:       rgba(63, 185, 80, 0.5);
+  --cp-color-caution-border:  rgba(240, 180, 41, 0.5);
+  --cp-color-critical-border: rgba(240, 82, 74, 0.5);
+
+  /* --------------------------------------------------------------------
+     COLOR — data visualization (chart.js)
+     Categorical: fixed slot order (CVD-optimized), assigned in sequence,
+     never cycled, never re-assigned when series are removed. A 9th series
+     folds into "Other". Validated: all slots >= 3:1 on surface-1.
+     -------------------------------------------------------------------- */
+  --cp-chart-1: #3987E5;   /* blue    */
+  --cp-chart-2: #199E70;   /* aqua    */
+  --cp-chart-3: #C98500;   /* yellow  */
+  --cp-chart-4: #008300;   /* green   */
+  --cp-chart-5: #9085E9;   /* violet  */
+  --cp-chart-6: #E66767;   /* red     */
+  --cp-chart-7: #D55181;   /* magenta */
+  --cp-chart-8: #D95926;   /* orange  */
+  --cp-chart-grid:     #232B3A;             /* hairline gridlines           */
+  --cp-chart-axis:     #384357;             /* baseline + axis line         */
+  --cp-chart-tick:     #8290A9;             /* tick labels (mono, 11px)     */
+  /* Sequential ramp (single hue, heatmaps): chart-1 blue family           */
+  --cp-chart-seq-1: #104281; --cp-chart-seq-2: #1C5CAB;
+  --cp-chart-seq-3: #2A78D6; --cp-chart-seq-4: #5598E7;
+  --cp-chart-seq-5: #86B6EF;
+  /* Diverging: chart-1 blue <-> chart-6 red, neutral mid                  */
+  --cp-chart-div-neg: #3987E5; --cp-chart-div-mid: #384357;
+  --cp-chart-div-pos: #E66767;
+
+  /* --------------------------------------------------------------------
+     TYPOGRAPHY
+     UI:    IBM Plex Sans     (Material typography config replaces Roboto)
+     Data:  IBM Plex Mono     (all telemetry values, timestamps, code)
+     Label: IBM Plex Sans Cond (pane headers, eyebrows — uppercase)
+     -------------------------------------------------------------------- */
+  --cp-font-ui:    "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --cp-font-mono:  "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
+  --cp-font-cond:  "IBM Plex Sans Condensed", "Arial Narrow", sans-serif;
+
+  /* Type scale — level: size/line-height weight (Material 17 mapping)     */
+  --cp-type-display:   600 28px/34px var(--cp-font-ui);   /* headline-4    */
+  --cp-type-title:     600 20px/28px var(--cp-font-ui);   /* headline-6    */
+  --cp-type-title-s:   600 16px/24px var(--cp-font-ui);   /* subtitle-1    */
+  --cp-type-body:      400 14px/20px var(--cp-font-ui);   /* body-1 (base) */
+  --cp-type-body-s:    400 12px/16px var(--cp-font-ui);   /* body-2        */
+  --cp-type-label:     500 13px/16px var(--cp-font-ui);   /* buttons, tabs */
+  --cp-type-caption:   400 11px/14px var(--cp-font-ui);   /* helper text   */
+  --cp-type-overline:  600 11px/16px var(--cp-font-cond); /* +.08em, caps  */
+  --cp-type-pane-head: 600 12px/16px var(--cp-font-cond); /* +.06em, caps  */
+  --cp-type-data-l:    500 24px/28px var(--cp-font-mono); /* gauge values  */
+  --cp-type-data:      400 13px/18px var(--cp-font-mono); /* table cells   */
+  --cp-type-data-s:    400 11px/14px var(--cp-font-mono); /* axis ticks    */
+
+  --cp-tracking-caps:  0.06em;   /* letter-spacing for condensed caps      */
+
+  /* --------------------------------------------------------------------
+     SPACING — 4px base unit. Component density = Material density -2
+     (controls 28–32px tall; ops screens are dense).
+     -------------------------------------------------------------------- */
+  --cp-space-1:  2px;    /* icon-to-badge gaps                             */
+  --cp-space-2:  4px;    /* chip padding-y, tight inline gaps              */
+  --cp-space-3:  8px;    /* default inline gap, cell padding-y             */
+  --cp-space-4:  12px;   /* control padding-x, pane padding (dense)        */
+  --cp-space-5:  16px;   /* pane padding, form row gap                     */
+  --cp-space-6:  20px;   /* section gap within a card                      */
+  --cp-space-7:  24px;   /* dialog padding, card padding                   */
+  --cp-space-8:  32px;   /* block separation                               */
+  --cp-space-9:  40px;   /* page section separation                        */
+  --cp-space-10: 64px;   /* page top/bottom padding                        */
+
+  /* Component metrics */
+  --cp-size-control:      32px;  /* buttons, inputs, selects (density -2)  */
+  --cp-size-control-s:    28px;  /* toolbar buttons, table filter inputs   */
+  --cp-size-row:          32px;  /* tree rows, menu items, table rows      */
+  --cp-size-row-dense:    24px;  /* telemetry table rows, autoflow rows    */
+  --cp-size-icon:         20px;  /* default icon                           */
+  --cp-size-icon-s:       16px;  /* inline/decorator icon                  */
+  --cp-size-statusbar:    28px;  /* indicator bar height                   */
+  --cp-size-toolbar:      40px;  /* app top bar height                     */
+  --cp-size-conductor:    48px;  /* time conductor bar height              */
+  --cp-size-pane-head:    32px;  /* pane header height                     */
+  --cp-layout-grid:       10px;  /* display-layout snap grid               */
+
+  /* --------------------------------------------------------------------
+     SHAPE — flat, instrument-like. Radius stays small everywhere.
+     -------------------------------------------------------------------- */
+  --cp-radius-s:   3px;   /* buttons, inputs, chips, menu items            */
+  --cp-radius-m:   6px;   /* cards, dialogs, popups                        */
+  --cp-radius-l:   10px;  /* large overlays                                */
+  --cp-radius-pill: 999px;/* count badges, status dots                     */
+
+  /* --------------------------------------------------------------------
+     ELEVATION — dark UIs elevate by lightening surface + hairline, with
+     soft shadows only for detached layers (menus, dialogs, drag ghosts).
+     -------------------------------------------------------------------- */
+  --cp-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);                 /* raised   */
+  --cp-shadow-2: 0 4px 12px rgba(0, 0, 0, 0.5);                /* menus    */
+  --cp-shadow-3: 0 12px 32px rgba(0, 0, 0, 0.6);               /* dialogs  */
+  --cp-shadow-drag: 0 8px 24px rgba(0, 0, 0, 0.55),
+                    0 0 0 1px var(--cp-color-primary-border);  /* ghosts   */
+
+  /* --------------------------------------------------------------------
+     MOTION — quick and mechanical; ops UIs never bounce.
+     Respect prefers-reduced-motion: transitions drop to 0ms.
+     -------------------------------------------------------------------- */
+  --cp-motion-fast:     80ms;   /* hover fills, focus rings                */
+  --cp-motion-base:     140ms;  /* menus, tooltips, expansion              */
+  --cp-motion-slow:     240ms;  /* dialogs, pane collapse                  */
+  --cp-ease-standard:   cubic-bezier(0.2, 0, 0, 1);
+  --cp-ease-exit:       cubic-bezier(0.3, 0, 1, 1);
+
+  /* --------------------------------------------------------------------
+     Z-INDEX ladder
+     -------------------------------------------------------------------- */
+  --cp-z-pane:      1;
+  --cp-z-statusbar: 10;
+  --cp-z-drag:      50;
+  --cp-z-menu:      100;
+  --cp-z-overlay:   200;
+  --cp-z-tooltip:   300;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --cp-motion-fast: 0ms;
+    --cp-motion-base: 0ms;
+    --cp-motion-slow: 0ms;
+  }
+}

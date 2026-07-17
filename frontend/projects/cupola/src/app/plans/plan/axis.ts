@@ -1,4 +1,4 @@
-import { TimeBounds } from '@cupola/core';
+import { TimeBounds, condenseTimeLabels } from '@cupola/core';
 
 /** A single time-axis label positioned by percentage offset. */
 export interface AxisTick {
@@ -25,5 +25,6 @@ export function buildAxisTicks(
     const time = bounds.start + (span * index) / count;
     ticks.push({ leftPct: (index / count) * 100, label: formatTime(time) });
   }
-  return ticks;
+  const labels = condenseTimeLabels(ticks.map((tick) => tick.label));
+  return ticks.map((tick, index) => ({ ...tick, label: labels[index] }));
 }

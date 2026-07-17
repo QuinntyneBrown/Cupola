@@ -23,7 +23,7 @@ import {
 import { CompositionMembers } from '../../telemetry-view/composition-members';
 import { PauseController } from '../../telemetry-view/pause-controller';
 import { TelemetryStream, WideDatum } from '../../telemetry-view/telemetry-stream';
-import { buildTicks, timeTickValues } from './axes';
+import { buildTicks, buildTimeTicks, timeTickValues } from './axes';
 import { evaluateLimits } from './limit-overlay';
 import { LegendMode, PlotConfiguration, readPlotConfig, resolveSeriesStyle } from './plot-config';
 import { panBounds, zoomBounds } from './plot-interactions';
@@ -297,7 +297,7 @@ export class PlotViewComponent {
     }
 
     const xTickValues = timeTickValues(bounds, 6);
-    const xTicks = buildTicks(xTickValues, xScale, formatTime).map((tick) => ({ x: tick.offset, label: tick.label }));
+    const xTicks = buildTimeTicks(xTickValues, xScale, formatTime).map((tick) => ({ x: tick.offset, label: tick.label }));
     const gridBind = yAxes[0]?.ticks ?? [];
 
     return {
