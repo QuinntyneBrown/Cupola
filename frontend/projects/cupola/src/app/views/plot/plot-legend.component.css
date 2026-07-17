@@ -1,0 +1,41 @@
+:host {
+  display: block;
+}
+
+.plot-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cp-space-5);
+  padding: var(--cp-space-3) var(--cp-space-4);
+  background: var(--cp-color-void);
+  border-bottom: 1px solid var(--cp-color-hairline);
+  font: var(--cp-type-body-s);
+  color: var(--cp-color-ink-2);
+}
+
+.plot-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.plot-key .v {
+  font: var(--cp-type-data);
+  color: var(--cp-color-ink);
+}
+
+.sw {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex: none;
+}
+
+.plot-legend-table .sw-col {
+  width: 24px;
+}
+
+.plot-legend-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

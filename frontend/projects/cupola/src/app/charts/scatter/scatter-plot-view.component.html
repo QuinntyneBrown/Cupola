@@ -1,0 +1,38 @@
+<div class="plot" data-testid="plot-view">
+  <div class="plot-toolbar">
+    <span class="plot-toolbar-title">{{ object().name }}</span>
+  </div>
+  <div class="plot-stage">
+    <svg class="plot-svg" data-testid="scatter-plot-svg" [attr.viewBox]="viewBox" preserveAspectRatio="none" role="img" [attr.aria-label]="object().name + ' scatter plot'">
+      <g stroke="var(--cp-chart-grid)" stroke-width="1">
+        @for (y of model().gridY; track $index) {
+          <line [attr.x1]="area.x" [attr.y1]="y" [attr.x2]="area.x + area.w" [attr.y2]="y" />
+        }
+        @for (x of model().gridX; track $index) {
+          <line [attr.x1]="x" [attr.y1]="area.y" [attr.x2]="x" [attr.y2]="area.y + area.h" />
+        }
+      </g>
+      <g stroke="var(--cp-chart-axis)" stroke-width="1">
+        <line [attr.x1]="area.x" [attr.y1]="area.y" [attr.x2]="area.x" [attr.y2]="area.y + area.h" />
+        <line [attr.x1]="area.x" [attr.y1]="area.y + area.h" [attr.x2]="area.x + area.w" [attr.y2]="area.y + area.h" />
+      </g>
+      <g text-anchor="end">
+        @for (tick of model().yTicks; track $index) {
+          <text data-testid="scatter-y-tick" [attr.x]="area.x - 8" [attr.y]="tick.y + 4">{{ tick.label }}</text>
+        }
+      </g>
+      <g text-anchor="middle">
+        @for (tick of model().xTicks; track $index) {
+          <text data-testid="scatter-x-tick" [attr.x]="tick.x" [attr.y]="area.y + area.h + 18">{{ tick.label }}</text>
+        }
+      </g>
+      <text class="axis-title" data-testid="scatter-x-title" [attr.x]="area.x + area.w / 2" [attr.y]="area.y + area.h + 36" text-anchor="middle">{{ model().xTitle }}</text>
+      <text class="axis-title" data-testid="scatter-y-title" [attr.transform]="'rotate(-90 14 ' + (area.y + area.h / 2) + ')'" x="14" [attr.y]="area.y + area.h / 2" text-anchor="middle">{{ model().yTitle }}</text>
+      <g [attr.fill]="model().color">
+        @for (point of model().points; track $index) {
+          <circle data-testid="scatter-point" [attr.cx]="point.x" [attr.cy]="point.y" r="3" />
+        }
+      </g>
+    </svg>
+  </div>
+</div>

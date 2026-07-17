@@ -26,6 +26,7 @@ import { registerDefaultActions } from '../../actions/register-default-actions';
 import { registerStandardInspectorViews } from '../../inspector/register-standard-inspector-views';
 import { registerDefaultToolbars } from '../../toolbars/register-default-toolbars';
 import { registerDefaultViews } from '../../views/register-default-views';
+import { registerPlotViews } from '../../views/plot/register-plot-views';
 
 const BUILD_INFO: BuildInfo = {
   version: '0.0.0-test',
@@ -101,6 +102,7 @@ export function buildTestAppConfig(): ApplicationConfig {
         inject(UrlParamsService);
         registerDefaultViews();
         registerStandardInspectorViews();
+        registerPlotViews();
         registerDefaultActions();
         registerDefaultToolbars();
       }),

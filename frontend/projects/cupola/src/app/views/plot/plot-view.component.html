@@ -1,34 +1,154 @@
 <div class="plot" data-testid="plot-view">
-  <div class="gauges">
-    @for (s of series(); track s.keyString) {
-      <div class="gauge" [attr.data-key]="s.keyString">
-        <div class="sh-overline">{{ s.name }}</div>
-        <div class="cp-gauge-value" data-testid="gauge-value">
-          {{ formatValue(s.latest) }} <span class="unit">{{ s.unit }}</span>
-        </div>
-      </div>
-    }
-    <div class="legend">
-      @for (s of series(); track s.keyString) {
-        <span class="legend-item">
-          <span class="sh-series-swatch" [style.background]="s.swatch"></span>{{ s.keyString }}
-        </span>
+  @if (!restricted()) {
+    <div class="plot-toolbar" data-testid="plot-toolbar">
+      <span class="plot-toolbar-title">{{ object().name }}</span>
+      @if (pause.paused()) {
+        <span class="paused-chip" data-testid="plot-paused">Paused</span>
       }
+      <span class="spacer"></span>
+      <button type="button" class="cp-icon-btn cp-icon-btn--s" data-testid="plot-pan" aria-label="Pan" (click)="panForward()">
+        <svg class="cp-icon cp-icon--s"><use href="#i-move" /></svg>
+      </button>
+      <button type="button" class="cp-icon-btn cp-icon-btn--s" data-testid="plot-zoom-in" aria-label="Zoom in" (click)="zoomIn()">
+        <svg class="cp-icon cp-icon--s"><use href="#i-zoom-in" /></svg>
+      </button>
+      <button type="button" class="cp-icon-btn cp-icon-btn--s" data-testid="plot-zoom-out" aria-label="Zoom out" (click)="zoomOut()">
+        <svg class="cp-icon cp-icon--s"><use href="#i-zoom-out" /></svg>
+      </button>
+      <button type="button" class="cp-icon-btn cp-icon-btn--s" data-testid="plot-reset" aria-label="Reset view" (click)="reset()">
+        <svg class="cp-icon cp-icon--s"><use href="#i-crosshair" /></svg>
+      </button>
+      <button type="button" class="cp-icon-btn cp-icon-btn--s" data-testid="plot-legend-toggle" aria-label="Toggle legend" (click)="toggleLegend()">
+        <svg class="cp-icon cp-icon--s"><use href="#i-list" /></svg>
+      </button>
+      <span class="cp-toolbar-sep"></span>
+      <button
+        type="button"
+        class="cp-icon-btn cp-icon-btn--s"
+        data-testid="plot-pause"
+        [class.is-active]="pause.paused()"
+        [attr.aria-pressed]="pause.paused()"
+        [attr.aria-label]="pause.paused() ? 'Resume plot' : 'Pause plot'"
+        (click)="togglePause()"
+      >
+        <svg class="cp-icon cp-icon--s"><use [attr.href]="pause.paused() ? '#i-play' : '#i-pause'" /></svg>
+      </button>
     </div>
-  </div>
+  }
 
-  <div class="chart">
-    <svg width="100%" height="100%" viewBox="0 0 600 240" preserveAspectRatio="none" aria-hidden="true">
-      <path
-        d="M0 48h600M0 96h600M0 144h600M0 192h600M100 0v240M200 0v240M300 0v240M400 0v240M500 0v240"
-        stroke="var(--cp-chart-grid)"
-        stroke-width="1"
-      />
-      <path d="M0 239h600" stroke="var(--cp-chart-axis)" stroke-width="1.5" />
-      @for (line of polylines(); track $index) {
-        @if (line.points) {
-          <polyline [attr.points]="line.points" fill="none" [attr.stroke]="line.swatch" stroke-width="2" />
+  @if (model().showLegend) {
+    <cp-plot-legend [series]="model().legend" [mode]="legendMode()" />
+  }
+
+  <div class="plot-stage">
+    <svg
+      #svg
+      class="plot-svg"
+      data-testid="plot-svg"
+      [attr.viewBox]="viewBox"
+      preserveAspectRatio="none"
+      role="img"
+      [attr.aria-label]="object().name + ' plot'"
+      (pointermove)="onPointerMove($event, svg)"
+      (pointerleave)="onPointerLeave()"
+    >
+      <!-- gridlines -->
+      <g stroke="var(--cp-chart-grid)" stroke-width="1">
+        @for (y of model().gridH; track $index) {
+          <line [attr.x1]="area.x" [attr.y1]="y" [attr.x2]="area.x + area.w" [attr.y2]="y" />
         }
+        @for (x of model().gridV; track $index) {
+          <line [attr.x1]="x" [attr.y1]="area.y" [attr.x2]="x" [attr.y2]="area.y + area.h" />
+        }
+      </g>
+
+      <!-- axes -->
+      <g stroke="var(--cp-chart-axis)" stroke-width="1">
+        <line [attr.x1]="area.x" [attr.y1]="area.y" [attr.x2]="area.x" [attr.y2]="area.y + area.h" />
+        <line [attr.x1]="area.x" [attr.y1]="area.y + area.h" [attr.x2]="area.x + area.w" [attr.y2]="area.y + area.h" />
+      </g>
+
+      <!-- y axes and ticks -->
+      @for (axis of model().yAxes; track $index) {
+        <g class="y-axis" [attr.text-anchor]="axis.anchor">
+          @for (tick of axis.ticks; track $index) {
+            <text data-testid="plot-y-tick" [attr.x]="axis.x + (axis.anchor === 'end' ? -8 : 8)" [attr.y]="tick.y + 4">{{ tick.label }}</text>
+          }
+        </g>
+      }
+
+      <!-- per-series axis labels (multi-axis mode) -->
+      @for (sa of model().seriesAxes; track $index) {
+        <g class="series-axis" data-testid="plot-series-axis" [attr.transform]="'translate(' + (area.x + 4) + ',' + (area.y + 4 + $index * 16) + ')'">
+          <rect x="0" y="0" width="8" height="8" rx="2" [attr.fill]="sa.color" />
+          <text class="series-label" x="13" y="8">{{ sa.name }}</text>
+        </g>
+      }
+
+      <!-- x ticks -->
+      <g text-anchor="middle">
+        @for (tick of model().xTicks; track $index) {
+          <text data-testid="plot-x-tick" [attr.x]="tick.x" [attr.y]="area.y + area.h + 20">{{ tick.label }}</text>
+        }
+      </g>
+
+      <!-- limit lines -->
+      @for (line of model().limitLines; track $index) {
+        <line
+          data-testid="plot-limit-line"
+          [class]="line.cssClass"
+          [attr.x1]="area.x"
+          [attr.y1]="line.y"
+          [attr.x2]="area.x + area.w"
+          [attr.y2]="line.y"
+          stroke="var(--cp-color-caution)"
+          stroke-width="1.5"
+          stroke-dasharray="6 4"
+        />
+        <text class="limit-label" [class]="'limit-label--' + (line.cssClass.includes('critical') ? 'critical' : 'caution')" [attr.x]="area.x + area.w - 4" [attr.y]="line.y - 4" text-anchor="end">{{ line.label }}</text>
+      }
+
+      <!-- series -->
+      @for (s of model().series; track s.keyString) {
+        <g [attr.data-key]="s.keyString">
+          @if (s.path) {
+            <path
+              class="series-line"
+              data-testid="plot-series-line"
+              [attr.data-key]="s.keyString"
+              [attr.data-count]="s.count"
+              [attr.d]="s.path"
+              fill="none"
+              [attr.stroke]="s.color"
+              stroke-width="2"
+              stroke-linejoin="round"
+              [attr.stroke-dasharray]="s.lineStyle === 'dashed' ? '6 4' : null"
+            />
+          }
+          @for (m of s.markers; track $index) {
+            <circle [attr.cx]="m.x" [attr.cy]="m.y" r="2.5" [attr.fill]="s.color" />
+          }
+          @if (s.cursor) {
+            <circle data-testid="plot-cursor-point" [attr.cx]="s.cursor.x" [attr.cy]="s.cursor.y" r="4.5" [attr.fill]="s.color" stroke="var(--cp-color-void)" stroke-width="2" />
+          }
+        </g>
+      }
+
+      <!-- alarm points -->
+      @for (a of model().alarms; track $index) {
+        <path
+          data-testid="plot-alarm-point"
+          [class]="a.cssClass"
+          [attr.d]="'M' + a.x + ',' + (a.y - 5) + ' L' + (a.x - 5) + ',' + (a.y + 4) + ' L' + (a.x + 5) + ',' + (a.y + 4) + ' Z'"
+          [attr.fill]="a.cssClass.includes('critical') ? 'var(--cp-color-critical)' : 'var(--cp-color-caution)'"
+          stroke="var(--cp-color-void)"
+          stroke-width="1.5"
+        />
+      }
+
+      <!-- cursor guide -->
+      @if (model().cursorX !== null) {
+        <line data-testid="plot-cursor" [attr.x1]="model().cursorX" [attr.y1]="area.y" [attr.x2]="model().cursorX" [attr.y2]="area.y + area.h" stroke="var(--cp-color-line-strong)" stroke-width="1" />
       }
     </svg>
   </div>

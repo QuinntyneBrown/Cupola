@@ -10,6 +10,7 @@ import { InspectorPage } from '../pages/inspector.page';
 import { LicensesPage } from '../pages/licenses.page';
 import { ObjectViewPage } from '../pages/object-view.page';
 import { OverlayPage } from '../pages/overlay.page';
+import { PlotPage } from '../pages/plot.page';
 import { TreePage } from '../pages/tree.page';
 import { FakeBackend } from './fake-backend';
 import { RealtimeDriver } from './realtime-driver';
@@ -28,6 +29,7 @@ interface CupolaFixtures {
   aboutDialog: AboutDialogPage;
   licenses: LicensesPage;
   conditionSet: ConditionSetPage;
+  plot: PlotPage;
 }
 
 /**
@@ -79,6 +81,9 @@ export const test = base.extend<CupolaFixtures>({
   },
   conditionSet: async ({ page }, use) => {
     await use(new ConditionSetPage(page));
+  },
+  plot: async ({ page }, use) => {
+    await use(new PlotPage(page));
   },
 });
 

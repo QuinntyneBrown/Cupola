@@ -1,0 +1,67 @@
+<div class="plot stacked" data-testid="plot-view">
+  <div class="plot-stage">
+    <svg
+      #svg
+      class="plot-svg"
+      data-testid="stacked-plot-svg"
+      [attr.viewBox]="model().viewBox"
+      preserveAspectRatio="none"
+      role="img"
+      [attr.aria-label]="object().name + ' stacked plot'"
+      (pointermove)="onPointerMove($event, svg)"
+      (pointerleave)="onPointerLeave()"
+    >
+      @for (row of model().rows; track row.key) {
+        <g class="stacked-row" data-testid="stacked-row" [attr.data-key]="row.key">
+          <rect [attr.x]="56" [attr.y]="row.y - 13" width="8" height="8" rx="2" [attr.fill]="row.color" />
+          <text class="series-label" [attr.x]="69" [attr.y]="row.y - 5">{{ row.label }}</text>
+
+          <g stroke="var(--cp-chart-grid)" stroke-width="1">
+            @for (y of row.gridH; track $index) {
+              <line [attr.x1]="56" [attr.y1]="y" [attr.x2]="model().width - 16" [attr.y2]="y" />
+            }
+          </g>
+          <g stroke="var(--cp-chart-axis)" stroke-width="1">
+            <line [attr.x1]="56" [attr.y1]="row.y" [attr.x2]="56" [attr.y2]="row.y + row.h" />
+            <line [attr.x1]="56" [attr.y1]="row.y + row.h" [attr.x2]="model().width - 16" [attr.y2]="row.y + row.h" />
+          </g>
+          <g text-anchor="end">
+            @for (tick of row.ticks; track $index) {
+              <text data-testid="plot-y-tick" [attr.x]="48" [attr.y]="tick.y + 4">{{ tick.label }}</text>
+            }
+          </g>
+
+          @for (s of row.series; track s.keyString) {
+            @if (s.path) {
+              <path
+                class="series-line"
+                data-testid="plot-series-line"
+                [attr.data-key]="s.keyString"
+                [attr.d]="s.path"
+                fill="none"
+                [attr.stroke]="s.color"
+                stroke-width="2"
+                stroke-linejoin="round"
+              />
+            }
+            @if (s.cursor) {
+              <circle data-testid="stacked-cursor-point" [attr.cx]="s.cursor.x" [attr.cy]="s.cursor.y" r="4.5" [attr.fill]="s.color" stroke="var(--cp-color-void)" stroke-width="2" />
+            }
+          }
+        </g>
+      }
+
+      <!-- shared x ticks -->
+      <g text-anchor="middle">
+        @for (tick of model().xTicks; track $index) {
+          <text data-testid="plot-x-tick" [attr.x]="tick.x" [attr.y]="model().xAxisY + 20">{{ tick.label }}</text>
+        }
+      </g>
+
+      <!-- coordinated crosshair through all rows -->
+      @if (model().cursorX !== null) {
+        <line data-testid="stacked-cursor" [attr.x1]="model().cursorX" [attr.y1]="8" [attr.x2]="model().cursorX" [attr.y2]="model().xAxisY" stroke="var(--cp-color-line-strong)" stroke-width="1" />
+      }
+    </svg>
+  </div>
+</div>

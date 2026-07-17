@@ -50,6 +50,7 @@ import { registerDefaultTime } from './time/register-default-time';
 import { registerTimeViews } from './time/register-time-views';
 import { registerDefaultToolbars } from './toolbars/register-default-toolbars';
 import { registerDefaultViews } from './views/register-default-views';
+import { registerPlotViews } from './views/plot/register-plot-views';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -87,6 +88,9 @@ export const appConfig: ApplicationConfig = {
       registerDefaultTelemetry();
       registerDefaultViews();
       registerStandardInspectorViews();
+      // C07 plots: register plot/chart types, composition policies, metadata, and
+      // view providers before create actions are minted from the creatable types.
+      registerPlotViews();
       // C10 conditions: register condition/widget/derived types and views, the
       // composition policy, the filter inspector, and derived providers before
       // create actions are minted from the creatable types.

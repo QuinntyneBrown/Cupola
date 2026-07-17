@@ -20,6 +20,24 @@ export const CREATABLE_TYPES: CreatableType[] = [
     description: 'Plots one or more telemetry series together on shared axes.',
   },
   {
+    type: 'stacked-plot',
+    name: 'Stacked Plot',
+    glyph: 'i-plot',
+    description: 'Stacks each composed telemetry series in its own row on a shared time axis.',
+  },
+  {
+    type: 'bar-graph',
+    name: 'Bar Graph',
+    glyph: 'i-plot',
+    description: 'Renders the latest value of each composed telemetry series as a bar.',
+  },
+  {
+    type: 'scatter-plot',
+    name: 'Scatter Plot',
+    glyph: 'i-plot',
+    description: 'Plots one telemetry range against another as a scatter of points.',
+  },
+  {
     type: 'notebook',
     name: 'Notebook',
     glyph: 'i-notebook',
