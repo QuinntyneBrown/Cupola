@@ -1,0 +1,15 @@
+<div class="cp-datum-detail" data-testid="datum-detail">
+  <div class="cp-datum-detail-head">{{ title() }}</div>
+  <div class="cp-table-wrap">
+    <table class="cp-table">
+      <tbody>
+        @for (field of fields(); track field.name) {
+          <tr data-testid="datum-detail-row">
+            <td>{{ field.name }}</td>
+            <td class="num" data-testid="datum-detail-value">{{ field.value }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

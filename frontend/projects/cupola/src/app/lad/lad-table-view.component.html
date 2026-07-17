@@ -1,0 +1,37 @@
+<div class="cp-table-wrap cp-scroll" data-testid="lad-table">
+  <table class="cp-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Timestamp (UTC)</th>
+        <th class="num">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.keyString) {
+        <tr
+          data-testid="lad-row"
+          [attr.data-key]="row.keyString"
+          (dblclick)="onDatum(row)"
+        >
+          <td [class.is-stale]="row.stale">
+            @if (row.stale) {
+              <svg class="cp-icon cp-lad-stale-icon"><use href="#i-history" /></svg>
+            }
+            {{ row.name }}
+          </td>
+          <td [class.is-stale]="row.stale">{{ row.timestamp }}</td>
+          <td
+            class="num"
+            data-testid="lad-value"
+            [class.is-stale]="row.stale"
+            [class.is-limit-caution]="row.limitClass === 'is-limit-caution'"
+            [class.is-limit-critical]="row.limitClass === 'is-limit-critical'"
+          >
+            {{ row.value }}<span class="unit">{{ row.unit }}</span>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

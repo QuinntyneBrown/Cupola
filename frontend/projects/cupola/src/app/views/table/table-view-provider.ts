@@ -15,6 +15,7 @@ export class TableViewProvider implements ViewProvider {
 
   canView(object: DomainObject): boolean {
     return (
+      object.type === 'table' ||
       object.type === 'overlay-plot' ||
       (object.type === 'telemetry' && (object.telemetry?.hints.includes('range') ?? false))
     );

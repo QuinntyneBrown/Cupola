@@ -1,0 +1,41 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--cp-space-5);
+}
+
+.gauge-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cp-space-3);
+}
+
+.dial text {
+  font-family: var(--cp-font-mono, monospace);
+  font-size: 11px;
+  fill: var(--cp-chart-tick, var(--cp-color-ink-3));
+}
+.dial .dial-value {
+  font-size: 24px;
+  font-weight: 500;
+  fill: var(--cp-color-ink);
+}
+.dial .dial-unit {
+  fill: var(--cp-color-ink-3);
+}
+
+.gauge-name {
+  font: var(--cp-type-overline);
+  text-transform: uppercase;
+  letter-spacing: var(--cp-tracking-caps);
+  color: var(--cp-color-ink-3);
+}
+
+.cp-gauge-stale {
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
+}

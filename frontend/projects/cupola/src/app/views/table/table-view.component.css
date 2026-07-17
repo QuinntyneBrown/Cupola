@@ -1,8 +1,54 @@
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
-.value {
-  font-variant-numeric: tabular-nums;
-  text-align: right;
+.cp-table-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.cp-table-scroll {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border: none;
+}
+
+.cp-table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.cp-progress {
+  position: sticky;
+  top: var(--cp-size-row, 32px);
+  left: 0;
+  right: 0;
+  z-index: 2;
+}
+
+.cp-menu-anchor {
+  position: relative;
+  display: inline-flex;
+}
+
+.cp-menu--pop {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 10;
+  min-width: 220px;
+}
+
+.cp-table-empty {
+  text-align: center;
+  color: var(--cp-color-ink-3);
+  padding: var(--cp-space-6);
 }

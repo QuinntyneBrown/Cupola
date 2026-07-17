@@ -1,0 +1,8 @@
+<div class="cp-lad-set" data-testid="lad-table-set">
+  @for (table of tables(); track table.keyString) {
+    <section class="cp-lad-group tt-lad-group" data-testid="lad-group" [attr.data-key]="table.keyString">
+      <h3 class="cp-lad-group-title">{{ table.name }}</h3>
+      <cp-lad-table-view [object]="table" [timeContext]="context()" />
+    </section>
+  }
+</div>

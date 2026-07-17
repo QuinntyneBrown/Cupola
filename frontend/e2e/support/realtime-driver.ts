@@ -7,6 +7,7 @@ interface E2eWindow {
     pushObjectUpdate(object: unknown): void;
     pushTelemetry(value: unknown): void;
     setConnectionState(state: string): void;
+    setBounds(bounds: { start: number; end: number }): void;
   };
 }
 
@@ -42,5 +43,12 @@ export class RealtimeDriver {
     await this.page.evaluate((s) => {
       (window as E2eWindow).__cupolaE2E!.setConnectionState(s);
     }, state);
+  }
+
+  /** Drives a user-originated conductor bounds change (OMCT-C08-L2-01.07). */
+  async setBounds(bounds: { start: number; end: number }): Promise<void> {
+    await this.page.evaluate((b) => {
+      (window as E2eWindow).__cupolaE2E!.setBounds(b);
+    }, bounds);
   }
 }

@@ -11,6 +11,7 @@ import { LicensesPage } from '../pages/licenses.page';
 import { ObjectViewPage } from '../pages/object-view.page';
 import { OverlayPage } from '../pages/overlay.page';
 import { PlotPage } from '../pages/plot.page';
+import { TelemetryTablePage } from '../pages/telemetry-table.page';
 import { TreePage } from '../pages/tree.page';
 import { FakeBackend } from './fake-backend';
 import { RealtimeDriver } from './realtime-driver';
@@ -30,6 +31,7 @@ interface CupolaFixtures {
   licenses: LicensesPage;
   conditionSet: ConditionSetPage;
   plot: PlotPage;
+  telemetryTable: TelemetryTablePage;
 }
 
 /**
@@ -84,6 +86,9 @@ export const test = base.extend<CupolaFixtures>({
   },
   plot: async ({ page }, use) => {
     await use(new PlotPage(page));
+  },
+  telemetryTable: async ({ page }, use) => {
+    await use(new TelemetryTablePage(page));
   },
 });
 

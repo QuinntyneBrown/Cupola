@@ -51,6 +51,7 @@ import { registerTimeViews } from './time/register-time-views';
 import { registerDefaultToolbars } from './toolbars/register-default-toolbars';
 import { registerDefaultViews } from './views/register-default-views';
 import { registerPlotViews } from './views/plot/register-plot-views';
+import { registerTabularViews } from './tabular/register-tabular-views';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -95,6 +96,10 @@ export const appConfig: ApplicationConfig = {
       // composition policy, the filter inspector, and derived providers before
       // create actions are minted from the creatable types.
       registerConditions();
+      // C08 tabular: register table/LAD/gauge/autoflow types, composition
+      // policies, view providers, and the gauge inspector before create actions
+      // are minted from the creatable types.
+      registerTabularViews();
       registerDefaultActions();
       registerDefaultToolbars();
       // C14 operational awareness: user/status providers, indicators, notifications, faults.
@@ -105,6 +110,17 @@ export const appConfig: ApplicationConfig = {
       registerDefaultTime();
       registerTimeViews();
       inject(UrlTimeSyncService).start();
+      // e2e only: expose a conductor bounds setter on the realtime test hook so
+      // acceptance tests can drive a user-originated bounds change (the conductor
+      // itself has no bounds-editing control). Mirrors the FakeRealtimeGateway
+      // hook; no effect in production builds.
+      if (environment.e2e) {
+        const time = inject(GlobalTimeContext);
+        const hook = (window as unknown as { __cupolaE2E?: Record<string, unknown> }).__cupolaE2E;
+        if (hook) {
+          hook['setBounds'] = (bounds: { start: number; end: number }) => time.setBounds(bounds);
+        }
+      }
     }),
   ],
 };

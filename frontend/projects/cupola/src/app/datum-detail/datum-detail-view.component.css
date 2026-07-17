@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  min-width: 320px;
+}
+
+.cp-datum-detail-head {
+  font: var(--cp-type-pane-head);
+  text-transform: uppercase;
+  letter-spacing: var(--cp-tracking-caps);
+  color: var(--cp-color-ink-2);
+  padding: var(--cp-space-3) var(--cp-space-4);
+}

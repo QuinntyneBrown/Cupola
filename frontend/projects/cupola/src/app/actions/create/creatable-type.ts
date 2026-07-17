@@ -44,6 +44,36 @@ export const CREATABLE_TYPES: CreatableType[] = [
     description: 'A timestamped log for operator notes and annotations.',
   },
   {
+    type: 'table',
+    name: 'Telemetry Table',
+    glyph: 'i-table',
+    description: 'Presents historical and realtime telemetry in a configurable table.',
+  },
+  {
+    type: 'lad-table',
+    name: 'LAD Table',
+    glyph: 'i-list',
+    description: 'Shows the latest available value for each composed telemetry object.',
+  },
+  {
+    type: 'lad-table-set',
+    name: 'LAD Table Set',
+    glyph: 'i-list',
+    description: 'Stacks several latest-available-data tables as one scrolling set.',
+  },
+  {
+    type: 'gauge',
+    name: 'Gauge',
+    glyph: 'i-gauge',
+    description: 'Displays the latest numeric telemetry value as a dial or meter.',
+  },
+  {
+    type: 'autoflow',
+    name: 'Autoflow Tabular',
+    glyph: 'i-list',
+    description: 'Packs many telemetry points into dense name/value rows that flow into columns.',
+  },
+  {
     type: 'condition-set',
     name: 'Condition Set',
     glyph: 'i-alert-circle',

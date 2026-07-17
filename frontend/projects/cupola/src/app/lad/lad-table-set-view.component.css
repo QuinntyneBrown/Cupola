@@ -1,0 +1,14 @@
+:host {
+  display: block;
+}
+
+.cp-lad-group-title {
+  font: var(--cp-type-overline);
+  text-transform: uppercase;
+  letter-spacing: var(--cp-tracking-caps);
+  color: var(--cp-color-ink-3);
+  background: var(--cp-color-surface-2);
+  padding: var(--cp-space-2) var(--cp-space-4);
+  margin: 0;
+  border-bottom: 1px solid var(--cp-color-hairline);
+}
