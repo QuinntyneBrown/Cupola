@@ -75,8 +75,7 @@ export class FakeBackend {
         continue;
       }
       const payload = object.configuration?.['annotation'] as
-        | { text?: string; targets?: string[]; tags?: string[] }
-        | undefined;
+        { text?: string; targets?: string[]; tags?: string[] } | undefined;
       if (!payload) {
         continue;
       }

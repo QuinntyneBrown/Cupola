@@ -16,7 +16,8 @@ function tryObject(fakeBackend: FakeBackend, key: string): Record<string, unknow
 
 function activities(fakeBackend: FakeBackend): Record<string, string> | undefined {
   const object = tryObject(fakeBackend, 'activity-states');
-  return (object?.['configuration'] as { activities?: Record<string, string> } | undefined)?.activities;
+  return (object?.['configuration'] as { activities?: Record<string, string> } | undefined)
+    ?.activities;
 }
 
 function plans(fakeBackend: FakeBackend): Record<string, unknown> | undefined {
@@ -90,10 +91,12 @@ test.describe('C12 L1-04 — Execution monitoring state', () => {
       await plan.monitoringDuration.fill('03:30:00');
       await plan.monitoringDuration.blur();
 
-      await expect.poll(() => plans(fakeBackend)?.['iss-plan']).toEqual({
-        status: 'active',
-        duration: 12_600_000,
-      });
+      await expect
+        .poll(() => plans(fakeBackend)?.['iss-plan'])
+        .toEqual({
+          status: 'active',
+          duration: 12_600_000,
+        });
     },
   );
 });

@@ -73,11 +73,19 @@ test.describe('C12 L1-03 — Time lists', () => {
       await openTimeList(shell, plan, realtime, NOW_MID);
       await expect(plan.timeListRows).toHaveCount(4);
 
-      await expect(page.locator('[data-testid="time-list-row"][data-temporal="past"]')).toHaveCount(1);
-      await expect(page.locator('[data-testid="time-list-row"][data-temporal="current"]').first()).toBeVisible();
-      await expect(page.locator('[data-testid="time-list-row"][data-temporal="future"]')).toHaveCount(1);
+      await expect(page.locator('[data-testid="time-list-row"][data-temporal="past"]')).toHaveCount(
+        1,
+      );
+      await expect(
+        page.locator('[data-testid="time-list-row"][data-temporal="current"]').first(),
+      ).toBeVisible();
+      await expect(
+        page.locator('[data-testid="time-list-row"][data-temporal="future"]'),
+      ).toHaveCount(1);
 
-      const current = page.locator('[data-testid="time-list-row"][data-temporal="current"]').first();
+      const current = page
+        .locator('[data-testid="time-list-row"][data-temporal="current"]')
+        .first();
       await expect(current.getByTestId('time-list-progress')).toContainText('%');
       // Array repointing runs 09:00–11:00 → a two-hour duration.
       const arrayRow = page.locator('[data-testid="time-list-row"][data-id="Station ops::1"]');
