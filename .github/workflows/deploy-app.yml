@@ -147,5 +147,15 @@ jobs:
         run: curl -fs "${{ needs.deploy.outputs.url }}/imagery/frame-0.svg" | grep -q '<svg'
 
       - name: Assert AVIF screenshots are served with the right type
+        # Retries because the freshly deployed process can lag the health check
+        # by a few seconds while the old instance drains.
         run: |
-          curl -fsI "${{ needs.deploy.outputs.url }}/assets/shots/dashboard.avif" | grep -qi 'content-type: image/avif'
+          for i in $(seq 1 6); do
+            if curl -fsI "${{ needs.deploy.outputs.url }}/assets/shots/dashboard.avif" | grep -qi 'content-type: image/avif'; then
+              exit 0
+            fi
+            echo "attempt $i: AVIF not served yet — retrying in 10s"
+            sleep 10
+          done
+          echo '::error::AVIF screenshots are not served with content-type image/avif.'
+          exit 1
