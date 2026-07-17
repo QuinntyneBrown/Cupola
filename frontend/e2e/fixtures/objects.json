@@ -65,7 +65,7 @@
     "name": "My Items",
     "type": "folder",
     "location": "ROOT",
-    "composition": ["station-displays", "ops-notebook", "conditions-lab", "plots-lab", "tables-lab", "notebook-lab"],
+    "composition": ["station-displays", "ops-notebook", "conditions-lab", "plots-lab", "tables-lab", "notebook-lab", "imagery-lab"],
     "telemetry": null,
     "created": "2026-07-02T14:51:08Z",
     "modified": "2026-07-13T09:12:44Z",
@@ -691,6 +691,58 @@
     "location": "planning-lab",
     "composition": ["iss-plan"],
     "telemetry": null,
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "imagery-lab" },
+    "keyString": "imagery-lab",
+    "name": "Imagery lab",
+    "type": "folder",
+    "location": "mine",
+    "composition": ["cam.aft", "aft-strip"],
+    "telemetry": null,
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "cam.aft" },
+    "keyString": "cam.aft",
+    "name": "Aft camera",
+    "type": "telemetry",
+    "location": "imagery-lab",
+    "composition": [],
+    "telemetry": {
+      "hints": ["image"],
+      "imagery": {
+        "layers": [
+          { "key": "reticle", "name": "Reticle grid", "source": "/imagery/layers/reticle.svg", "visible": true },
+          { "key": "horizon", "name": "Horizon limb", "source": "/imagery/layers/horizon.svg", "visible": false }
+        ],
+        "relatedTelemetry": ["pwr.bus_v", "pwr.array_out"]
+      }
+    },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "aft-strip" },
+    "keyString": "aft-strip",
+    "name": "Aft imagery strip",
+    "type": "time-strip",
+    "location": "imagery-lab",
+    "composition": ["cam.aft", "pwr.bus_v"],
+    "telemetry": null,
+    "configuration": {
+      "independentTime": {
+        "enabled": true,
+        "mode": "fixed",
+        "bounds": { "start": 1783927800000, "end": 1783949400000 }
+      }
+    },
     "created": "2026-07-02T14:51:08Z",
     "modified": "2026-07-13T09:12:44Z",
     "createdBy": "j.reyes"
