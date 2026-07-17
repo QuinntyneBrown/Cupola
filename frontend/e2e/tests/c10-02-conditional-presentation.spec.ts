@@ -74,7 +74,7 @@ test.describe('C10 L1-02 — Conditional presentation and summary widgets', () =
   test(
     'OMCT-C10-L2-02.05 — test data previews rules without persisting telemetry',
     { annotation: [{ type: 'requirement', description: 'OMCT-C10-L2-02.05' }] },
-    async ({ shell, conditionSet, page }) => {
+    async ({ shell, conditionSet }) => {
       await shell.goto(SUMMARY);
       await expect(conditionSet.summaryPreview).toBeVisible();
       await expect(conditionSet.summaryPreview).toHaveText('NOMINAL');
