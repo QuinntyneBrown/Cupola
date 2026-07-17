@@ -5,7 +5,7 @@
     "name": "Root",
     "type": "root",
     "location": null,
-    "composition": ["station", "mine"],
+    "composition": ["station", "operations", "mine"],
     "telemetry": null,
     "created": "2026-07-02T14:51:08Z",
     "modified": "2026-07-13T09:12:44Z",
@@ -500,6 +500,109 @@
     "type": "autoflow",
     "location": "tables-lab",
     "composition": ["pwr.bus_v", "pwr.array_out"],
+    "telemetry": null,
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "operations" },
+    "keyString": "operations",
+    "name": "Operations",
+    "type": "folder",
+    "location": "ROOT",
+    "composition": ["iss-plan", "log.activity", "planning-lab"],
+    "telemetry": null,
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "iss-plan" },
+    "keyString": "iss-plan",
+    "name": "ISS daily plan",
+    "type": "plan",
+    "location": "operations",
+    "composition": [],
+    "telemetry": null,
+    "configuration": {
+      "planData": {
+        "Station ops": [
+          { "name": "Eclipse preparation", "start": 1783929600000, "end": 1783935000000, "type": "Station ops" },
+          { "name": "Array repointing", "start": 1783933200000, "end": 1783940400000, "type": "Station ops" },
+          { "name": "Battery reconditioning", "start": 1783944000000, "end": 1783947600000, "type": "Station ops" }
+        ],
+        "Crew": [
+          { "name": "Cupola photo survey", "start": 1783936800000, "end": 1783939500000, "type": "Crew" }
+        ]
+      }
+    },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "log.activity" },
+    "keyString": "log.activity",
+    "name": "Activity log",
+    "type": "telemetry",
+    "location": "operations",
+    "composition": [],
+    "telemetry": { "hints": ["domain"] },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "planning-lab" },
+    "keyString": "planning-lab",
+    "name": "Planning lab",
+    "type": "folder",
+    "location": "operations",
+    "composition": ["ops-strip", "ops-timelist", "ops-gantt"],
+    "telemetry": null,
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "ops-strip" },
+    "keyString": "ops-strip",
+    "name": "Ops time strip",
+    "type": "time-strip",
+    "location": "planning-lab",
+    "composition": ["iss-plan", "solar-array-output", "log.activity"],
+    "telemetry": null,
+    "configuration": {
+      "independentTime": {
+        "enabled": true,
+        "mode": "fixed",
+        "bounds": { "start": 1783927800000, "end": 1783949400000 }
+      }
+    },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "ops-timelist" },
+    "keyString": "ops-timelist",
+    "name": "Ops time list",
+    "type": "time-list",
+    "location": "planning-lab",
+    "composition": ["iss-plan"],
+    "telemetry": null,
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "ops-gantt" },
+    "keyString": "ops-gantt",
+    "name": "Ops gantt",
+    "type": "gantt-chart",
+    "location": "planning-lab",
+    "composition": ["iss-plan"],
     "telemetry": null,
     "created": "2026-07-02T14:51:08Z",
     "modified": "2026-07-13T09:12:44Z",

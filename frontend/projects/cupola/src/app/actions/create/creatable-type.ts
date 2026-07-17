@@ -97,4 +97,22 @@ export const CREATABLE_TYPES: CreatableType[] = [
     glyph: 'i-plot',
     description: 'Calculates a new telemetry stream from source-combination operations.',
   },
+  {
+    type: 'gantt-chart',
+    name: 'Gantt Chart',
+    glyph: 'i-timeline',
+    description: 'Composes plans as grouped activity rows on one shared time axis.',
+  },
+  {
+    type: 'time-strip',
+    name: 'Time Strip',
+    glyph: 'i-timeline',
+    description: 'Stacks compatible time-based views as rows sharing one time axis.',
+  },
+  {
+    type: 'time-list',
+    name: 'Time List',
+    glyph: 'i-list',
+    description: 'Presents a plan’s activities as a sortable, filterable time list.',
+  },
 ];

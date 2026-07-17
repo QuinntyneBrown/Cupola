@@ -1,0 +1,55 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tl-strip {
+  position: relative;
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-m);
+  background: var(--cp-color-void);
+  overflow: hidden;
+  width: 100%;
+}
+
+.tl-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 128px;
+  right: 0;
+  pointer-events: none;
+}
+
+.tl-evline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--cp-color-primary);
+}
+
+.ts-itc {
+  position: absolute;
+  top: 34px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: var(--cp-type-data-s);
+  color: var(--cp-color-ink-2);
+  background: var(--cp-color-surface-3);
+  border: 1px solid var(--cp-color-line);
+  border-radius: var(--cp-radius-pill);
+  padding: 1px 8px;
+}
+
+.strip-mode-toggle {
+  border: none;
+  background: transparent;
+  color: var(--cp-color-primary);
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}

@@ -1,0 +1,43 @@
+<div class="tl-gantt" data-testid="gantt-chart">
+  <div class="gnt-axis">
+    @for (tick of axisTicks(); track $index) {
+      <span
+        class="tl-tick"
+        data-testid="gantt-axis-tick"
+        [class.tl-tick--first]="$first"
+        [class.tl-tick--last]="$last"
+        [style.left.%]="tick.leftPct"
+        >{{ tick.label }}</span
+      >
+    }
+  </div>
+
+  @for (plan of plans(); track plan.keyString) {
+    <div class="gnt-group" data-testid="gantt-plan" [attr.data-key]="plan.keyString">
+      <span class="gnt-name">{{ plan.name }}</span>
+      <span class="meta">{{ plan.activityCount }} activities</span>
+    </div>
+    @for (row of plan.rows; track $index) {
+      <div class="gnt-row" data-testid="gantt-row">
+        @for (bar of row.bars; track bar.activity.id) {
+          <div
+            class="tl-bar"
+            data-testid="plan-activity"
+            [class.is-past]="bar.temporal === 'past'"
+            [class.is-future]="bar.temporal === 'future'"
+            [class.is-selected]="isSelected(bar)"
+            [attr.data-activity-id]="bar.activity.id"
+            [attr.data-plan]="plan.keyString"
+            [attr.data-temporal]="bar.temporal"
+            [style.--slot]="slotVar(bar.slot)"
+            [style.left.%]="bar.leftPct"
+            [style.width.%]="bar.widthPct"
+            (click)="selectActivity(bar.activity, bar.plan, $event)"
+          >
+            {{ bar.activity.name }}
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

@@ -1,0 +1,66 @@
+:host {
+  display: block;
+  width: 100%;
+  padding: var(--cp-space-4);
+}
+
+.time-list-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.cp-mono {
+  font-family: var(--cp-font-mono, monospace);
+}
+
+tr.is-currentrow td {
+  background: var(--cp-color-primary-dim);
+}
+
+tr.is-pastrow td {
+  color: var(--cp-color-ink-3);
+}
+
+.tt-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tt-progress--future {
+  color: var(--cp-color-ink-3);
+}
+
+.tl-arc {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+.tl-arc circle {
+  fill: none;
+  stroke-width: 3;
+}
+
+.tl-arc .trk {
+  stroke: color-mix(in srgb, currentColor 30%, transparent);
+}
+
+.tl-arc .fil {
+  stroke: currentColor;
+}
+
+.cp-th-sort {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.cp-th-sort.is-sorted {
+  color: var(--cp-color-primary);
+}

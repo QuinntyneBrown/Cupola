@@ -1,0 +1,32 @@
+<div class="tl-strip" data-testid="time-strip-chart">
+  <cp-time-axis [ticks]="axisTicks()" />
+
+  @for (member of members(); track member.keyString) {
+    <cp-time-strip-row
+      [object]="member"
+      [objectPath]="childPath(member)"
+      [timeContext]="stripContext()"
+    />
+  }
+
+  @if (evLinePct() !== null) {
+    <div class="tl-overlay">
+      <div class="tl-evline" data-testid="extended-line" [style.left.%]="evLinePct()"></div>
+    </div>
+  }
+
+  @if (independent()) {
+    <span class="ts-itc" data-testid="strip-independent-time">
+      <button
+        type="button"
+        class="strip-mode-toggle"
+        data-testid="strip-mode-toggle"
+        [attr.data-mode]="stripMode()"
+        (click)="toggleMode()"
+      >
+        Independent time · {{ modeLabel() }}
+      </button>
+      <span data-testid="strip-bounds">{{ boundsText() }}</span>
+    </span>
+  }
+</div>

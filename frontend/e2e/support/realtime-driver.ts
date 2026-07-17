@@ -8,6 +8,7 @@ interface E2eWindow {
     pushTelemetry(value: unknown): void;
     setConnectionState(state: string): void;
     setBounds(bounds: { start: number; end: number }): void;
+    setNow(timestamp: number): void;
   };
 }
 
@@ -50,5 +51,12 @@ export class RealtimeDriver {
     await this.page.evaluate((b) => {
       (window as E2eWindow).__cupolaE2E!.setBounds(b);
     }, bounds);
+  }
+
+  /** Pins the controllable "now" for deterministic temporal classes (OMCT-C12-L2-03.04). */
+  async setNow(timestamp: number): Promise<void> {
+    await this.page.evaluate((t) => {
+      (window as E2eWindow).__cupolaE2E!.setNow(t);
+    }, timestamp);
   }
 }

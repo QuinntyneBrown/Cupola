@@ -1,0 +1,7 @@
+:host {
+  display: block;
+}
+
+.cp-mono {
+  font-family: var(--cp-font-mono, monospace);
+}

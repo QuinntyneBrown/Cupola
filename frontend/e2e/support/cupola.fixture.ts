@@ -10,6 +10,7 @@ import { InspectorPage } from '../pages/inspector.page';
 import { LicensesPage } from '../pages/licenses.page';
 import { ObjectViewPage } from '../pages/object-view.page';
 import { OverlayPage } from '../pages/overlay.page';
+import { PlanPage } from '../pages/plan.page';
 import { PlotPage } from '../pages/plot.page';
 import { TelemetryTablePage } from '../pages/telemetry-table.page';
 import { TreePage } from '../pages/tree.page';
@@ -31,6 +32,7 @@ interface CupolaFixtures {
   licenses: LicensesPage;
   conditionSet: ConditionSetPage;
   plot: PlotPage;
+  plan: PlanPage;
   telemetryTable: TelemetryTablePage;
 }
 
@@ -86,6 +88,9 @@ export const test = base.extend<CupolaFixtures>({
   },
   plot: async ({ page }, use) => {
     await use(new PlotPage(page));
+  },
+  plan: async ({ page }, use) => {
+    await use(new PlanPage(page));
   },
   telemetryTable: async ({ page }, use) => {
     await use(new TelemetryTablePage(page));

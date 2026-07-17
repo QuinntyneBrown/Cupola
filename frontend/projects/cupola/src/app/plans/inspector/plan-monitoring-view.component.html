@@ -1,0 +1,34 @@
+@if (plan(); as plan) {
+  <div class="cp-expand is-open">
+    <div class="cp-expand-head">Plan execution monitoring</div>
+    <div class="cp-expand-body">
+      <div class="cp-field">
+        <label class="cp-field-label" for="plan-monitoring-status">Plan status</label>
+        <select
+          id="plan-monitoring-status"
+          class="cp-select"
+          data-testid="plan-monitoring-status"
+          [value]="status()"
+          (change)="onStatusChange($any($event.target).value)"
+        >
+          @for (option of statusOptions; track option.value) {
+            <option [value]="option.value" [selected]="option.value === status()">
+              {{ option.label }}
+            </option>
+          }
+        </select>
+      </div>
+      <div class="cp-field">
+        <label class="cp-field-label" for="plan-monitoring-duration">Expected duration</label>
+        <input
+          id="plan-monitoring-duration"
+          class="cp-input cp-input--data"
+          data-testid="plan-monitoring-duration"
+          [value]="durationText()"
+          (change)="onDurationChange($any($event.target).value)"
+        />
+        <span class="cp-field-help">Overdue when exceeded without completion (HH:mm:ss)</span>
+      </div>
+    </div>
+  </div>
+}

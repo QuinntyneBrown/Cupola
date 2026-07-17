@@ -52,6 +52,8 @@ import { registerDefaultToolbars } from './toolbars/register-default-toolbars';
 import { registerDefaultViews } from './views/register-default-views';
 import { registerPlotViews } from './views/plot/register-plot-views';
 import { registerTabularViews } from './tabular/register-tabular-views';
+import { registerPlans } from './plans/register-plans';
+import { NowProvider } from './plans/plan/now-provider';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -100,6 +102,11 @@ export const appConfig: ApplicationConfig = {
       // policies, view providers, and the gauge inspector before create actions
       // are minted from the creatable types.
       registerTabularViews();
+      // C12 planning: register plan/gantt/time-strip/time-list/monitoring types,
+      // view and inspector providers, composition policies, event timeline, and
+      // the activity-state / plan-monitoring interceptors and roots before create
+      // actions are minted from the creatable types.
+      registerPlans();
       registerDefaultActions();
       registerDefaultToolbars();
       // C14 operational awareness: user/status providers, indicators, notifications, faults.
@@ -119,6 +126,10 @@ export const appConfig: ApplicationConfig = {
         const hook = (window as unknown as { __cupolaE2E?: Record<string, unknown> }).__cupolaE2E;
         if (hook) {
           hook['setBounds'] = (bounds: { start: number; end: number }) => time.setBounds(bounds);
+          // C12 time list / plan temporal classification reads a controllable
+          // "now"; let acceptance tests pin it for deterministic temporal classes.
+          const now = inject(NowProvider);
+          hook['setNow'] = (value: number) => now.set(value);
         }
       }
     }),
