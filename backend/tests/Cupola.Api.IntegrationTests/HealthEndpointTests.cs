@@ -1,4 +1,5 @@
 using System.Net;
+using Cupola.Api.IntegrationTests.Testing;
 
 namespace Cupola.Api.IntegrationTests;
 
@@ -14,6 +15,7 @@ public class HealthEndpointTests
     public void OneTimeTearDown() => _factory.Dispose();
 
     [Test]
+    [Requirement("ADR-0005")]
     public async Task GetHealth_ReturnsHealthy()
     {
         var client = _factory.CreateClient();

@@ -7,7 +7,7 @@
 ## Context
 
 Cupola is a marketing site, an Angular console, and a .NET 8 API with a SignalR
-hub. We want a public demo that is cheap to run and simple to reason about,
+hub. The public demo is required to be cheap to run and simple to reason about,
 without standing up a database, an identity provider, or a separate front door.
 
 The frontend already makes this tractable. It calls the API with relative URLs

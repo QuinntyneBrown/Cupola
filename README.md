@@ -15,8 +15,8 @@ frontend support for real-time updates over SignalR.
 
 The whole product runs from a single Azure App Service (Free F1 tier), served from one origin:
 
-- `https://<app>.azurewebsites.net/` — the marketing site *(URL set after first deploy)*
-- `https://<app>.azurewebsites.net/app/` — the Cupola console
+- [cupola-app.azurewebsites.net](https://cupola-app.azurewebsites.net/) — the marketing site
+- [cupola-app.azurewebsites.net/app/](https://cupola-app.azurewebsites.net/app/) — the Cupola console
 
 Because the demo runs on the Free tier, a few caveats apply: the first request after the app has been idle cold-starts in roughly 10–30 seconds, the tier allows 60 CPU-minutes per day, and the seeded demo data resets to its initial state on every restart. See [ADR 0005](docs/adr/0005-single-app-service-deployment.md) for the hosting decision and [`infra/README.md`](infra/README.md) for provisioning and deployment.
 

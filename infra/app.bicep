@@ -13,14 +13,18 @@
 //   az deployment group create \
 //     --resource-group cupola-rg \
 //     --template-file infra/app.bicep \
-//     --parameters name=cupola-app location=eastus2
+//     --parameters name=cupola-app location=canadacentral
+//
+// Region note: Linux Free (F1) quota is per region per subscription, and this
+// subscription has zero in eastus2 ("SubscriptionIsOverQuotaForSku"); Canada
+// Central is the proven region here.
 // ---------------------------------------------------------------------------
 
 @description('App Service name (also used to derive the default hostname and the plan name). Must be globally unique; use a suffixed fallback such as cupola-app-<suffix> if cupola-app is taken.')
 param name string = 'cupola-app'
 
-@description('Azure region for the plan and site.')
-param location string = 'eastus2'
+@description('Azure region for the plan and site. Linux Free-tier quota varies by region; canadacentral is known-good for this subscription.')
+param location string = 'canadacentral'
 
 resource plan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: '${name}-plan'

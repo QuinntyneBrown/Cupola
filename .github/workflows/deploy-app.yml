@@ -74,6 +74,9 @@ jobs:
           mkdir -p publish/wwwroot/app
           cp -r marketing/. publish/wwwroot/
           cp -r frontend/dist/cupola/browser/. publish/wwwroot/app/
+          # The backend's ImageTelemetry emits root-absolute /imagery/... URLs,
+          # so the camera frames must also exist at the site root.
+          cp -r frontend/dist/cupola/browser/imagery publish/wwwroot/imagery
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -89,7 +92,7 @@ jobs:
       id-token: write
       contents: read
     outputs:
-      hostname: ${{ steps.host.outputs.hostname }}
+      url: ${{ steps.deploy.outputs.webapp-url }}
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -105,19 +108,11 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy package
+        id: deploy
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ vars.AZURE_WEBAPP_NAME }}
           package: publish
-
-      - name: Resolve default hostname
-        id: host
-        run: |
-          host=$(az webapp show \
-            -g "${{ vars.AZURE_RESOURCE_GROUP || 'cupola-rg' }}" \
-            -n "${{ vars.AZURE_WEBAPP_NAME }}" \
-            --query defaultHostName -o tsv)
-          echo "hostname=$host" >> "$GITHUB_OUTPUT"
 
   smoke:
     name: Smoke test
@@ -126,9 +121,9 @@ jobs:
     steps:
       - name: Wait for health (tolerating F1 cold start)
         run: |
-          host="${{ needs.deploy.outputs.hostname }}"
+          url="${{ needs.deploy.outputs.url }}"
           for i in $(seq 1 30); do
-            code=$(curl -s -o /dev/null -w '%{http_code}' "https://$host/health" || true)
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$url/health" || true)
             if [ "$code" = "200" ]; then
               echo "healthy after $i attempt(s)"
               exit 0
@@ -140,16 +135,13 @@ jobs:
           exit 1
 
       - name: Assert marketing site at /
-        run: |
-          host="${{ needs.deploy.outputs.hostname }}"
-          curl -s "https://$host/" | grep -qi 'cupola-marketing'
+        run: curl -s "${{ needs.deploy.outputs.url }}/" | grep -qi 'cupola-marketing'
 
       - name: Assert Angular console at /app/
-        run: |
-          host="${{ needs.deploy.outputs.hostname }}"
-          curl -s "https://$host/app/" | grep -q '<cp-root'
+        run: curl -s "${{ needs.deploy.outputs.url }}/app/" | grep -q '<cp-root'
 
       - name: Assert API responds at /api/branding
-        run: |
-          host="${{ needs.deploy.outputs.hostname }}"
-          curl -s "https://$host/api/branding" | grep -qi 'cupola'
+        run: curl -s "${{ needs.deploy.outputs.url }}/api/branding" | grep -qi 'cupola'
+
+      - name: Assert camera frames at /imagery (root-absolute telemetry URLs)
+        run: curl -fs "${{ needs.deploy.outputs.url }}/imagery/frame-0.svg" | grep -q '<svg'

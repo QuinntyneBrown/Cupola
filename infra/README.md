@@ -130,7 +130,7 @@ root. PowerShell:
 ```powershell
 az login
 $rg   = 'cupola-rg'
-$loc  = 'eastus2'
+$loc  = 'canadacentral'  # Linux Free quota is regional; eastus2 has none on this subscription
 $app  = 'cupola-app'   # globally unique; if taken, use cupola-app-<suffix>
 $repo = 'QuinntyneBrown/Cupola'
 
@@ -170,7 +170,6 @@ gh secret   set AZURE_CLIENT_ID       --body $appId  --repo $repo
 gh secret   set AZURE_TENANT_ID       --body $tenant --repo $repo
 gh secret   set AZURE_SUBSCRIPTION_ID --body $sub    --repo $repo
 gh variable set AZURE_WEBAPP_NAME     --body $app    --repo $repo
-gh variable set AZURE_RESOURCE_GROUP  --body $rg     --repo $repo
 ```
 
 Bash equivalent:
@@ -178,7 +177,7 @@ Bash equivalent:
 ```bash
 az login
 rg=cupola-rg
-loc=eastus2
+loc=canadacentral    # Linux Free quota is regional; eastus2 has none on this subscription
 app=cupola-app       # globally unique; if taken, use cupola-app-<suffix>
 repo=QuinntyneBrown/Cupola
 
@@ -212,13 +211,23 @@ gh secret   set AZURE_CLIENT_ID       --body "$appId"  --repo "$repo"
 gh secret   set AZURE_TENANT_ID       --body "$tenant" --repo "$repo"
 gh secret   set AZURE_SUBSCRIPTION_ID --body "$sub"    --repo "$repo"
 gh variable set AZURE_WEBAPP_NAME     --body "$app"    --repo "$repo"
-gh variable set AZURE_RESOURCE_GROUP  --body "$rg"     --repo "$repo"
 ```
 
 > The site name only lives in the `AZURE_WEBAPP_NAME` variable — nothing
 > downstream hardcodes it. If `cupola-app` is globally taken, deploy with a
 > suffixed `name` (e.g. `cupola-app-7f3a`) and set the variable to match; the
-> workflow reads it and resolves the hostname from the resource group.
+> workflow reads it and the deploy action reports the live URL. Update the
+> hardcoded canonical/OG URLs in `marketing/index.html` to the same host.
+
+> Older Azure CLI builds lack `az ad app federated-credential`. Equivalent
+> fallback (same JSON body; `$objId` is the application **object** id from
+> `az ad app show --id $appId --query id -o tsv`):
+>
+> ```powershell
+> az rest --method POST `
+>   --uri "https://graph.microsoft.com/v1.0/applications/$objId/federatedIdentityCredentials" `
+>   --headers "Content-Type=application/json" --body '@federated-credential.json'
+> ```
 
 ### First deploy
 

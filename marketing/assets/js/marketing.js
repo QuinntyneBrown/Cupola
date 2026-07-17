@@ -65,9 +65,9 @@
   // Gentle parallax on the hero offset cards. Skipped for reduced motion
   // and coarse pointers; transform stays composited (custom property only).
   var cards = document.querySelectorAll('.mk-hero-card');
+  var stage = document.querySelector('.mk-hero-stage');
   var coarse = window.matchMedia('(pointer: coarse)');
-  if (cards.length && !reducedMotion.matches && !coarse.matches) {
-    var stage = document.querySelector('.mk-hero-stage');
+  if (stage && cards.length && !reducedMotion.matches && !coarse.matches) {
     var ticking = false;
     var applyParallax = function () {
       ticking = false;

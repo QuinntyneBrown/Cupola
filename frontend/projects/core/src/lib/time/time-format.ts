@@ -26,18 +26,18 @@ const DATED_LABEL = /^(\d{4}-\d{2}-\d{2})[T ]/;
  * `YYYY-MM-DD HH:mm:ss.SSS` renderings overlap at typical tick densities:
  * when every label carries the same date the axis goes time-only (the dated
  * bounds remain visible in the conductor and independent-time badges), and
- * uniform `.000` millisecond tails are dropped. Labels that are not
+ * uniform `.000` millisecond tails are then dropped. Labels that are not
  * shared-date timestamps pass through unchanged, so non-time formatters are
  * unaffected.
  */
 export function condenseTimeLabels(labels: string[]): string[] {
   if (labels.length < 2) {
-    return stripUniformZeroMillis(labels);
+    return labels;
   }
   const dates = labels.map((label) => DATED_LABEL.exec(label)?.[1]);
   const shared = dates[0];
   if (!shared || dates.some((date) => date !== shared)) {
-    return stripUniformZeroMillis(labels);
+    return labels;
   }
   return stripUniformZeroMillis(labels.map((label) => label.slice(shared.length + 1)));
 }

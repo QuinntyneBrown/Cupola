@@ -127,7 +127,7 @@ public static class SeedData
 
         // Conditions lab
         Folder("conditions-lab", "Conditions lab", "folder", "mine",
-            "bus-monitor", "bus-status", "power-summary", "derived-power"),
+            "pwr.mode", "bus-monitor", "bus-status", "power-summary", "derived-power"),
         Obj("pwr.mode", "Bus mode", "telemetry", "conditions-lab", [],
             telemetry: new TelemetryMetadata(
                 ["range"],
@@ -330,28 +330,11 @@ public static class SeedData
     ];
 
     private static DomainObject Folder(
-        string key, string name, string type, string? location, params string[] composition)
-    {
-        var identifier = Identifier.Parse(key);
-        return new DomainObject
-        {
-            Identifier = identifier,
-            KeyString = identifier.ToKeyString(),
-            Name = name,
-            Type = type,
-            Location = location,
-            Composition = composition,
-            Telemetry = null,
-            Created = Created,
-            Modified = Modified,
-            CreatedBy = CreatedBy,
-            Version = 1,
-        };
-    }
+        string key, string name, string type, string? location, params string[] composition) =>
+        Obj(key, name, type, location, composition);
 
     private static DomainObject Plan(string key, string name, string location)
     {
-        var identifier = Identifier.Parse(key);
         static long At(int hour, int minute) =>
             new DateTimeOffset(2026, 7, 13, hour, minute, 0, TimeSpan.Zero).ToUnixTimeMilliseconds();
 
@@ -369,43 +352,13 @@ public static class SeedData
             ],
         };
 
-        return new DomainObject
-        {
-            Identifier = identifier,
-            KeyString = identifier.ToKeyString(),
-            Name = name,
-            Type = "plan",
-            Location = location,
-            Composition = Array.Empty<string>(),
-            Telemetry = null,
-            Created = Created,
-            Modified = Modified,
-            CreatedBy = CreatedBy,
-            Version = 1,
-            Configuration = JsonSerializer.SerializeToElement(
-                new Dictionary<string, object> { ["planData"] = planData }),
-        };
+        return Obj(key, name, "plan", location, Array.Empty<string>(),
+            configuration: new Dictionary<string, object> { ["planData"] = planData });
     }
 
     private static DomainObject Telemetry(
-        string key, string name, string location, TelemetryMetadata telemetry)
-    {
-        var identifier = Identifier.Parse(key);
-        return new DomainObject
-        {
-            Identifier = identifier,
-            KeyString = identifier.ToKeyString(),
-            Name = name,
-            Type = "telemetry",
-            Location = location,
-            Composition = Array.Empty<string>(),
-            Telemetry = telemetry,
-            Created = Created,
-            Modified = Modified,
-            CreatedBy = CreatedBy,
-            Version = 1,
-        };
-    }
+        string key, string name, string location, TelemetryMetadata telemetry) =>
+        Obj(key, name, "telemetry", location, Array.Empty<string>(), telemetry: telemetry);
 
     /// <summary>
     /// General builder for a seeded object with an optional passthrough

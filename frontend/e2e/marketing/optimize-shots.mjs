@@ -30,27 +30,31 @@ async function main() {
     return;
   }
 
-  const masters = entries.filter(
-    (file) => file.toLowerCase().endsWith('.png') && basename(file, extname(file)) !== 'og-image',
-  );
+  const masters = entries.filter((file) => file.toLowerCase().endsWith('.png'));
   if (masters.length === 0) {
     console.log(`No PNG masters found in ${srcDir}. Run "npm run shots" first.`);
     return;
   }
 
-  for (const file of masters) {
-    const name = basename(file, extname(file));
-    const input = join(srcDir, file);
-    const avifOut = join(outDir, `${name}.avif`);
-    const webpOut = join(outDir, `${name}.webp`);
+  // Encodes are independent; libvips releases the JS thread, so run them all.
+  const lines = await Promise.all(
+    masters.map(async (file) => {
+      const name = basename(file, extname(file));
+      const input = join(srcDir, file);
+      const avifOut = join(outDir, `${name}.avif`);
+      const webpOut = join(outDir, `${name}.webp`);
 
-    await sharp(input).avif({ quality: 50, effort: 6 }).toFile(avifOut);
-    await sharp(input).webp({ quality: 80 }).toFile(webpOut);
+      await Promise.all([
+        sharp(input).avif({ quality: 50, effort: 6 }).toFile(avifOut),
+        sharp(input).webp({ quality: 80 }).toFile(webpOut),
+      ]);
 
-    const [master, avif, webp] = await Promise.all([stat(input), stat(avifOut), stat(webpOut)]);
-    console.log(
-      `${name}: png ${formatKb(master.size)} -> avif ${formatKb(avif.size)}, webp ${formatKb(webp.size)}`,
-    );
+      const [master, avif, webp] = await Promise.all([stat(input), stat(avifOut), stat(webpOut)]);
+      return `${name}: png ${formatKb(master.size)} -> avif ${formatKb(avif.size)}, webp ${formatKb(webp.size)}`;
+    }),
+  );
+  for (const line of lines.sort()) {
+    console.log(line);
   }
 }
 

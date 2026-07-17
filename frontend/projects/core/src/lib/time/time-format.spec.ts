@@ -34,10 +34,15 @@ describe('condenseTimeLabels', () => {
 
   it('passes non-timestamp labels through unchanged', () => {
     expect(condenseTimeLabels(['1000', '2000', '3000'])).toEqual(['1000', '2000', '3000']);
+    expect(condenseTimeLabels(['0.000', '5.000', '10.000'])).toEqual(['0.000', '5.000', '10.000']);
+    expect(condenseTimeLabels(['00:10:00.000', '00:20:00.000'])).toEqual([
+      '00:10:00.000',
+      '00:20:00.000',
+    ]);
   });
 
   it('handles empty and single-label input', () => {
     expect(condenseTimeLabels([])).toEqual([]);
-    expect(condenseTimeLabels(['2026-07-13 09:30:00.000'])).toEqual(['2026-07-13 09:30:00']);
+    expect(condenseTimeLabels(['2026-07-13 09:30:00.000'])).toEqual(['2026-07-13 09:30:00.000']);
   });
 });

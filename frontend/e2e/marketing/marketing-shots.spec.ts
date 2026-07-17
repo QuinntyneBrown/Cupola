@@ -85,21 +85,6 @@ test.describe('marketing shots', () => {
     await captureShot(page, SHOTS_DIR, 'conditions');
   });
 
-  test('table', async ({ page, shell, telemetryTable }) => {
-    await shell.goto('browse/mine/tables-lab/bus-v-table');
-    await expect(telemetryTable.view).toBeVisible();
-    await expect.poll(() => telemetryTable.rowCount()).toBeGreaterThan(10);
-    await captureShot(page, SHOTS_DIR, 'table');
-  });
-
-  test('search', async ({ page, shell, grandSearch }) => {
-    await shell.goto('browse/mine');
-    await grandSearch.search('power');
-    await expect(grandSearch.results).toBeVisible();
-    await expect(grandSearch.objectResults.first()).toBeVisible();
-    await captureShot(page, SHOTS_DIR, 'search');
-  });
-
   test.describe('og-image', () => {
     // The Open Graph card is a flat 1200x630 at 1x — the standard social size.
     test.use({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
