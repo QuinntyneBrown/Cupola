@@ -110,6 +110,15 @@ export class ObjectApi {
   }
 
   /**
+   * True when the object's namespace provider can persist it — `update` for a
+   * persisted object, `create` otherwise (wave-5 B01 extension, OMCT-C11-L2-02.04).
+   */
+  supportsMutation(object: DomainObject): boolean {
+    const provider = this.providerFor(object.identifier.namespace);
+    return object.persisted === undefined ? provider.create !== undefined : provider.update !== undefined;
+  }
+
+  /**
    * Resolves the original hierarchy path for a key, object-first up to the
    * root, terminating on cyclic locations (OMCT-C02-L2-03.06).
    */

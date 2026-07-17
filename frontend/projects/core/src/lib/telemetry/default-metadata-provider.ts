@@ -21,7 +21,7 @@ export class DefaultMetadataProvider implements TelemetryMetadataProvider {
   }
 
   getMetadata(object: DomainObject): TelemetryValueMetadata[] {
-    return [
+    const values: TelemetryValueMetadata[] = [
       {
         key: 'timestamp',
         name: 'Timestamp',
@@ -40,5 +40,13 @@ export class DefaultMetadataProvider implements TelemetryMetadataProvider {
         filters: object.telemetry?.filters,
       },
     ];
+
+    // Only image-hinted sources mint an image value; the unconditional numeric
+    // range above must never make plain telemetry imagery-eligible (OMCT-C11-L2-01.01).
+    if (object.telemetry?.hints.includes('image')) {
+      values.push({ key: 'url', name: 'Image', hint: 'image', priority: 0, format: 'image' });
+    }
+
+    return values;
   }
 }

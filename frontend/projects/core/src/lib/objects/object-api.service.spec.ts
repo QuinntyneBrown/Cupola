@@ -259,3 +259,31 @@ describe('OMCT-C02-L2-03.06 Original-path resolution', () => {
     expect(path.map((object) => object.keyString)).toEqual(['a', 'b']);
   });
 });
+
+describe('OMCT-C11-L2-02.04 Mutation support predicate', () => {
+  it('reports mutation support from the namespace provider update capability', () => {
+    const api = setup();
+    const provider = new FakeProvider();
+    api.registerProvider('ns', provider);
+    const persisted = domainObject('ns:old', {
+      identifier: { namespace: 'ns', key: 'old' },
+      persisted: 'x',
+    });
+
+    expect(api.supportsMutation(persisted)).toBe(true);
+  });
+
+  it('reports no mutation support when the provider lacks the required operation', () => {
+    const api = setup();
+    const readOnly: ObjectProvider = { get: async () => undefined };
+    api.registerProvider('ro', readOnly);
+    const persisted = domainObject('ro:old', {
+      identifier: { namespace: 'ro', key: 'old' },
+      persisted: 'x',
+    });
+    const unpersisted = domainObject('ro:new', { identifier: { namespace: 'ro', key: 'new' } });
+
+    expect(api.supportsMutation(persisted)).toBe(false);
+    expect(api.supportsMutation(unpersisted)).toBe(false);
+  });
+});

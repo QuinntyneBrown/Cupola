@@ -46,6 +46,39 @@ public class TelemetryEndpointTests
     }
 
     [Test]
+    [Requirement("OMCT-C11-L2-01.02")]
+    public async Task GetHistory_ImageHintedKey_ReturnsImageFramesOnTheCaptureGrid()
+    {
+        var client = _factory.CreateClient();
+        const long start = 0;
+        const long end = 90_000;
+
+        var response = await client.GetAsync($"/api/telemetry/cam.cupola?start={start}&end={end}");
+        var body = JsonSerializer.Deserialize<JsonElement>(
+            await response.Content.ReadAsStringAsync(), Json);
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        var samples = body.EnumerateArray().ToList();
+        Assert.That(samples, Has.Count.EqualTo(4)); // 0, 30, 60, 90 s
+        Assert.That(samples[0].GetProperty("url").GetString(), Is.EqualTo("/imagery/frame-0.svg"));
+        Assert.That(samples[1].GetProperty("url").GetString(), Is.EqualTo("/imagery/frame-1.svg"));
+        Assert.That(samples.All(s => s.TryGetProperty("heading", out _)), Is.True);
+    }
+
+    [Test]
+    [Requirement("OMCT-C11-L2-01.02")]
+    public async Task GetHistory_PlainTelemetry_CarriesNoImageFields()
+    {
+        var client = _factory.CreateClient();
+
+        var response = await client.GetAsync("/api/telemetry/pwr.bus_v?start=0&end=5000");
+        var body = JsonSerializer.Deserialize<JsonElement>(
+            await response.Content.ReadAsStringAsync(), Json);
+
+        Assert.That(body.EnumerateArray().Any(s => s.TryGetProperty("url", out _)), Is.False);
+    }
+
+    [Test]
     [Requirement("OMCT-C06-L2-04.01")]
     public async Task GetHistory_UnknownKey_Returns404()
     {

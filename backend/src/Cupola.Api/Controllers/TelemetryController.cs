@@ -18,7 +18,10 @@ public class TelemetryController : ControllerBase
         _store = store;
     }
 
-    /// <summary>Bounded historical samples for a telemetry object (OMCT-C06-L2-04.01).</summary>
+    /// <summary>
+    /// Bounded historical samples for a telemetry object (OMCT-C06-L2-04.01);
+    /// image-hinted sources return image frames (wave-5 B06 extension, OMCT-C11-L2-01.02).
+    /// </summary>
     [HttpGet("{keyString}")]
     public IActionResult GetHistory(string keyString, [FromQuery] long start, [FromQuery] long end)
     {
@@ -28,6 +31,9 @@ public class TelemetryController : ControllerBase
             return NotFound();
         }
 
-        return Ok(SineTelemetry.Range(keyString, start, end));
+        var isImage = domainObject.Telemetry?.Hints.Contains("image") == true;
+        return Ok(isImage
+            ? ImageTelemetry.Range(keyString, start, end)
+            : SineTelemetry.Range(keyString, start, end));
     }
 }
