@@ -41,14 +41,7 @@ const ROW_CLASS: Record<StripRowKind, string> = {
       [attr.data-key]="object().keyString"
     >
       <div class="tl-gutter" data-testid="strip-row-gutter">{{ object().name }}</div>
-      <div class="tl-track" #host>
-        @if (kind() === 'image') {
-          <div class="ts-shot" style="left: 50%">
-            <span class="ts-shot-img"></span>
-            <span>{{ object().name }}</span>
-          </div>
-        }
-      </div>
+      <div class="tl-track" #host></div>
     </div>
   `,
   styleUrl: './time-strip-row.component.css',

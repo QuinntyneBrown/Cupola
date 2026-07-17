@@ -5,6 +5,7 @@ import { BarGraphViewComponent } from '../../charts/bar/bar-graph-view.component
 import { ScatterPlotViewComponent } from '../../charts/scatter/scatter-plot-view.component';
 import { PlotViewComponent } from '../../views/plot/plot-view.component';
 import { StackedPlotViewComponent } from '../../views/plot/stacked-plot/stacked-plot-view.component';
+import { ImageryTimeViewComponent } from '../../views/imagery/time-strip/imagery-time-view.component';
 import { EventTrackViewComponent } from '../events/event-track-view.component';
 import { GanttViewComponent } from '../gantt/gantt-view.component';
 import { PlanViewComponent } from '../plan/plan-view.component';
@@ -19,7 +20,7 @@ export interface StripComponent {
 /**
  * Resolves the component that renders a strip child (OMCT-C12-L2-02.02). Bar and
  * scatter charts do not declare a `restricted` input, so they are flagged not to
- * receive one. Image telemetry is rendered by the row directly (no component).
+ * receive one. Image telemetry hosts C11's imagery time view (OMCT-C11-L2-01.05).
  */
 export function stripComponentFor(
   object: DomainObject,
@@ -47,6 +48,9 @@ export function stripComponentFor(
   }
   if (kind === 'event') {
     return { component: EventTrackViewComponent, acceptsRestricted: true };
+  }
+  if (kind === 'image') {
+    return { component: ImageryTimeViewComponent, acceptsRestricted: true };
   }
   return null;
 }

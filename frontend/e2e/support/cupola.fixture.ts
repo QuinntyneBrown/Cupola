@@ -6,6 +6,7 @@ import { ConditionSetPage } from '../pages/condition-set.page';
 import { ContextMenuPage } from '../pages/context-menu.page';
 import { FormDialogPage } from '../pages/form-dialog.page';
 import { GrandSearchPage } from '../pages/grand-search.page';
+import { ImageryPage } from '../pages/imagery.page';
 import { InspectorPage } from '../pages/inspector.page';
 import { LayoutPage } from '../pages/layout.page';
 import { LicensesPage } from '../pages/licenses.page';
@@ -38,6 +39,7 @@ interface CupolaFixtures {
   telemetryTable: TelemetryTablePage;
   notebook: NotebookPage;
   layout: LayoutPage;
+  imagery: ImageryPage;
 }
 
 /**
@@ -104,6 +106,9 @@ export const test = base.extend<CupolaFixtures>({
   },
   layout: async ({ page }, use) => {
     await use(new LayoutPage(page));
+  },
+  imagery: async ({ page }, use) => {
+    await use(new ImageryPage(page));
   },
 });
 

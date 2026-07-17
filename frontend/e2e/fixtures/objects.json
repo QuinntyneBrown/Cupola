@@ -901,7 +901,7 @@
       "independentTime": {
         "enabled": true,
         "mode": "fixed",
-        "bounds": { "start": 1783927800000, "end": 1783949400000 }
+        "bounds": { "start": 1783948800000, "end": 1783949400000 }
       }
     },
     "created": "2026-07-02T14:51:08Z",
