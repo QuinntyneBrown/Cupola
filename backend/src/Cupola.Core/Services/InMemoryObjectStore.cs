@@ -183,12 +183,25 @@ public class InMemoryObjectStore : IObjectStore
             ? textElement.GetString()!
             : string.Empty;
 
+        // Typed-annotation extras live beside the payload (B10 wave-5 extension);
+        // AnnotationService writes them at configuration.annotationType/targetDetails.
+        var annotationType = configuration.TryGetProperty("annotationType", out var typeElement)
+                             && typeElement.ValueKind == JsonValueKind.String
+            ? typeElement.GetString()
+            : null;
+        JsonElement? targetDetails = configuration.TryGetProperty("targetDetails", out var detailsElement)
+                                     && detailsElement.ValueKind == JsonValueKind.Array
+            ? detailsElement.Clone()
+            : null;
+
         return new Annotation(
             domainObject.KeyString,
             text,
             ReadStrings(payload, "targets"),
             ReadStrings(payload, "tags"),
-            domainObject.Modified);
+            domainObject.Modified,
+            annotationType,
+            targetDetails);
     }
 
     private static IReadOnlyList<string> ReadStrings(JsonElement element, string property)

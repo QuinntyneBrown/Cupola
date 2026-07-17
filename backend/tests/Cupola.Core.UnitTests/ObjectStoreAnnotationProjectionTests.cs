@@ -72,6 +72,71 @@ public class ObjectStoreAnnotationProjectionTests
     }
 
     [Test]
+    [Requirement("OMCT-C11-L2-03.02")]
+    public void GetAnnotationsFor_ProjectsAnnotationTypeAndTargetDetails()
+    {
+        var identifier = Identifier.Parse("ann.pixel-1");
+        _store.Save(new DomainObject
+        {
+            Identifier = identifier,
+            KeyString = identifier.ToKeyString(),
+            Name = "Star tracker glint",
+            Type = "annotation",
+            Location = null,
+            Composition = Array.Empty<string>(),
+            CreatedBy = "test.operator",
+            Configuration = JsonSerializer.SerializeToElement(new
+            {
+                annotation = new
+                {
+                    text = "Star tracker glint",
+                    targets = new[] { "cam.cupola" },
+                    tags = new[] { "imagery" },
+                },
+                annotationType = "image-pixel",
+                targetDetails = new[]
+                {
+                    new
+                    {
+                        keyString = "cam.cupola",
+                        detail = new { time = 60_000, rectangle = new { x = 0.1, y = 0.2, w = 0.3, h = 0.4 } },
+                    },
+                },
+            }),
+        });
+
+        var projected = _store.GetAnnotationsFor("cam.cupola")!
+            .Single(a => a.KeyString == "ann.pixel-1");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(projected.AnnotationType, Is.EqualTo("image-pixel"));
+            Assert.That(projected.TargetDetails, Is.Not.Null);
+            var detail = projected.TargetDetails!.Value[0];
+            Assert.That(detail.GetProperty("keyString").GetString(), Is.EqualTo("cam.cupola"));
+            Assert.That(detail.GetProperty("detail").GetProperty("rectangle").GetProperty("x").GetDouble(),
+                Is.EqualTo(0.1));
+        });
+    }
+
+    [Test]
+    [Requirement("OMCT-C11-L2-03.02")]
+    public void GetAnnotationsFor_LeavesUntypedAnnotationsBare()
+    {
+        _store.Save(AnnotationObject(
+            "ann.untyped", "Plain note", ["solar-array-output"], []));
+
+        var projected = _store.GetAnnotationsFor("solar-array-output")!
+            .Single(a => a.KeyString == "ann.untyped");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(projected.AnnotationType, Is.Null);
+            Assert.That(projected.TargetDetails, Is.Null);
+        });
+    }
+
+    [Test]
     [Requirement("OMCT-C13-L2-04.01")]
     public void GetAnnotationsFor_IgnoresAnnotationObjectsWithoutAPayload()
     {
