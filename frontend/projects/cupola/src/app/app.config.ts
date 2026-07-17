@@ -53,6 +53,7 @@ import { registerDefaultViews } from './views/register-default-views';
 import { registerPlotViews } from './views/plot/register-plot-views';
 import { registerTabularViews } from './tabular/register-tabular-views';
 import { registerPlans } from './plans/register-plans';
+import { registerNotebook } from './notebook/register-notebook';
 import { NowProvider } from './plans/plan/now-provider';
 
 export const appConfig: ApplicationConfig = {
@@ -107,6 +108,10 @@ export const appConfig: ApplicationConfig = {
       // the activity-state / plan-monitoring interceptors and roots before create
       // actions are minted from the creatable types.
       registerPlans();
+      // C13 notebooks: register the notebook, restricted-notebook, and annotation
+      // types, the notebook view, the copy/export actions, and the known
+      // annotation types before create actions are minted from the creatable types.
+      registerNotebook();
       registerDefaultActions();
       registerDefaultToolbars();
       // C14 operational awareness: user/status providers, indicators, notifications, faults.

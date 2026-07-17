@@ -44,6 +44,12 @@ export const CREATABLE_TYPES: CreatableType[] = [
     description: 'A timestamped log for operator notes and annotations.',
   },
   {
+    type: 'restricted-notebook',
+    name: 'Restricted Notebook',
+    glyph: 'i-notebook',
+    description: 'A notebook with committed entries and a restricted URL whitelist.',
+  },
+  {
     type: 'table',
     name: 'Telemetry Table',
     glyph: 'i-table',

@@ -1,0 +1,13 @@
+<button
+  type="button"
+  class="nb-snap"
+  data-testid="notebook-embed"
+  [attr.data-object]="embed().objectKeyString"
+  (click)="expand()"
+>
+  <span class="nb-snap-img"></span>
+  <span class="nb-snap-meta">
+    <span class="nb-snap-name" data-testid="notebook-embed-name">{{ embed().objectName }}</span>
+    <span class="nb-snap-ts">{{ capturedLabel() }}</span>
+  </span>
+</button>

@@ -78,6 +78,14 @@ export * from './lib/faults/fault';
 export * from './lib/faults/fault-provider';
 export * from './lib/faults/fault-management.service';
 
+export * from './lib/notebook/notebook-model';
+export * from './lib/notebook/notebook.service';
+export * from './lib/notebook/notebook-storage.service';
+
+export * from './lib/annotations/annotation.service';
+export * from './lib/annotations/tag-registry';
+export * from './lib/annotations/target-comparators';
+
 export * from './lib/security/sanitizers';
 export * from './lib/security/image-url';
 export * from './lib/security/safe-object';

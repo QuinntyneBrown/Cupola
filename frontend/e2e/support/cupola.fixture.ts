@@ -8,6 +8,7 @@ import { FormDialogPage } from '../pages/form-dialog.page';
 import { GrandSearchPage } from '../pages/grand-search.page';
 import { InspectorPage } from '../pages/inspector.page';
 import { LicensesPage } from '../pages/licenses.page';
+import { NotebookPage } from '../pages/notebook.page';
 import { ObjectViewPage } from '../pages/object-view.page';
 import { OverlayPage } from '../pages/overlay.page';
 import { PlanPage } from '../pages/plan.page';
@@ -34,6 +35,7 @@ interface CupolaFixtures {
   plot: PlotPage;
   plan: PlanPage;
   telemetryTable: TelemetryTablePage;
+  notebook: NotebookPage;
 }
 
 /**
@@ -94,6 +96,9 @@ export const test = base.extend<CupolaFixtures>({
   },
   telemetryTable: async ({ page }, use) => {
     await use(new TelemetryTablePage(page));
+  },
+  notebook: async ({ page }, use) => {
+    await use(new NotebookPage(page));
   },
 });
 

@@ -65,7 +65,7 @@
     "name": "My Items",
     "type": "folder",
     "location": "ROOT",
-    "composition": ["station-displays", "ops-notebook", "conditions-lab", "plots-lab", "tables-lab"],
+    "composition": ["station-displays", "ops-notebook", "conditions-lab", "plots-lab", "tables-lab", "notebook-lab"],
     "telemetry": null,
     "created": "2026-07-02T14:51:08Z",
     "modified": "2026-07-13T09:12:44Z",
@@ -115,6 +115,40 @@
     "location": "mine",
     "composition": [],
     "telemetry": null,
+    "configuration": {
+      "sections": [
+        { "id": "sec-eva", "name": "EVA operations", "pages": [{ "id": "pg-eva71", "name": "EVA 71" }] }
+      ],
+      "entries": {
+        "sec-eva": {
+          "pg-eva71": [
+            {
+              "id": "ent-1",
+              "createdOn": "2026-07-13T14:52:07Z",
+              "createdBy": "j.reyes",
+              "text": "Torqued battery 2B bolts; drive readings nominal",
+              "embeds": [
+                {
+                  "objectKeyString": "pwr.bus_v",
+                  "objectName": "Bus voltage",
+                  "viewKey": "plot-view",
+                  "capturedAt": "2026-07-13T14:51:40Z"
+                }
+              ],
+              "tags": ["power"]
+            },
+            {
+              "id": "ent-2",
+              "createdOn": "2026-07-13T13:38:19Z",
+              "createdBy": "j.reyes",
+              "text": "Scrubber swap complete before egress",
+              "embeds": [],
+              "tags": []
+            }
+          ]
+        }
+      }
+    },
     "created": "2026-07-02T14:51:08Z",
     "modified": "2026-07-13T09:12:44Z",
     "createdBy": "j.reyes"
@@ -501,6 +535,59 @@
     "location": "tables-lab",
     "composition": ["pwr.bus_v", "pwr.array_out"],
     "telemetry": null,
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "notebook-lab" },
+    "keyString": "notebook-lab",
+    "name": "Notebook lab",
+    "type": "folder",
+    "location": "mine",
+    "composition": ["shift-log"],
+    "telemetry": null,
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "shift-log" },
+    "keyString": "shift-log",
+    "name": "Shift log",
+    "type": "restricted-notebook",
+    "location": "notebook-lab",
+    "composition": [],
+    "telemetry": null,
+    "configuration": {
+      "isRestricted": true,
+      "urlWhitelist": ["example.com"],
+      "sections": [
+        { "id": "sec-log", "name": "Console log", "pages": [{ "id": "pg-shift", "name": "Shift 1" }] }
+      ],
+      "entries": {
+        "sec-log": {
+          "pg-shift": [
+            {
+              "id": "log-1",
+              "createdOn": "2026-07-13T12:00:00Z",
+              "createdBy": "e.thorne",
+              "text": "Reference procedure at <a href=\"https://ops.example.com/procedure\">the ops log</a>.",
+              "embeds": [],
+              "tags": []
+            },
+            {
+              "id": "log-2",
+              "createdOn": "2026-07-13T12:04:51Z",
+              "createdBy": "e.thorne",
+              "text": "External note <a href=\"https://mission-wiki.example.org/entry\">the mission wiki</a>.",
+              "embeds": [],
+              "tags": []
+            }
+          ]
+        }
+      }
+    },
     "created": "2026-07-02T14:51:08Z",
     "modified": "2026-07-13T09:12:44Z",
     "createdBy": "j.reyes"
