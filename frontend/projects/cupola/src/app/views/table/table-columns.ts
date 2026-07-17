@@ -1,10 +1,10 @@
-import { DomainObject, MetadataRegistry, TelemetryValueMetadata } from '@cupola/core';
+import { DomainObject, MetadataRegistry, TelemetryValueHint, TelemetryValueMetadata } from '@cupola/core';
 
 /** A rendered table column derived from a telemetry metadata value. */
 export interface TableColumn {
   key: string; // datum field key, or 'name' for the synthetic member column
   name: string;
-  hint: 'domain' | 'range' | 'name';
+  hint: TelemetryValueHint | 'name';
   unit?: string;
   format?: string;
   width?: number;

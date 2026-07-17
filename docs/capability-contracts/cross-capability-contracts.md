@@ -428,6 +428,11 @@ compatible; `targetDetails` carries per-target typed detail — C11's pixel-spat
 coordinates (OMCT-C11-L2-03.02/03.03) ride in `detail` — and `annotationType` selects the
 comparator registered per type, with deep equality as the fallback (OMCT-C13-L2-04.06).
 
+Wave-5 addition: the backend `Annotation` record and the store's annotation-object
+projection carry `annotationType` and `targetDetails` (null-suppressed on the wire), so
+typed annotations created through the generic persistence routes round-trip through
+`GET /api/objects/{keyString}/annotations`.
+
 ### B11 — Time-strip child-view contract
 
 Path: `docs/capability-contracts/time-strip-children.md` (new, spec-kind contract)

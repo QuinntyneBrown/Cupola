@@ -1,0 +1,64 @@
+<div
+  class="fl-canvas"
+  [class.fl-canvas--edit]="editing()"
+  [class.fl-canvas--rows]="config().rowsLayout"
+  data-testid="fl-canvas"
+  [attr.data-editing]="editing()"
+  [style.background-color]="canvasStyle().backgroundColor ?? null"
+  [style.border-color]="canvasStyle().borderColor ?? null"
+  [style.color]="canvasStyle().color ?? null"
+>
+  @for (container of config().containers; track container.id; let containerIndex = $index) {
+    <section
+      class="fl-container"
+      data-testid="fl-container"
+      [attr.data-container-id]="container.id"
+      [style.flex-basis.%]="container.size"
+    >
+      @if (editing()) {
+        <span class="fl-chip">{{ container.frames.length }} frame(s)</span>
+      }
+      @for (frame of container.frames; track frame.id; let frameIndex = $index) {
+        <div
+          class="fl-pane"
+          [class.fl-pane--styled]="frame.styles"
+          [class.is-selected]="selectedFrameId() === frame.id"
+          data-testid="fl-pane"
+          [attr.data-frame-id]="frame.id"
+          [attr.data-key]="frame.keyString"
+          [style.flex-basis.%]="frame.size"
+          [style.background-color]="frame.styles?.backgroundColor ?? null"
+          [style.border-color]="frame.styles?.borderColor ?? null"
+          [style.color]="frame.styles?.color ?? null"
+          [style.visibility]="frame.styles?.visibility ?? null"
+          (click)="selectFrame($event, frame.id, frame.keyString)"
+        >
+          <cp-embedded-object-view [keyString]="frame.keyString" [objectPath]="objectPath()" />
+        </div>
+        @if (editing() && frameIndex < container.frames.length - 1) {
+          <div
+            class="cp-splitter"
+            [class.cp-splitter--v]="config().rowsLayout"
+            [class.cp-splitter--h]="!config().rowsLayout"
+            data-testid="fl-splitter"
+            [attr.data-scope]="'frames'"
+            (pointerdown)="onSplitterPointerDown($event, 'frames', frameIndex, container.id)"
+          ></div>
+        }
+      }
+      @if (container.frames.length === 0) {
+        <div class="cp-empty fl-empty">Empty container</div>
+      }
+    </section>
+    @if (editing() && containerIndex < config().containers.length - 1) {
+      <div
+        class="cp-splitter"
+        [class.cp-splitter--h]="config().rowsLayout"
+        [class.cp-splitter--v]="!config().rowsLayout"
+        data-testid="fl-splitter"
+        [attr.data-scope]="'containers'"
+        (pointerdown)="onSplitterPointerDown($event, 'containers', containerIndex)"
+      ></div>
+    }
+  }
+</div>

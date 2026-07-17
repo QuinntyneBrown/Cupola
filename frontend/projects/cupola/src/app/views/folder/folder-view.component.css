@@ -2,6 +2,12 @@
   display: block;
 }
 
+.folder-head {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
 .children-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));

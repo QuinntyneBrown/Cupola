@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <!-- Reticle grid overlay: transparent; thirds grid + center crosshair. -->
+  <g stroke="#7fd4ff" stroke-width="1" opacity="0.55" fill="none">
+    <path d="M133 0v300 M267 0v300 M0 100h400 M0 200h400"/>
+    <circle cx="200" cy="150" r="26"/>
+    <path d="M200 112v24 M200 164v24 M162 150h24 M214 150h24"/>
+  </g>
+</svg>

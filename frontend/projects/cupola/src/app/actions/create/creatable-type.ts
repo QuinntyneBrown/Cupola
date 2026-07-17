@@ -38,6 +38,36 @@ export const CREATABLE_TYPES: CreatableType[] = [
     description: 'Plots one telemetry range against another as a scatter of points.',
   },
   {
+    type: 'layout',
+    name: 'Display Layout',
+    glyph: 'i-layout',
+    description: 'An editable canvas that positions and styles composed object views.',
+  },
+  {
+    type: 'flexible-layout',
+    name: 'Flexible Layout',
+    glyph: 'i-columns',
+    description: 'Resizable pane containers hosting composed object views.',
+  },
+  {
+    type: 'tabs',
+    name: 'Tabs View',
+    glyph: 'i-tabs',
+    description: 'Presents each composed object behind its own selectable tab.',
+  },
+  {
+    type: 'hyperlink',
+    name: 'Hyperlink',
+    glyph: 'i-link',
+    description: 'A configured web destination presented as a text link or button.',
+  },
+  {
+    type: 'web-page',
+    name: 'Web Page',
+    glyph: 'i-link',
+    description: 'Embeds a configured web page in a dedicated object view.',
+  },
+  {
     type: 'notebook',
     name: 'Notebook',
     glyph: 'i-notebook',

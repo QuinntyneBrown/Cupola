@@ -12,7 +12,7 @@ export interface DomainObjectFixture {
   type: string;
   location: string | null;
   composition: string[];
-  telemetry: { hints: string[]; unit?: string; filters?: unknown[] } | null;
+  telemetry: { hints: string[]; unit?: string; filters?: unknown[]; imagery?: unknown } | null;
   created: string;
   modified: string;
   createdBy: string;
@@ -27,6 +27,9 @@ export interface AnnotationFixture {
   targets: string[];
   tags: string[];
   modified: string;
+  /** Typed-annotation extras (B10 wave-5 extension). */
+  annotationType?: string;
+  targetDetails?: unknown[];
 }
 
 /**
@@ -85,9 +88,46 @@ export class FakeBackend {
         targets: payload.targets ?? [],
         tags: payload.tags ?? [],
         modified: object.modified,
+        annotationType: object.configuration?.['annotationType'] as string | undefined,
+        targetDetails: object.configuration?.['targetDetails'] as unknown[] | undefined,
       });
     }
     return [...this.annotations, ...projected];
+  }
+
+  /**
+   * Deterministic image history mirroring the backend ImageTelemetry generator
+   * formula-for-formula: frames sit on unix-epoch multiples of the 30 s capture
+   * grid (IMAGE_CADENCE_MS in both places); changing either side invalidates the
+   * imagery e2e fixtures.
+   */
+  private static imageHistory(
+    keyString: string,
+    start: number,
+    end: number,
+  ): {
+    keyString: string;
+    timestamp: string;
+    value: number;
+    url: string;
+    heading: number;
+    cameraAngle: number;
+  }[] {
+    const cadence = 30_000;
+    const values = [];
+    const firstGrid = Math.ceil(start / cadence) * cadence;
+    for (let t = firstGrid; t <= end && values.length < 3600; t += cadence) {
+      const frameIndex = Math.floor(t / cadence) % 4;
+      values.push({
+        keyString,
+        timestamp: new Date(t).toISOString(),
+        value: frameIndex,
+        url: `/imagery/frame-${frameIndex}.svg`,
+        heading: ((t / 1000) * 0.75) % 360,
+        cameraAngle: 20 * Math.sin(t / 60_000),
+      });
+    }
+    return values;
   }
 
   /** Deterministic sine history: one point per second, capped at 200 points. */
@@ -137,16 +177,22 @@ export class FakeBackend {
         return json({ objects, annotations });
       }
 
-      // Historical telemetry: deterministic sine so plots/tables load repeatably.
+      // Historical telemetry: deterministic sine (or image frames for
+      // image-hinted sources) so plots/tables/imagery load repeatably.
       const telemetryPath = path.match(/^\/api\/telemetry\/([^/]+)$/);
       if (telemetryPath) {
         const keyString = decodeURIComponent(telemetryPath[1]);
-        if (!this.objects.get(keyString)?.telemetry) {
+        const telemetry = this.objects.get(keyString)?.telemetry;
+        if (!telemetry) {
           return json({ title: 'Not Found', status: 404 }, 404);
         }
         const start = Number(url.searchParams.get('start') ?? 0);
         const end = Number(url.searchParams.get('end') ?? 0);
-        return json(FakeBackend.sineHistory(keyString, start, end));
+        return json(
+          telemetry.hints.includes('image')
+            ? FakeBackend.imageHistory(keyString, start, end)
+            : FakeBackend.sineHistory(keyString, start, end),
+        );
       }
 
       // B04 persistence routes (the app binds CouchObjectsGateway, which batches

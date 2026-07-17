@@ -1,10 +1,209 @@
-<div class="imagery" data-testid="imagery-view">
-  <div class="frame">
-    <svg class="cp-icon" viewBox="0 0 24 24" width="48" height="48"><use href="#i-camera" /></svg>
-    <span class="frame-label">{{ object().name }}</span>
+<div class="imagery" data-testid="imagery-view" tabindex="0" (keydown)="onKeydown($event)">
+  <div
+    class="im-stage"
+    [class.im-stage--zoom]="zoomed()"
+    #stage
+    (wheel)="onWheel($event)"
+    (pointerdown)="onStagePointerDown($event)"
+  >
+    @if (focused(); as frame) {
+      <div class="im-transform" [style.transform]="transform()">
+        <img
+          class="im-image"
+          data-testid="focused-image"
+          [src]="frame.url"
+          [style.filter]="cssFilter()"
+          [alt]="object().name + ' at ' + frame.timestampIso"
+          draggable="false"
+        />
+        @for (layer of visibleLayers(); track layer.key) {
+          <img
+            class="im-layer"
+            data-testid="image-layer"
+            [attr.data-layer]="layer.key"
+            [src]="layer.source"
+            [alt]="layer.name"
+            draggable="false"
+          />
+        }
+        <cp-imagery-annotations
+          [annotations]="frameAnnotations()"
+          [object]="object()"
+          [marqueeEnabled]="!zoomed()"
+        />
+      </div>
+
+      <div class="im-chip">
+        <span data-testid="frame-time">{{ frame.timestampIso }}</span>
+        @if (live()) {
+          <span class="live" data-testid="imagery-live">LIVE</span>
+        }
+      </div>
+
+      @if (orientation(); as heading) {
+        <cp-imagery-compass [orientation]="heading" />
+      }
+
+      @if (zoomed()) {
+        <div class="im-overview" data-testid="viewable-area">
+          <div
+            class="im-overview-vis"
+            data-testid="viewable-area-region"
+            [style.left.%]="overviewRegion().x * 100"
+            [style.top.%]="overviewRegion().y * 100"
+            [style.width.%]="overviewRegion().w * 100"
+            [style.height.%]="overviewRegion().h * 100"
+          ></div>
+        </div>
+      }
+
+      @if (!restricted()) {
+        <div class="im-controls" data-testid="imagery-controls">
+          <button class="cp-icon-btn" type="button" aria-label="Zoom in" data-testid="imagery-zoom-in" (click)="zoomStep(1.25)">
+            <svg class="cp-icon cp-icon--s"><use href="#i-zoom-in" /></svg>
+          </button>
+          <button class="cp-icon-btn" type="button" aria-label="Zoom out" data-testid="imagery-zoom-out" (click)="zoomStep(0.8)">
+            <svg class="cp-icon cp-icon--s"><use href="#i-zoom-out" /></svg>
+          </button>
+          <button class="cp-icon-btn" type="button" aria-label="Reset view" data-testid="imagery-zoom-reset" (click)="resetView()">
+            <svg class="cp-icon cp-icon--s"><use href="#i-crosshair" /></svg>
+          </button>
+          <button
+            class="cp-icon-btn"
+            type="button"
+            aria-label="Brightness and contrast"
+            data-testid="imagery-filters-toggle"
+            [class.is-active]="filtersOpen()"
+            (click)="filtersOpen.set(!filtersOpen()); layersOpen.set(false)"
+          >
+            <svg class="cp-icon cp-icon--s"><use href="#i-filter" /></svg>
+          </button>
+          @if ((layerStore()?.layers() ?? []).length > 0) {
+            <button
+              class="cp-icon-btn"
+              type="button"
+              aria-label="Image layers"
+              data-testid="imagery-layers-toggle"
+              [class.is-active]="layersOpen()"
+              (click)="layersOpen.set(!layersOpen()); filtersOpen.set(false)"
+            >
+              <svg class="cp-icon cp-icon--s"><use href="#i-layers" /></svg>
+            </button>
+          }
+          <button
+            class="cp-icon-btn"
+            type="button"
+            aria-label="Open image in new tab"
+            data-testid="imagery-open-new-tab"
+            [disabled]="!openAllowed()"
+            (click)="invokeAction('imagery.open-image')"
+          >
+            <svg class="cp-icon cp-icon--s"><use href="#i-external" /></svg>
+          </button>
+          <button
+            class="cp-icon-btn"
+            type="button"
+            aria-label="Save image as"
+            data-testid="imagery-save"
+            (click)="invokeAction('imagery.save-image')"
+          >
+            <svg class="cp-icon cp-icon--s"><use href="#i-download" /></svg>
+          </button>
+        </div>
+      }
+
+      @if (filtersOpen()) {
+        <div class="cp-menu im-panel" data-testid="imagery-filter-panel">
+          <div class="cp-menu-head">Brightness &amp; contrast</div>
+          <label class="cp-field">
+            <span class="cp-field-label">Brightness {{ brightness() }}%</span>
+            <input
+              data-testid="imagery-brightness"
+              type="range"
+              min="0"
+              max="300"
+              [value]="brightness()"
+              (input)="setBrightness($event)"
+            />
+          </label>
+          <label class="cp-field">
+            <span class="cp-field-label">Contrast {{ contrast() }}%</span>
+            <input
+              data-testid="imagery-contrast"
+              type="range"
+              min="0"
+              max="300"
+              [value]="contrast()"
+              (input)="setContrast($event)"
+            />
+          </label>
+          <button class="cp-btn cp-btn--small" type="button" data-testid="imagery-filters-reset" (click)="resetFilters()">
+            Reset to 100%
+          </button>
+        </div>
+      }
+
+      @if (layersOpen()) {
+        <div class="cp-menu im-panel" data-testid="imagery-layer-panel">
+          <div class="cp-menu-head">Layers</div>
+          @for (layer of layerStore()?.layers() ?? []; track layer.key) {
+            <button
+              class="cp-menu-item"
+              type="button"
+              data-testid="imagery-layer-toggle"
+              [attr.data-layer]="layer.key"
+              [attr.aria-pressed]="layer.visible"
+              (click)="toggleLayer(layer.key)"
+            >
+              <svg class="cp-icon cp-icon--s" [style.opacity]="layer.visible ? 1 : 0.35">
+                <use href="#i-eye" />
+              </svg>
+              {{ layer.name }}
+            </button>
+          }
+        </div>
+      }
+    } @else {
+      <div class="cp-empty" data-testid="imagery-empty">No imagery in the current bounds.</div>
+    }
   </div>
-  <div class="frame-meta">
-    <span class="sh-overline">Latest frame</span>
-    <span class="frame-time" data-testid="frame-time">{{ timestamp() || 'awaiting telemetry' }}</span>
+
+  <div class="im-thumbs" data-testid="imagery-thumbs">
+    @for (frame of frames(); track frame.time) {
+      <button
+        class="im-thumb"
+        type="button"
+        data-testid="imagery-thumb"
+        [attr.data-time]="frame.time"
+        [class.is-selected]="frame.time === focused()?.time"
+        [attr.aria-current]="frame.time === focused()?.time"
+        (click)="selectThumbnail(frame.time)"
+      >
+        <img class="im-thumb-img" [src]="frame.url" [alt]="'Frame at ' + frame.timestampIso" draggable="false" />
+        <span class="im-thumb-ts">{{ frame.timestampIso.slice(11, 19) }}</span>
+      </button>
+    }
   </div>
+
+  @if (relatedRows().length > 0) {
+    <div class="cp-pane im-related" data-testid="imagery-related">
+      <div class="cp-pane-head">Related telemetry</div>
+      <table class="cp-table">
+        <tbody>
+          @for (row of relatedRows(); track row.keyString) {
+            <tr data-testid="imagery-related-row" [attr.data-key]="row.keyString">
+              <td>{{ row.name }}</td>
+              <td class="num" data-testid="imagery-related-value">
+                {{ row.value === null ? '—' : row.value }}
+                @if (row.unit) {
+                  <span class="unit">{{ row.unit }}</span>
+                }
+              </td>
+              <td data-testid="imagery-related-time">{{ row.timestamp ?? '—' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 </div>

@@ -48,4 +48,31 @@ public class SeedDataTests
             }
         }
     }
+
+    [Test]
+    [Requirement("OMCT-C11-L2-02.04")]
+    public void CupolaCamera_CarriesImageryLayerAndRelatedSourceDeclarations()
+    {
+        var camera = _store.GetByKeyString("cam.cupola");
+
+        Assert.That(camera?.Telemetry?.Imagery, Is.Not.Null);
+        var imagery = camera!.Telemetry!.Imagery!.Value;
+        var layers = imagery.GetProperty("layers").EnumerateArray().ToList();
+        var related = imagery.GetProperty("relatedTelemetry").EnumerateArray()
+            .Select(source => source.GetString())
+            .ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(layers.Select(l => l.GetProperty("key").GetString()),
+                Is.EqualTo(new[] { "reticle", "horizon" }));
+            Assert.That(layers.All(l => l.GetProperty("source").GetString()!.StartsWith("/imagery/layers/")),
+                Is.True);
+            foreach (var source in related)
+            {
+                Assert.That(_store.GetByKeyString(source!), Is.Not.Null,
+                    $"related telemetry '{source}' is not a seeded object");
+            }
+        });
+    }
 }

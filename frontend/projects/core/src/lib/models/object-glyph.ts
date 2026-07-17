@@ -10,6 +10,13 @@ export function objectGlyph(object: DomainObject): string {
       return 'i-plot';
     case 'layout':
       return 'i-layout';
+    case 'flexible-layout':
+      return 'i-columns';
+    case 'tabs':
+      return 'i-tabs';
+    case 'hyperlink':
+    case 'web-page':
+      return 'i-link';
     case 'notebook':
       return 'i-notebook';
     case 'telemetry':

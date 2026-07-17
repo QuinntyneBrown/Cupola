@@ -1,11 +1,14 @@
 import { DomainObject } from '../models/domain-object';
 import { TelemetryFilterDefinition } from '../models/telemetry-filter';
 
-/** A datum field descriptor: a domain (e.g. time) or range (e.g. value) column. */
+/** The role a datum field plays: time domain, numeric range, or image reference. */
+export type TelemetryValueHint = 'domain' | 'range' | 'image';
+
+/** A datum field descriptor: a domain (e.g. time), range (e.g. value), or image column. */
 export interface TelemetryValueMetadata {
-  key: string; // datum field key, e.g. 'timestamp' | 'value'
+  key: string; // datum field key, e.g. 'timestamp' | 'value' | 'url'
   name?: string;
-  hint: 'domain' | 'range';
+  hint: TelemetryValueHint;
   priority?: number; // lower sorts first (OMCT-C06-L2-03.02)
   unit?: string;
   format?: string; // named format for the value formatter (OMCT-C06-L2-03.04)
@@ -27,7 +30,7 @@ export interface TelemetryMetadataProvider {
 export class TelemetryMetadataView {
   constructor(readonly values: TelemetryValueMetadata[]) {}
 
-  valuesForHints(hints: ('domain' | 'range')[]): TelemetryValueMetadata[] {
+  valuesForHints(hints: TelemetryValueHint[]): TelemetryValueMetadata[] {
     return this.values
       .filter((value) => hints.includes(value.hint))
       .sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));

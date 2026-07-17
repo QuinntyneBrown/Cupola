@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <!-- Horizon reference overlay: transparent; dashed limb guide + elevation ticks. -->
+  <g stroke="#ffc266" fill="none" opacity="0.7">
+    <path d="M0 218 Q 200 186 400 222" stroke-width="2" stroke-dasharray="10 6"/>
+    <path d="M60 212 v-10 M140 200 v-10 M200 196 v-10 M260 198 v-10 M340 208 v-10" stroke-width="1.5"/>
+  </g>
+  <text x="12" y="184" font-family="monospace" font-size="11" fill="#ffc266" opacity="0.7">HORIZON</text>
+</svg>

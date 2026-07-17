@@ -29,7 +29,17 @@ public static class SeedData
         Plan("iss-plan", "ISS daily plan", "operations"),
         Telemetry("pwr.array_out", "Solar array power", "power", new TelemetryMetadata(["range"], "kW")),
         Telemetry("pwr.bus_v", "Bus voltage", "power", new TelemetryMetadata(["range"], "V")),
-        Telemetry("cam.cupola", "Cupola camera", "comms", new TelemetryMetadata(["image"])),
+        Telemetry("cam.cupola", "Cupola camera", "comms", new TelemetryMetadata(
+            ["image"],
+            Imagery: JsonSerializer.SerializeToElement(new
+            {
+                layers = new object[]
+                {
+                    new { key = "reticle", name = "Reticle grid", source = "/imagery/layers/reticle.svg", visible = true },
+                    new { key = "horizon", name = "Horizon limb", source = "/imagery/layers/horizon.svg", visible = false },
+                },
+                relatedTelemetry = new[] { "pwr.bus_v", "pwr.array_out" },
+            }))),
         Telemetry("log.activity", "Activity log", "operations", new TelemetryMetadata(["domain"])),
     ];
 

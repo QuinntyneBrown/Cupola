@@ -10,12 +10,14 @@ import {
 import { DomainObject, ObjectsGateway, objectGlyph } from '@cupola/core';
 import { SelectableDirective } from '@cupola/components';
 
+import { FolderViewToggleComponent } from './folder-view-toggle.component';
+
 @Component({
   selector: 'cp-folder-view',
   templateUrl: './folder-view.component.html',
   styleUrl: './folder-view.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [SelectableDirective],
+  imports: [SelectableDirective, FolderViewToggleComponent],
 })
 export class FolderViewComponent {
   private readonly objects = inject(ObjectsGateway);

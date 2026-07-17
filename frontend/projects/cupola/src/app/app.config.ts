@@ -54,6 +54,8 @@ import { registerPlotViews } from './views/plot/register-plot-views';
 import { registerTabularViews } from './tabular/register-tabular-views';
 import { registerPlans } from './plans/register-plans';
 import { registerNotebook } from './notebook/register-notebook';
+import { registerLayouts } from './layouts/register-layouts';
+import { registerImagery } from './views/imagery/register-imagery';
 import { NowProvider } from './plans/plan/now-provider';
 
 export const appConfig: ApplicationConfig = {
@@ -112,6 +114,14 @@ export const appConfig: ApplicationConfig = {
       // types, the notebook view, the copy/export actions, and the known
       // annotation types before create actions are minted from the creatable types.
       registerNotebook();
+      // C09 layouts: register display/flexible layout, tabs, hyperlink, and
+      // web-page types and views, the layout edit toolbars, the folder list
+      // view, and the layout clipboard before create actions are minted from
+      // the creatable types.
+      registerLayouts();
+      // C11 imagery: register the imagery view (metadata image-value gate),
+      // the open/save image actions, and the pixel-spatial annotation type.
+      registerImagery();
       registerDefaultActions();
       registerDefaultToolbars();
       // C14 operational awareness: user/status providers, indicators, notifications, faults.

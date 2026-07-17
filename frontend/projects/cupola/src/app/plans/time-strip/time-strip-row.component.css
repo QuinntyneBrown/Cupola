@@ -45,25 +45,4 @@
   height: 42px;
 }
 
-.ts-shot {
-  position: absolute;
-  top: 5px;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.ts-shot-img {
-  width: 56px;
-  height: 32px;
-  border-radius: 2px;
-  border: 1px solid var(--cp-color-line);
-  background: linear-gradient(135deg, #1d3a5c 0%, #0c1826 80%);
-}
-
-.ts-shot span {
-  font: var(--cp-type-data-s);
-  color: var(--cp-color-ink-3);
-}
+/* Imagery rows host C11's imagery time view (OMCT-C11-L2-01.05). */

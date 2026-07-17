@@ -12,5 +12,39 @@
     "targets": ["solar-array-output"],
     "tags": ["power"],
     "modified": "2026-07-13T09:12:44Z"
+  },
+  {
+    "keyString": "ann-img-1",
+    "text": "Debris strike candidate on panel edge",
+    "targets": ["cam.aft"],
+    "tags": ["imagery"],
+    "modified": "2026-07-13T09:12:44Z",
+    "annotationType": "image-pixel",
+    "targetDetails": [
+      {
+        "keyString": "cam.aft",
+        "detail": {
+          "time": 1783949400000,
+          "rectangle": { "x": 0.12, "y": 0.18, "w": 0.2, "h": 0.16 }
+        }
+      }
+    ]
+  },
+  {
+    "keyString": "ann-img-2",
+    "text": "Star tracker glint",
+    "targets": ["cam.aft"],
+    "tags": ["imagery"],
+    "modified": "2026-07-13T09:12:44Z",
+    "annotationType": "image-pixel",
+    "targetDetails": [
+      {
+        "keyString": "cam.aft",
+        "detail": {
+          "time": 1783949370000,
+          "rectangle": { "x": 0.6, "y": 0.55, "w": 0.14, "h": 0.2 }
+        }
+      }
+    ]
   }
 ]
