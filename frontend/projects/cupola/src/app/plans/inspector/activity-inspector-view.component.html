@@ -1,0 +1,50 @@
+@if (activity(); as activity) {
+  <div class="cp-expand is-open">
+    <div class="cp-expand-head">Activity</div>
+    <div class="cp-expand-body">
+      <dl class="cp-props">
+        <dt>Name</dt>
+        <dd data-testid="activity-inspector-name">{{ activity.name }}</dd>
+        <dt>Start</dt>
+        <dd class="cp-mono" data-testid="activity-inspector-start">{{ startText() }}</dd>
+        <dt>End</dt>
+        <dd class="cp-mono" data-testid="activity-inspector-end">{{ endText() }}</dd>
+        <dt>Duration</dt>
+        <dd class="cp-mono" data-testid="activity-inspector-duration">{{ durationText() }}</dd>
+        <dt>Group</dt>
+        <dd data-testid="activity-inspector-group">{{ activity.groupName }}</dd>
+        <dt>Plan</dt>
+        <dd data-testid="activity-inspector-plan">{{ planName() }}</dd>
+        @for (property of displayProperties(); track property.key) {
+          <dt>{{ property.key }}</dt>
+          <dd data-testid="activity-inspector-prop" [attr.data-key]="property.key">
+            {{ property.value }}
+          </dd>
+        }
+      </dl>
+    </div>
+  </div>
+
+  <div class="cp-expand is-open">
+    <div class="cp-expand-head">Execution</div>
+    <div class="cp-expand-body">
+      <div class="cp-field">
+        <label class="cp-field-label" for="activity-execution-state">Execution state</label>
+        <select
+          id="activity-execution-state"
+          class="cp-select"
+          data-testid="activity-execution-state"
+          [value]="state()"
+          (change)="onStateChange($any($event.target).value)"
+        >
+          @for (option of stateOptions; track option.value) {
+            <option [value]="option.value" [selected]="option.value === state()">
+              {{ option.label }}
+            </option>
+          }
+        </select>
+        <span class="cp-field-help">Persists to the “Activity States” object at the root</span>
+      </div>
+    </div>
+  </div>
+}

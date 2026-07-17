@@ -18,6 +18,8 @@ export class AnnotationsInspectorViewProvider implements InspectorViewProvider {
   }
 
   view(selection: SelectedItem[]): CupolaView {
-    return componentView(this.environmentInjector, AnnotationsInspectorViewComponent, { selection });
+    return componentView(this.environmentInjector, AnnotationsInspectorViewComponent, {
+      selection,
+    });
   }
 }

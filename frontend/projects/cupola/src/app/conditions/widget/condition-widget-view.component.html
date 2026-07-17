@@ -1,0 +1,39 @@
+@if (href(); as link) {
+  <a
+    class="condw condw--url"
+    [class.condw--ok]="severity() === 'ok'"
+    [class.condw--caution]="severity() === 'caution'"
+    [class.condw--critical]="severity() === 'critical'"
+    [style.background-color]="conditionalStyle().backgroundColor"
+    [style.border-color]="conditionalStyle().borderColor"
+    [style.color]="conditionalStyle().color"
+    [style.visibility]="conditionalStyle().visibility"
+    [attr.href]="link"
+    target="_blank"
+    rel="noopener noreferrer"
+    data-testid="condition-widget-view"
+  >
+    @if (icon(); as glyph) {
+      <svg class="cp-icon cp-icon--s"><use [attr.href]="'#' + glyph"></use></svg>
+    }
+    <span data-testid="condition-widget-label">{{ label() }}</span>
+    <svg class="cp-icon condw-link"><use href="#i-external"></use></svg>
+  </a>
+} @else {
+  <div
+    class="condw"
+    [class.condw--ok]="severity() === 'ok'"
+    [class.condw--caution]="severity() === 'caution'"
+    [class.condw--critical]="severity() === 'critical'"
+    [style.background-color]="conditionalStyle().backgroundColor"
+    [style.border-color]="conditionalStyle().borderColor"
+    [style.color]="conditionalStyle().color"
+    [style.visibility]="conditionalStyle().visibility"
+    data-testid="condition-widget-view"
+  >
+    @if (icon(); as glyph) {
+      <svg class="cp-icon cp-icon--s"><use [attr.href]="'#' + glyph"></use></svg>
+    }
+    <span data-testid="condition-widget-label">{{ label() }}</span>
+  </div>
+}

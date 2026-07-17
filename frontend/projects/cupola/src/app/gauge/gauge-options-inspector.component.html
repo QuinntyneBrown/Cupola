@@ -1,0 +1,51 @@
+<div class="cp-inspector-section" data-testid="gauge-inspector">
+  <div class="cp-field">
+    <label class="cp-field-label" for="gauge-form">Form</label>
+    <select
+      id="gauge-form"
+      class="cp-select"
+      data-testid="gauge-opt-form"
+      [value]="config().form"
+      (change)="setForm($event)"
+    >
+      @for (form of forms; track form) {
+        <option [value]="form" [selected]="form === config().form">{{ form }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="cp-field">
+    <label class="cp-field-label" for="gauge-bounds">Bounds</label>
+    <select
+      id="gauge-bounds"
+      class="cp-select"
+      data-testid="gauge-opt-boundsmode"
+      [value]="config().boundsMode"
+      (change)="setBoundsMode($event)"
+    >
+      <option value="manual" [selected]="config().boundsMode === 'manual'">Manual bounds</option>
+      <option value="limits" [selected]="config().boundsMode === 'limits'">Telemetry limits</option>
+    </select>
+  </div>
+
+  @if (config().boundsMode === 'manual') {
+    <div class="cp-gauge-manual">
+      <div class="cp-field">
+        <label class="cp-field-label" for="gauge-min">Minimum</label>
+        <input id="gauge-min" class="cp-input cp-input--data" type="number" data-testid="gauge-opt-min" [value]="config().min" (change)="setNumber('min', $event)" />
+      </div>
+      <div class="cp-field">
+        <label class="cp-field-label" for="gauge-max">Maximum</label>
+        <input id="gauge-max" class="cp-input cp-input--data" type="number" data-testid="gauge-opt-max" [value]="config().max" (change)="setNumber('max', $event)" />
+      </div>
+      <div class="cp-field">
+        <label class="cp-field-label" for="gauge-low">Low limit</label>
+        <input id="gauge-low" class="cp-input cp-input--data" type="number" data-testid="gauge-opt-low" [value]="config().limitLow" (change)="setNumber('limitLow', $event)" />
+      </div>
+      <div class="cp-field">
+        <label class="cp-field-label" for="gauge-high">High limit</label>
+        <input id="gauge-high" class="cp-input cp-input--data" type="number" data-testid="gauge-opt-high" [value]="config().limitHigh" (change)="setNumber('limitHigh', $event)" />
+      </div>
+    </div>
+  }
+</div>

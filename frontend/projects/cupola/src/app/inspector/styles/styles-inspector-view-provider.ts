@@ -4,7 +4,16 @@ import { componentView } from '@cupola/components';
 
 import { StylesInspectorViewComponent } from './styles-inspector-view.component';
 
-/** Styles inspector view — for plot and layout objects. */
+/** Types whose objects can carry conditional styles. */
+const STYLABLE_TYPES = new Set([
+  'overlay-plot',
+  'layout',
+  'condition-set',
+  'condition-widget',
+  'summary-widget',
+]);
+
+/** Styles inspector view — for plot, layout, and condition-driven objects. */
 export class StylesInspectorViewProvider implements InspectorViewProvider {
   readonly key = 'styles';
   readonly name = 'Styles';
@@ -15,7 +24,7 @@ export class StylesInspectorViewProvider implements InspectorViewProvider {
 
   canView(selection: SelectedItem[]): boolean {
     const type = selection[0]?.context.object?.type;
-    return type === 'overlay-plot' || type === 'layout';
+    return type !== undefined && STYLABLE_TYPES.has(type);
   }
 
   view(selection: SelectedItem[]): CupolaView {

@@ -1,0 +1,171 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Standalone plan chart */
+.tl-plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 320px;
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-m);
+  background: var(--cp-color-void);
+  overflow: hidden;
+}
+
+.tl-row {
+  display: flex;
+  min-height: 0;
+}
+
+.tl-lane {
+  flex: 1;
+  border-top: 1px solid var(--cp-color-hairline);
+}
+
+.tl-lane:first-of-type {
+  border-top: none;
+}
+
+.tl-gutter {
+  flex: none;
+  width: 128px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 var(--cp-space-4);
+  border-right: 1px solid var(--cp-color-hairline);
+  background: var(--cp-color-surface-1);
+  font: var(--cp-type-pane-head);
+  text-transform: uppercase;
+  letter-spacing: var(--cp-tracking-caps);
+  color: var(--cp-color-ink-2);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.tl-axis {
+  flex: none;
+  height: 30px;
+  border-bottom: 1px solid var(--cp-color-hairline);
+}
+
+.tl-axis .tl-gutter {
+  font: var(--cp-type-data-s);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--cp-color-ink-3);
+  background: var(--cp-color-surface-2);
+}
+
+.tl-track {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background-image: linear-gradient(90deg, var(--cp-color-hairline) 1px, transparent 1px);
+  background-size: calc(100% / 6) 100%;
+}
+
+.tl-track--axis {
+  display: block;
+  background-color: var(--cp-color-surface-2);
+}
+
+.tl-tick {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font: var(--cp-type-data-s);
+  color: var(--cp-chart-tick);
+  white-space: nowrap;
+}
+
+.tl-tick--first {
+  transform: translate(4px, -50%);
+}
+
+.tl-tick--last {
+  transform: translate(calc(-100% - 4px), -50%);
+}
+
+.tl-subrow {
+  flex: 1;
+  position: relative;
+  min-height: 24px;
+}
+
+/* Activity bar */
+.tl-bar {
+  --slot: var(--cp-chart-1);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 20px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 6px;
+  font: var(--cp-type-caption);
+  color: var(--cp-color-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--slot) 35%, transparent);
+  border: 1px solid var(--slot);
+}
+
+.tl-bar.is-past {
+  opacity: 0.6;
+}
+
+.tl-bar.is-future {
+  background: transparent;
+  color: var(--cp-color-ink-2);
+}
+
+.tl-bar.is-selected {
+  outline: 1px solid var(--cp-color-primary);
+  outline-offset: 1px;
+  overflow: visible;
+}
+
+/* Now line */
+.tl-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 128px;
+  right: 0;
+  pointer-events: none;
+}
+
+.tl-now {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--cp-color-ok);
+}
+
+/* Restricted (strip child): edge-to-edge lanes, no gutter, no axis */
+.plan-lanes {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.plan-lanes .tl-lane {
+  flex: 1;
+  min-height: 0;
+}
+
+.plan-lanes .tl-track {
+  background-image: none;
+}

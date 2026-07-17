@@ -86,8 +86,14 @@ export interface DomainObject {
   createdBy?: string;
   version?: number;                   // optimistic-concurrency version, bumped per accepted save (B04)
   modifiedBy?: string;                // save provenance (open item 1, resolved for B04)
+  configuration?: Record<string, unknown>; // type-specific view/behavior configuration (wave-4 extension)
 }
 ```
+
+The `configuration` bag joins the shared shape in wave 4: it carries type-specific view
+and behavior configuration (plot/table options, condition sets, plan data, notebook
+structure) and round-trips the store as an opaque passthrough — the backend mirrors it as
+a nullable `JsonElement` and never inspects it.
 
 The C# records in `backend/src/Cupola.Core/Models/` mirror these shapes field for field and
 serialize to camelCase JSON. `modifiedBy` and `version` join the shared shape for B04
@@ -357,17 +363,41 @@ Path: `frontend/projects/core/src/lib/models/telemetry-filter.ts` (new)
 Owner: C10 · Consumers: C06 (request options), C07, C08 · Stability: medium
 
 The specifications establish that filter definitions travel with telemetry requests and
-persist per scope (OMCT-C10-L2-04.01–04.03) but do not enumerate the definition schema.
-Open contract: `<TO SUPPLY: telemetry filter definition schema>`. Committed as a typed
-placeholder referenced by `TelemetryRequestOptions` (B06).
+persist per scope (OMCT-C10-L2-04.01–04.03). Resolved (open item #8): `telemetry-filter.ts`
+exports the shapes crossing the boundary —
+
+```ts
+export type TelemetryFilterComparator = 'equals' | 'notEquals' | 'contains';
+export interface TelemetryFilter { key: string; comparator: TelemetryFilterComparator; values: (string | number)[]; }
+export interface TelemetryFilterValue { label: string; value: string | number; }
+export interface TelemetryFilterDefinition { key: string; name?: string; comparator: TelemetryFilterComparator; possibleValues?: TelemetryFilterValue[]; singleSelection?: boolean; }
+```
+
+`TelemetryFilterDefinition` entries are declared by telemetry metadata and drive the C10
+filter inspector controls; active `TelemetryFilter` values travel in
+`TelemetryRequestOptions.filters` (B06) on historical requests and subscriptions. Filter
+persistence scopes and the inspector are C10-owned (`app/conditions/filters/**`), not part
+of the boundary.
 
 ### B09 — Conditional styles
 
 Path: `frontend/projects/core/src/lib/models/conditional-style.ts` (new)
 Owner: C10 · Consumers: C09, C15 (inspector styles pane) · Stability: medium
 
-Open contract per OMCT-C10-L2-02.01/02.02: `<TO SUPPLY: conditional style properties
-(background, border, text, visibility) and condition-output binding>`.
+Resolved (open item #9) per OMCT-C10-L2-02.01/02.02: `conditional-style.ts` exports the
+shapes crossing the boundary —
+
+```ts
+export interface StyleProperties { backgroundColor?: string; borderColor?: string; color?: string; visibility?: 'visible' | 'hidden'; }
+export interface ConditionalStyle { conditionId: string; style: StyleProperties; }
+export interface ObjectStyleConfiguration { conditionSetKeyString: string; enabled: boolean; styles: ConditionalStyle[]; defaultStyle?: StyleProperties; }
+```
+
+`ObjectStyleConfiguration` persists under a stylable object's
+`configuration.objectStyles`; `conditionId` binds each rule to a condition in the driving
+condition set, and `defaultStyle` applies when the set's default condition is active or no
+rule matches. Style evaluation (the style rule manager) is C10-owned
+(`app/conditions/presentation/**`), not part of the boundary.
 
 ### B10 — Annotations
 
@@ -377,18 +407,26 @@ Owner: C13 · Consumers: C02 (search envelope), C11 (image annotations), C15 (in
 
 ```ts
 // frontend/projects/core/src/lib/models/annotation.ts
+export interface AnnotationTarget {
+  keyString: string;                 // keyString of the annotated object
+  detail?: Record<string, unknown>;  // type-specific payload, e.g. image pixel coordinates
+}
 export interface Annotation {
   keyString: string;
   text: string;
-  targets: string[];           // keyStrings of annotated objects
+  targets: string[];                 // keyStrings of annotated objects (wire-compatible)
   tags: string[];
-  modified?: string;           // ISO 8601
+  modified?: string;                 // ISO 8601
+  annotationType?: string;           // selects the registered target comparator
+  targetDetails?: AnnotationTarget[]; // typed detail per target, parallel to targets
 }
 ```
 
-Open: pixel-spatial target coordinates for image annotations (OMCT-C11-L2-03.02/03.03) and
-tag comparator registration (OMCT-C13-L2-04.06) — `<TO SUPPLY: typed annotation target
-schema per annotation type>`.
+Resolved (open item #10): the typed target schema is additive. `targets` keeps the
+original keyString list so seeded fixtures and the store's target matching stay wire
+compatible; `targetDetails` carries per-target typed detail — C11's pixel-spatial image
+coordinates (OMCT-C11-L2-03.02/03.03) ride in `detail` — and `annotationType` selects the
+comparator registered per type, with deep equality as the fallback (OMCT-C13-L2-04.06).
 
 ### B11 — Time-strip child-view contract
 
@@ -678,8 +716,8 @@ and tests before the provider finishes.
 | `frontend/projects/core/src/lib/models/build-info.ts` | existing | B18 | `frontend/e2e/fixtures/build-info.json` |
 | `frontend/projects/core/src/lib/models/branding-info.ts` | existing | B19 | `frontend/e2e/fixtures/branding.json` |
 | `frontend/projects/core/src/lib/models/time.ts` | new | B05 | `FakeTimeContext` (below) |
-| `frontend/projects/core/src/lib/models/telemetry-filter.ts` | new | B08 placeholder | n/a until resolved |
-| `frontend/projects/core/src/lib/models/conditional-style.ts` | new | B09 placeholder | n/a until resolved |
+| `frontend/projects/core/src/lib/models/telemetry-filter.ts` | new | B08 (resolved) | seeded metadata `filters` definitions |
+| `frontend/projects/core/src/lib/models/conditional-style.ts` | new | B09 (resolved) | `configuration.objectStyles` on seeded objects |
 | `frontend/projects/core/src/lib/models/user.ts` | new | B12 | `FakeUserService` (below) |
 | `frontend/projects/core/src/lib/gateways/objects-gateway.ts` | existing | B02 | `frontend/e2e/support/fake-backend.ts` |
 | `frontend/projects/core/src/lib/gateways/search-gateway.ts` | existing | B03 | same |
@@ -891,14 +929,14 @@ has been invented here.
 | 1 | Save provenance `persisted` timestamp in the shared object shape (`modifiedBy` and `version` resolved under B01/B04) | B01 | C02 |
 | 2 | Authoring transaction and composition-mutation routes | B02 | C03 |
 | 5 | Time-of-interest and telemetry-derived clock surfaces | B05 | C05/C06 |
-| 8 | Telemetry filter definition schema | B08 | C10 |
-| 9 | Conditional style schema | B09 | C09, C10 |
-| 10 | Typed annotation target schema (including image pixel coordinates) | B10 | C11, C13 |
 | 12 | Route schema for non-browse views | B16 | C09, C15 |
 | 13 | Plugin-install abstraction beyond Angular DI | B18 | C01 |
 
 Items 3 (connection-state vocabulary) and 4 (persistence change-feed event shape) are
 resolved in the B04 contract; items 6 (historical telemetry route + datum/collection envelope)
-and 7 (limit/staleness shapes) are resolved in the B06/B07 contracts by C06; item 11 (fault
+and 7 (limit/staleness shapes) are resolved in the B06/B07 contracts by C06; items 8
+(telemetry filter definition schema) and 9 (conditional style schema) are resolved in the
+B08/B09 contracts by C10; item 10 (typed annotation target schema) is resolved in the B10
+contract by C13; item 11 (fault
 object shape and fault-provider interface) is resolved in the B13 contract by C14. Item
 numbering is stable, so the resolved rows are removed without renumbering the rest.

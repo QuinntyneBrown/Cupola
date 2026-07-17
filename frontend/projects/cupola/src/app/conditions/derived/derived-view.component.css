@@ -1,0 +1,25 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.derived {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cp-space-3);
+  padding: var(--cp-space-6);
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-m);
+  background: var(--cp-color-surface-2);
+}
+
+.derived-label {
+  color: var(--cp-color-ink-3);
+}
+
+.derived-value {
+  color: var(--cp-color-ink);
+}

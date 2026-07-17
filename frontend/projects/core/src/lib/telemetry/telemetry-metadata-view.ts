@@ -1,4 +1,5 @@
 import { DomainObject } from '../models/domain-object';
+import { TelemetryFilterDefinition } from '../models/telemetry-filter';
 
 /** A datum field descriptor: a domain (e.g. time) or range (e.g. value) column. */
 export interface TelemetryValueMetadata {
@@ -9,6 +10,7 @@ export interface TelemetryValueMetadata {
   unit?: string;
   format?: string; // named format for the value formatter (OMCT-C06-L2-03.04)
   timeSystem?: string; // for domain values: the time-system key they express (OMCT-C06-L2-04.02)
+  filters?: TelemetryFilterDefinition[]; // filter definitions for this field (B08, OMCT-C10-L2-04.01)
 }
 
 /** A telemetry metadata provider selected by the {@link MetadataRegistry}. */

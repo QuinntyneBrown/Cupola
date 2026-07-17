@@ -16,4 +16,88 @@
   } @else {
     <p class="empty">No annotations.</p>
   }
+
+  @if (object()) {
+    <div class="annotation-authoring" data-testid="annotation-authoring">
+      <div class="sh-overline">Add annotation</div>
+
+      <div class="nb-target" data-testid="annotation-target">
+        <svg class="cp-icon"><use href="#i-flag" /></svg>{{ object()!.name }}
+      </div>
+
+      <div class="cp-field" style="max-width: none">
+        <label class="cp-field-label">Comment</label>
+        <textarea
+          class="cp-textarea"
+          data-testid="annotation-text"
+          placeholder="Describe what you are annotating…"
+          [value]="draftText()"
+          (input)="draftText.set($any($event.target).value)"
+        ></textarea>
+      </div>
+
+      <div class="cp-field" style="max-width: none">
+        <label class="cp-field-label">Tags</label>
+        @if (draftTags().length > 0) {
+          <div class="nb-tags" data-testid="annotation-draft-tags">
+            @for (tag of draftTags(); track tag) {
+              <span class="cp-chip" data-testid="annotation-draft-tag">
+                {{ tag }}
+                <button
+                  class="cp-chip-x"
+                  data-testid="annotation-remove-tag"
+                  [attr.aria-label]="'Remove tag ' + tag"
+                  (click)="removeTag(tag)"
+                >
+                  <svg class="cp-icon" style="width: 10px; height: 10px">
+                    <use href="#i-close" />
+                  </svg>
+                </button>
+              </span>
+            }
+          </div>
+        }
+        <span class="cp-input-wrap">
+          <svg class="cp-icon cp-icon--s cp-icon--lead"><use href="#i-search" /></svg>
+          <input
+            class="cp-input"
+            data-testid="annotation-tag-input"
+            placeholder="Add tag"
+            [value]="tagInput()"
+            (input)="tagInput.set($any($event.target).value)"
+            (keydown.enter)="addTag(tagInput())"
+          />
+        </span>
+        @if (suggestions().length > 0) {
+          <div class="cp-menu annotation-suggestions" data-testid="annotation-tag-suggestions">
+            @for (tag of suggestions(); track tag) {
+              <button
+                class="cp-menu-item"
+                data-testid="annotation-tag-suggestion"
+                (click)="addTag(tag)"
+              >
+                {{ tag }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+
+      <button
+        class="cp-btn cp-btn--filled cp-btn--small"
+        data-testid="annotation-create"
+        [disabled]="!draftText().trim()"
+        (click)="createAnnotation()"
+      >
+        Create annotation
+      </button>
+
+      @if (error()) {
+        <div class="cp-banner cp-banner--critical" role="alert" data-testid="annotation-error">
+          <svg class="cp-icon"><use href="#i-alert-circle" /></svg>
+          <span class="cp-banner-msg">{{ error() }}</span>
+        </div>
+      }
+    </div>
+  }
 </div>

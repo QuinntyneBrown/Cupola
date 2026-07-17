@@ -1,0 +1,69 @@
+<div class="inspector-section filters-inspector" data-testid="filters-inspector">
+  <div class="sh-overline">Filters</div>
+
+  <div class="cp-field cp-field--inline filters-scope">
+    <span class="cp-field-label">Apply to</span>
+    <select class="cp-select" data-testid="filter-scope" [value]="scope()" (change)="setScope($any($event.target).value)">
+      <option value="object">This object</option>
+      <option value="global">All objects</option>
+    </select>
+  </div>
+
+  @if (targets().length === 0) {
+    <p class="cp-empty">No filters are defined for this telemetry.</p>
+  }
+
+  @for (target of targets(); track target.keyString) {
+    <div class="filter-target" data-testid="filter-target" [attr.data-key]="target.keyString">
+      <div class="sh-overline filter-target-name">{{ target.name }}</div>
+
+      @for (definition of target.definitions; track definition.key) {
+        <div class="cp-field filter-field" data-testid="filter-field" [attr.data-key]="definition.key">
+          <span class="cp-field-label">{{ definition.name ?? definition.key }}</span>
+
+          @switch (controlKind(definition)) {
+            @case ('radio') {
+              @for (choice of definition.possibleValues; track choice.value) {
+                <label class="cp-radio">
+                  <input
+                    type="radio"
+                    data-testid="filter-radio"
+                    [attr.data-value]="choice.value"
+                    [name]="target.keyString + '-' + definition.key"
+                    [checked]="isChecked(target, definition, choice.value)"
+                    (change)="selectRadio(target, definition, choice.value)"
+                  />
+                  <span class="cp-radio-dot"></span>
+                  {{ choice.label }}
+                </label>
+              }
+            }
+            @case ('checkbox') {
+              @for (choice of definition.possibleValues; track choice.value) {
+                <label class="cp-check">
+                  <input
+                    type="checkbox"
+                    data-testid="filter-checkbox"
+                    [attr.data-value]="choice.value"
+                    [checked]="isChecked(target, definition, choice.value)"
+                    (change)="toggleCheckbox(target, definition, choice.value)"
+                  />
+                  <span class="cp-check-box"></span>
+                  {{ choice.label }}
+                </label>
+              }
+            }
+            @default {
+              <input
+                class="cp-input"
+                type="text"
+                data-testid="filter-text"
+                (change)="setText(target, definition, $any($event.target).value)"
+              />
+            }
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

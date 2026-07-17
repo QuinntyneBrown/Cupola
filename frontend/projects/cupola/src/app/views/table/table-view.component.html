@@ -1,22 +1,156 @@
-<div class="cp-table-wrap" data-testid="table-view">
-  <table class="cp-table">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Value</th>
-        <th>Unit</th>
-        <th>Timestamp</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (row of rows(); track row.keyString) {
-        <tr [attr.data-key]="row.keyString" data-testid="table-row">
-          <td>{{ row.name }}</td>
-          <td class="value">{{ formatValue(row) }}</td>
-          <td>{{ row.unit }}</td>
-          <td>{{ row.timestamp || '—' }}</td>
-        </tr>
+<div class="cp-table-view" data-testid="table-view">
+  <div class="cp-toolbar">
+    <span class="tt-title">{{ currentObject().name }}</span>
+    @if (pause.isPaused()) {
+      <span class="tt-paused" data-testid="table-paused">
+        <svg class="cp-icon"><use href="#i-pause" /></svg>Paused
+      </span>
+    }
+    <span class="cp-toolbar-spacer"></span>
+    <button
+      class="cp-icon-btn cp-icon-btn--s"
+      type="button"
+      [class.is-active]="pause.isPaused()"
+      [attr.aria-pressed]="pause.isPaused()"
+      aria-label="Pause table"
+      data-testid="table-pause"
+      (click)="togglePause()"
+    >
+      <svg class="cp-icon cp-icon--s"><use href="#i-pause" /></svg>
+    </button>
+    <span class="cp-toolbar-sep"></span>
+    <div class="cp-menu-anchor">
+      <button
+        class="cp-icon-btn cp-icon-btn--s"
+        type="button"
+        aria-label="Export as CSV"
+        data-testid="table-export"
+        (click)="toggleExportMenu()"
+      >
+        <svg class="cp-icon cp-icon--s"><use href="#i-download" /></svg>
+      </button>
+      @if (exportMenuOpen()) {
+        <div class="cp-menu cp-menu--pop" data-testid="table-export-menu">
+          <div class="cp-menu-head">Export</div>
+          <button class="cp-menu-item" type="button" data-testid="table-export-all" (click)="exportAll()">
+            <svg class="cp-icon"><use href="#i-download" /></svg>Export all rows as CSV
+          </button>
+          <button
+            class="cp-menu-item"
+            type="button"
+            data-testid="table-export-marked"
+            [class.is-disabled]="markedCount() === 0"
+            [attr.aria-disabled]="markedCount() === 0"
+            (click)="exportMarked()"
+          >
+            <svg class="cp-icon"><use href="#i-download" /></svg>Export marked rows as CSV
+          </button>
+        </div>
       }
-    </tbody>
-  </table>
+    </div>
+    <div class="cp-menu-anchor">
+      <button
+        class="cp-icon-btn cp-icon-btn--s"
+        type="button"
+        aria-label="Configure columns"
+        data-testid="table-columns-btn"
+        (click)="toggleMenu()"
+      >
+        <svg class="cp-icon cp-icon--s"><use href="#i-columns" /></svg>
+      </button>
+      @if (menuOpen()) {
+        <cp-column-menu
+          class="cp-menu--pop"
+          [columns]="derivedColumns()"
+          [config]="config()"
+          (toggleColumn)="onToggleColumn($event)"
+          (moveColumn)="onMoveColumn($event)"
+        />
+      }
+    </div>
+  </div>
+
+  <div class="cp-table-wrap cp-scroll cp-table-scroll">
+    @if (loading()) {
+      <div
+        class="cp-progress cp-progress--indeterminate"
+        role="progressbar"
+        aria-label="Loading telemetry"
+        data-testid="table-progress"
+      >
+        <div class="cp-progress-fill"></div>
+      </div>
+    }
+    <table class="cp-table">
+      <thead>
+        <tr>
+          @for (column of columns(); track column.key) {
+            <th [class.num]="column.hint === 'range'" [style.width.px]="column.width">
+              <button
+                class="cp-th-sort"
+                type="button"
+                [class.is-sorted]="sortIndicator(column) !== null"
+                data-testid="table-sort"
+                [attr.data-col]="column.key"
+                [attr.aria-sort]="sortIndicator(column) === 'asc' ? 'ascending' : sortIndicator(column) === 'desc' ? 'descending' : 'none'"
+                (click)="onSort(column)"
+              >
+                {{ column.name }}
+                <svg class="cp-icon">
+                  <use [attr.href]="sortIndicator(column) === 'desc' ? '#i-arrow-down' : '#i-arrow-up'" />
+                </svg>
+              </button>
+            </th>
+          }
+        </tr>
+        <tr class="cp-filter-row">
+          @for (column of columns(); track column.key) {
+            <th>
+              <input
+                class="cp-input"
+                [class.is-active]="!!filters()[column.key]"
+                placeholder="Filter"
+                [attr.aria-label]="'Filter ' + column.name"
+                data-testid="table-filter"
+                [attr.data-col]="column.key"
+                (input)="setFilter(column.key, $event)"
+              />
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of visibleRows(); track row.id) {
+          <tr
+            [class.is-marked]="isMarked(row)"
+            data-testid="table-row"
+            [attr.data-key]="row.id"
+            [attr.data-member]="row.memberKey"
+            (click)="toggleMark(row)"
+            (dblclick)="onDatum(row)"
+          >
+            @for (column of columns(); track column.key) {
+              <td
+                [class.num]="column.hint === 'range'"
+                [class.is-limit-caution]="column.hint === 'range' && row.limitClass === 'is-limit-caution'"
+                [class.is-limit-critical]="column.hint === 'range' && row.limitClass === 'is-limit-critical'"
+                data-testid="table-cell"
+                [attr.data-col]="column.key"
+              >
+                {{ row.cells[column.key] }}
+              </td>
+            }
+          </tr>
+        } @empty {
+          @if (!loading()) {
+            <tr>
+              <td [attr.colspan]="columns().length || 1" class="cp-table-empty" data-testid="table-empty">
+                No telemetry in the selected time range
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
 </div>

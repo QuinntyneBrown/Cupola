@@ -1,0 +1,54 @@
+:host {
+  display: block;
+}
+
+.tl-row {
+  display: flex;
+}
+
+.tl-axis {
+  flex: none;
+  height: 30px;
+  border-bottom: 1px solid var(--cp-color-hairline);
+}
+
+.tl-gutter {
+  flex: none;
+  width: 128px;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--cp-space-4);
+  border-right: 1px solid var(--cp-color-hairline);
+  background: var(--cp-color-surface-2);
+  font: var(--cp-type-data-s);
+  color: var(--cp-color-ink-3);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.tl-track {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+}
+
+.tl-track--axis {
+  background-color: var(--cp-color-surface-2);
+}
+
+.tl-tick {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font: var(--cp-type-data-s);
+  color: var(--cp-chart-tick);
+  white-space: nowrap;
+}
+
+.tl-tick--first {
+  transform: translate(4px, -50%);
+}
+
+.tl-tick--last {
+  transform: translate(calc(-100% - 4px), -50%);
+}

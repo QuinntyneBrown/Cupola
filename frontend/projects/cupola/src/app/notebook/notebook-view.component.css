@@ -1,0 +1,242 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+}
+
+.nb-shell {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-m);
+  background: var(--cp-color-surface-1);
+  overflow: hidden;
+}
+
+.nb-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.nb-col--sections {
+  width: 190px;
+  flex: none;
+  border-right: 1px solid var(--cp-color-hairline);
+}
+
+.nb-col--pages {
+  width: 214px;
+  flex: none;
+  border-right: 1px solid var(--cp-color-hairline);
+}
+
+.nb-col--entries {
+  flex: 1;
+}
+
+.nb-list {
+  padding: var(--cp-space-2);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.nb-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--cp-size-row);
+  padding: 0 var(--cp-space-3);
+  border-radius: var(--cp-radius-s);
+  font: var(--cp-type-body);
+  color: var(--cp-color-ink-2);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.nb-item:hover {
+  background: var(--cp-color-surface-hover);
+  color: var(--cp-color-ink);
+}
+
+.nb-item.is-selected {
+  background: var(--cp-color-primary-dim);
+  color: var(--cp-color-primary);
+}
+
+.nb-item .cp-icon {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+.nb-item-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nb-item-actions {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+  opacity: 0;
+}
+
+.nb-item:hover .nb-item-actions,
+.nb-item.is-selected .nb-item-actions {
+  opacity: 1;
+}
+
+.nb-rename {
+  flex: 1;
+  height: 24px;
+}
+
+.nb-act {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: var(--cp-radius-s);
+  background: transparent;
+  color: var(--cp-color-ink-3);
+  cursor: pointer;
+}
+
+.nb-act:hover {
+  background: var(--cp-color-surface-hover);
+  color: var(--cp-color-ink);
+}
+
+.nb-act:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.nb-act .cp-icon {
+  width: 13px;
+  height: 13px;
+}
+
+.nb-editor {
+  flex: none;
+  padding: var(--cp-space-4);
+  border-bottom: 1px solid var(--cp-color-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cp-space-3);
+  background: var(--cp-color-surface-1);
+}
+
+.nb-entries {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--cp-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cp-space-4);
+  background: var(--cp-color-void);
+}
+
+.nb-entry {
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-m);
+  background: var(--cp-color-surface-2);
+  padding: var(--cp-space-4) 14px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cp-space-3);
+}
+
+.nb-entry-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 22px;
+}
+
+.nb-ts {
+  font: var(--cp-type-data-s);
+  color: var(--cp-color-ink-2);
+}
+
+.nb-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: var(--cp-type-body-s);
+  color: var(--cp-color-ink-3);
+}
+
+.nb-author .cp-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.nb-entry-head .nb-item-actions {
+  margin-left: auto;
+  opacity: 1;
+}
+
+.nb-entry-body {
+  font: var(--cp-type-body);
+  color: var(--cp-color-ink);
+}
+
+.nb-entry-body ::ng-deep p {
+  margin: 0;
+  max-width: none;
+  color: inherit;
+}
+
+.nb-embeds {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nb-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.nb-committed {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: var(--cp-type-overline);
+  text-transform: uppercase;
+  letter-spacing: var(--cp-tracking-caps);
+  color: var(--cp-color-ink-3);
+  border: 1px solid var(--cp-color-line);
+  border-radius: var(--cp-radius-pill);
+  padding: 0 8px;
+  line-height: 16px;
+}
+
+.nb-entry-body ::ng-deep .nb-blocked {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--cp-color-ink-3);
+  text-decoration: line-through;
+}
+
+.nb-entry-body ::ng-deep .nb-blocked-badge {
+  font: var(--cp-type-data-s);
+  text-decoration: none;
+  color: var(--cp-color-critical);
+  background: var(--cp-color-critical-dim);
+  border: 1px solid var(--cp-color-critical-border);
+  border-radius: var(--cp-radius-s);
+  padding: 0 4px;
+  line-height: 15px;
+  margin-left: 2px;
+}

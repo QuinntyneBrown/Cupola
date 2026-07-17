@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Cupola.Core.Models;
 
 namespace Cupola.Core.Services;
@@ -14,7 +15,7 @@ public static class SeedData
 
     public static IReadOnlyList<DomainObject> CreateObjects() =>
     [
-        Folder("ROOT", "Root", "root", location: null, "station", "mine"),
+        Folder("ROOT", "Root", "root", location: null, "station", "operations", "mine"),
         Folder("station", "Station", "folder", "ROOT", "power", "thermal", "comms"),
         Folder("power", "Power", "folder", "station", "pwr.array_out", "pwr.bus_v"),
         Folder("thermal", "Thermal", "folder", "station"),
@@ -24,9 +25,12 @@ public static class SeedData
         Folder("power-dashboard", "Power dashboard", "layout", "station-displays"),
         Folder("solar-array-output", "Solar array output", "overlay-plot", "station-displays", "pwr.array_out", "pwr.bus_v"),
         Folder("ops-notebook", "Ops notebook", "notebook", "mine"),
+        Folder("operations", "Operations", "folder", "ROOT", "iss-plan", "log.activity"),
+        Plan("iss-plan", "ISS daily plan", "operations"),
         Telemetry("pwr.array_out", "Solar array power", "power", new TelemetryMetadata(["range"], "kW")),
         Telemetry("pwr.bus_v", "Bus voltage", "power", new TelemetryMetadata(["range"], "V")),
         Telemetry("cam.cupola", "Cupola camera", "comms", new TelemetryMetadata(["image"])),
+        Telemetry("log.activity", "Activity log", "operations", new TelemetryMetadata(["domain"])),
     ];
 
     public static IReadOnlyList<Annotation> CreateAnnotations() =>
@@ -62,6 +66,44 @@ public static class SeedData
             Modified = Modified,
             CreatedBy = CreatedBy,
             Version = 1,
+        };
+    }
+
+    private static DomainObject Plan(string key, string name, string location)
+    {
+        var identifier = Identifier.Parse(key);
+        static long At(int hour, int minute) =>
+            new DateTimeOffset(2026, 7, 13, hour, minute, 0, TimeSpan.Zero).ToUnixTimeMilliseconds();
+
+        var planData = new Dictionary<string, object[]>
+        {
+            ["Station ops"] =
+            [
+                new { name = "Eclipse preparation", start = At(8, 0), end = At(9, 30), type = "Station ops" },
+                new { name = "Array repointing", start = At(9, 0), end = At(11, 0), type = "Station ops" },
+                new { name = "Battery reconditioning", start = At(12, 0), end = At(13, 0), type = "Station ops" },
+            ],
+            ["Crew"] =
+            [
+                new { name = "Cupola photo survey", start = At(10, 0), end = At(10, 45), type = "Crew" },
+            ],
+        };
+
+        return new DomainObject
+        {
+            Identifier = identifier,
+            KeyString = identifier.ToKeyString(),
+            Name = name,
+            Type = "plan",
+            Location = location,
+            Composition = Array.Empty<string>(),
+            Telemetry = null,
+            Created = Created,
+            Modified = Modified,
+            CreatedBy = CreatedBy,
+            Version = 1,
+            Configuration = JsonSerializer.SerializeToElement(
+                new Dictionary<string, object> { ["planData"] = planData }),
         };
     }
 

@@ -1,0 +1,77 @@
+<div class="gauge-col" data-testid="gauge-view">
+  <div class="cp-gauge-form" data-testid="gauge-form" [attr.data-form]="model().form">
+    @switch (model().form) {
+      @case ('filled-dial') {
+        <svg class="dial" width="160" height="140" viewBox="0 0 160 140" role="img" aria-label="Filled dial gauge">
+          <path [attr.d]="model().track" fill="none" stroke="var(--cp-color-surface-3)" stroke-width="10" stroke-linecap="round" />
+          @if (model().fill) {
+            <path [attr.d]="model().fill" fill="none" stroke="var(--cp-color-primary)" stroke-width="10" stroke-linecap="round" data-testid="gauge-fill" />
+          }
+          <text class="dial-value" x="80" y="80" text-anchor="middle">{{ model().value }}</text>
+          <text class="dial-unit" x="80" y="96" text-anchor="middle">{{ model().unit }}</text>
+          <text x="29.8" y="132" text-anchor="middle" data-testid="gauge-min">{{ model().min }}</text>
+          <text x="130.2" y="132" text-anchor="middle" data-testid="gauge-max">{{ model().max }}</text>
+        </svg>
+      }
+      @case ('needle-dial') {
+        <svg class="dial" width="160" height="142" viewBox="0 0 160 142" role="img" aria-label="Needle dial gauge">
+          <path [attr.d]="model().track" fill="none" stroke="var(--cp-color-surface-3)" stroke-width="10" stroke-linecap="round" />
+          <line
+            [attr.x1]="model().needle.x1"
+            [attr.y1]="model().needle.y1"
+            [attr.x2]="model().needle.x2"
+            [attr.y2]="model().needle.y2"
+            stroke="var(--cp-color-ink)"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            data-testid="gauge-needle"
+          />
+          <circle cx="80" cy="84" r="5" fill="var(--cp-color-surface-3)" stroke="var(--cp-color-ink-2)" stroke-width="1.5" />
+          <text x="29.8" y="132" text-anchor="middle" data-testid="gauge-min">{{ model().min }}</text>
+          <text x="130.2" y="132" text-anchor="middle" data-testid="gauge-max">{{ model().max }}</text>
+        </svg>
+      }
+      @case ('vertical-meter') {
+        <div class="cp-meter cp-meter--v" [class.is-limit-caution-state]="model().limitState === 'is-limit-caution-state'" [class.is-limit-critical-state]="model().limitState === 'is-limit-critical-state'" [style.--pct]="model().fillPct">
+          <div class="cp-meter-fill"></div>
+          @if (model().lowPct) {
+            <div class="cp-meter-mark" data-testid="gauge-mark-low" [style.bottom]="model().lowPct"></div>
+          }
+          @if (model().highPct) {
+            <div class="cp-meter-mark cp-meter-mark--critical" data-testid="gauge-mark-high" [style.bottom]="model().highPct"></div>
+          }
+        </div>
+      }
+      @case ('vertical-meter-inverted') {
+        <div class="cp-meter cp-meter--v cp-meter--inverted" [class.is-limit-caution-state]="model().limitState === 'is-limit-caution-state'" [class.is-limit-critical-state]="model().limitState === 'is-limit-critical-state'" [style.--pct]="model().fillPct">
+          <div class="cp-meter-fill"></div>
+          @if (model().lowPct) {
+            <div class="cp-meter-mark" data-testid="gauge-mark-low" [style.top]="model().lowPct"></div>
+          }
+          @if (model().highPct) {
+            <div class="cp-meter-mark cp-meter-mark--critical" data-testid="gauge-mark-high" [style.top]="model().highPct"></div>
+          }
+        </div>
+      }
+      @case ('horizontal-meter') {
+        <div class="cp-meter cp-meter--h" [class.is-limit-caution-state]="model().limitState === 'is-limit-caution-state'" [class.is-limit-critical-state]="model().limitState === 'is-limit-critical-state'" [style.--pct]="model().fillPct">
+          <div class="cp-meter-fill"></div>
+          @if (model().lowPct) {
+            <div class="cp-meter-mark" data-testid="gauge-mark-low" [style.left]="model().lowPct"></div>
+          }
+          @if (model().highPct) {
+            <div class="cp-meter-mark cp-meter-mark--critical" data-testid="gauge-mark-high" [style.left]="model().highPct"></div>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <div class="cp-gauge-value" [class.is-stale]="model().stale" data-testid="gauge-value">
+    {{ model().value }} <span class="unit">{{ model().unit }}</span>
+    @if (model().stale) {
+      <svg class="cp-icon cp-icon--s cp-gauge-stale"><use href="#i-history" /></svg>
+    }
+  </div>
+  <span class="gauge-name">{{ member()?.name ?? currentObject().name }}</span>
+</div>

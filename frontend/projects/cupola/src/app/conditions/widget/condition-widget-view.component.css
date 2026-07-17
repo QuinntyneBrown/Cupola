@@ -1,0 +1,58 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--cp-space-5);
+}
+
+.condw {
+  position: relative;
+  min-width: 200px;
+  height: 64px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cp-space-3);
+  padding: 0 var(--cp-space-5);
+  border-radius: var(--cp-radius-s);
+  border: 1px solid var(--cp-color-line);
+  background: var(--cp-color-surface-2);
+  color: var(--cp-color-ink-2);
+  font: var(--cp-type-label);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.condw--ok {
+  background: var(--cp-color-ok-dim);
+  border-color: var(--cp-color-ok-border);
+  color: var(--cp-color-ok);
+}
+
+.condw--caution {
+  background: var(--cp-color-caution-dim);
+  border-color: var(--cp-color-caution-border);
+  color: var(--cp-color-caution);
+}
+
+.condw--critical {
+  background: var(--cp-color-critical-dim);
+  border-color: var(--cp-color-critical-border);
+  color: var(--cp-color-critical);
+}
+
+.condw--url {
+  cursor: pointer;
+}
+
+.condw-link {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 14px;
+  height: 14px;
+  opacity: 0.8;
+}

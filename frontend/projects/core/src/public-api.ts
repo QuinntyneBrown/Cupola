@@ -39,6 +39,7 @@ export * from './lib/time/time-api.service';
 export * from './lib/time/url-time-sync.service';
 
 export * from './lib/telemetry/telemetry-request';
+export * from './lib/telemetry/telemetry-filtering';
 export * from './lib/telemetry/limits';
 export * from './lib/telemetry/telemetry-provider';
 export * from './lib/telemetry/subscription-cache';
@@ -76,6 +77,14 @@ export * from './lib/notifications/default-notification.service';
 export * from './lib/faults/fault';
 export * from './lib/faults/fault-provider';
 export * from './lib/faults/fault-management.service';
+
+export * from './lib/notebook/notebook-model';
+export * from './lib/notebook/notebook.service';
+export * from './lib/notebook/notebook-storage.service';
+
+export * from './lib/annotations/annotation.service';
+export * from './lib/annotations/tag-registry';
+export * from './lib/annotations/target-comparators';
 
 export * from './lib/security/sanitizers';
 export * from './lib/security/image-url';

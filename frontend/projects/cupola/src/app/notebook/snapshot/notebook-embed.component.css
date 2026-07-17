@@ -1,0 +1,49 @@
+:host {
+  display: inline-flex;
+}
+
+.nb-snap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-s);
+  background: var(--cp-color-void);
+  padding: 6px 10px 6px 6px;
+  max-width: 100%;
+  cursor: pointer;
+  text-align: left;
+}
+
+.nb-snap:hover {
+  border-color: var(--cp-color-line);
+}
+
+.nb-snap-img {
+  width: 64px;
+  height: 40px;
+  flex: none;
+  border-radius: 2px;
+  border: 1px solid var(--cp-color-line);
+  background: linear-gradient(135deg, #1d3a5c 0%, #0c1826 80%);
+}
+
+.nb-snap-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.nb-snap-name {
+  font: var(--cp-type-body-s);
+  color: var(--cp-color-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nb-snap-ts {
+  font: var(--cp-type-data-s);
+  color: var(--cp-color-ink-3);
+}

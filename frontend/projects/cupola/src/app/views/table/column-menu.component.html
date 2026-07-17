@@ -1,0 +1,39 @@
+<div class="cp-menu" data-testid="table-column-menu">
+  <div class="cp-menu-head">Columns</div>
+  @for (item of items(); track item.key) {
+    <div class="cp-menu-item cp-column-row" [attr.data-key]="item.key">
+      <label
+        class="cp-check"
+        [class.is-checked]="item.visible"
+        data-testid="table-column-toggle"
+        [attr.data-key]="item.key"
+        (click)="onToggle(item.key)"
+      >
+        <span class="cp-check-box"><svg class="cp-icon"><use href="#i-check" /></svg></span>
+        {{ item.name }}
+      </label>
+      <span class="cp-column-move">
+        <button
+          class="cp-icon-btn cp-icon-btn--s"
+          type="button"
+          aria-label="Move column up"
+          data-testid="table-column-up"
+          [attr.data-key]="item.key"
+          (click)="onMove(item.key, 'up')"
+        >
+          <svg class="cp-icon cp-icon--s"><use href="#i-arrow-up" /></svg>
+        </button>
+        <button
+          class="cp-icon-btn cp-icon-btn--s"
+          type="button"
+          aria-label="Move column down"
+          data-testid="table-column-down"
+          [attr.data-key]="item.key"
+          (click)="onMove(item.key, 'down')"
+        >
+          <svg class="cp-icon cp-icon--s"><use href="#i-arrow-down" /></svg>
+        </button>
+      </span>
+    </div>
+  }
+</div>

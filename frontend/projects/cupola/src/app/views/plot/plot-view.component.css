@@ -3,7 +3,6 @@
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  gap: var(--cp-space-3);
 }
 
 .plot {
@@ -11,36 +10,80 @@
   flex-direction: column;
   height: 100%;
   min-height: 240px;
-  gap: var(--cp-space-3);
+  background: var(--cp-color-surface-1);
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-m);
+  overflow: hidden;
 }
 
-.gauges {
+.plot-toolbar {
   display: flex;
-  gap: var(--cp-space-8);
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-
-.legend {
-  margin-left: auto;
-  display: flex;
-  gap: var(--cp-space-5);
   align-items: center;
-  font: var(--cp-type-caption);
-  color: var(--cp-color-ink-2);
+  gap: 2px;
+  height: 36px;
+  padding: 0 var(--cp-space-3);
+  background: var(--cp-color-surface-2);
+  border-bottom: 1px solid var(--cp-color-hairline);
 }
 
-.legend-item {
+.plot-toolbar-title {
+  font: var(--cp-type-pane-head);
+  text-transform: uppercase;
+  letter-spacing: var(--cp-tracking-caps);
+  color: var(--cp-color-ink-2);
+  margin-right: var(--cp-space-4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.paused-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  height: 22px;
+  padding: 0 var(--cp-space-3);
+  border-radius: var(--cp-radius-s);
+  background: var(--cp-color-info-dim);
+  border: 1px solid var(--cp-color-primary-border);
+  color: var(--cp-color-primary);
+  font: var(--cp-type-overline);
+  text-transform: uppercase;
+  letter-spacing: var(--cp-tracking-caps);
 }
 
-.chart {
+.plot-stage {
+  position: relative;
   flex: 1;
   min-height: 180px;
-  border: 1px solid var(--cp-color-hairline);
-  border-radius: var(--cp-radius-s);
   background: var(--cp-color-void);
-  overflow: hidden;
+  padding: var(--cp-space-3);
+}
+
+.plot-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.plot-svg text {
+  font-family: 'IBM Plex Mono', 'Cascadia Mono', Consolas, monospace;
+  font-size: 11px;
+  fill: var(--cp-chart-tick);
+}
+
+.plot-svg .series-label {
+  fill: var(--cp-color-ink-2);
+}
+
+.plot-svg .limit-label--caution {
+  fill: var(--cp-color-caution);
+}
+
+.plot-svg .limit-label--critical {
+  fill: var(--cp-color-critical);
 }

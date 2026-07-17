@@ -2,13 +2,18 @@ import { test as base } from '@playwright/test';
 
 import { AboutDialogPage } from '../pages/about-dialog.page';
 import { AppShellPage } from '../pages/app-shell.page';
+import { ConditionSetPage } from '../pages/condition-set.page';
 import { ContextMenuPage } from '../pages/context-menu.page';
 import { FormDialogPage } from '../pages/form-dialog.page';
 import { GrandSearchPage } from '../pages/grand-search.page';
 import { InspectorPage } from '../pages/inspector.page';
 import { LicensesPage } from '../pages/licenses.page';
+import { NotebookPage } from '../pages/notebook.page';
 import { ObjectViewPage } from '../pages/object-view.page';
 import { OverlayPage } from '../pages/overlay.page';
+import { PlanPage } from '../pages/plan.page';
+import { PlotPage } from '../pages/plot.page';
+import { TelemetryTablePage } from '../pages/telemetry-table.page';
 import { TreePage } from '../pages/tree.page';
 import { FakeBackend } from './fake-backend';
 import { RealtimeDriver } from './realtime-driver';
@@ -26,6 +31,11 @@ interface CupolaFixtures {
   grandSearch: GrandSearchPage;
   aboutDialog: AboutDialogPage;
   licenses: LicensesPage;
+  conditionSet: ConditionSetPage;
+  plot: PlotPage;
+  plan: PlanPage;
+  telemetryTable: TelemetryTablePage;
+  notebook: NotebookPage;
 }
 
 /**
@@ -74,6 +84,21 @@ export const test = base.extend<CupolaFixtures>({
   },
   licenses: async ({ page }, use) => {
     await use(new LicensesPage(page));
+  },
+  conditionSet: async ({ page }, use) => {
+    await use(new ConditionSetPage(page));
+  },
+  plot: async ({ page }, use) => {
+    await use(new PlotPage(page));
+  },
+  plan: async ({ page }, use) => {
+    await use(new PlanPage(page));
+  },
+  telemetryTable: async ({ page }, use) => {
+    await use(new TelemetryTablePage(page));
+  },
+  notebook: async ({ page }, use) => {
+    await use(new NotebookPage(page));
   },
 });
 

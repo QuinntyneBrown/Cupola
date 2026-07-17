@@ -1,0 +1,97 @@
+@if (restricted()) {
+  <div class="plan-lanes" data-testid="plan-lanes">
+    @for (group of model(); track group.name) {
+      <div class="tl-lane plan-lane" data-testid="plan-group" [attr.data-group]="group.name">
+        <div class="tl-track">
+          @for (rowIndex of group.rowIndices; track rowIndex) {
+            <div class="tl-subrow" data-testid="plan-row" [attr.data-row]="rowIndex">
+              @for (item of group.activities; track item.activity.id) {
+                @if (item.row === rowIndex) {
+                  <div
+                    class="tl-bar"
+                    data-testid="plan-activity"
+                    [class.is-past]="item.temporal === 'past'"
+                    [class.is-future]="item.temporal === 'future'"
+                    [class.is-selected]="isSelected(item.activity)"
+                    [attr.data-activity-id]="item.activity.id"
+                    [attr.data-group]="group.name"
+                    [attr.data-row]="item.row"
+                    [attr.data-temporal]="item.temporal"
+                    [style.--slot]="slotVar(group.slot)"
+                    [style.left.%]="item.leftPct"
+                    [style.width.%]="item.widthPct"
+                    (click)="selectActivity(item.activity, $event)"
+                  >
+                    {{ item.activity.name }}
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+} @else {
+  <div class="tl-plan" data-testid="plan-chart">
+    <div class="tl-row tl-axis" data-testid="plan-axis">
+      <div class="tl-gutter">{{ object().name }}</div>
+      <div class="tl-track tl-track--axis">
+        @for (tick of axisTicks(); track $index) {
+          <span
+            class="tl-tick"
+            data-testid="plan-axis-tick"
+            [class.tl-tick--first]="$first"
+            [class.tl-tick--last]="$last"
+            [style.left.%]="tick.leftPct"
+            >{{ tick.label }}</span
+          >
+        }
+      </div>
+    </div>
+
+    @for (group of model(); track group.name) {
+      <div
+        class="tl-row tl-lane plan-lane"
+        data-testid="plan-group"
+        [attr.data-group]="group.name"
+        [style.flex]="group.rows"
+      >
+        <div class="tl-gutter" data-testid="plan-group-name">{{ group.name }}</div>
+        <div class="tl-track">
+          @for (rowIndex of group.rowIndices; track rowIndex) {
+            <div class="tl-subrow" data-testid="plan-row" [attr.data-row]="rowIndex">
+              @for (item of group.activities; track item.activity.id) {
+                @if (item.row === rowIndex) {
+                  <div
+                    class="tl-bar"
+                    data-testid="plan-activity"
+                    [class.is-past]="item.temporal === 'past'"
+                    [class.is-future]="item.temporal === 'future'"
+                    [class.is-selected]="isSelected(item.activity)"
+                    [attr.data-activity-id]="item.activity.id"
+                    [attr.data-group]="group.name"
+                    [attr.data-row]="item.row"
+                    [attr.data-temporal]="item.temporal"
+                    [style.--slot]="slotVar(group.slot)"
+                    [style.left.%]="item.leftPct"
+                    [style.width.%]="item.widthPct"
+                    (click)="selectActivity(item.activity, $event)"
+                  >
+                    {{ item.activity.name }}
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (nowPct() !== null) {
+      <div class="tl-overlay">
+        <div class="tl-now" data-testid="plan-now" [style.left.%]="nowPct()"></div>
+      </div>
+    }
+  </div>
+}

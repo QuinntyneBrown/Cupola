@@ -1,0 +1,16 @@
+<div class="tl-track event-track">
+  @for (marker of markers(); track marker.timestamp) {
+    <div
+      class="ts-ev"
+      data-testid="event-marker"
+      [class.is-selected]="isSelected(marker)"
+      [attr.data-timestamp]="marker.timestamp"
+      [style.left.%]="marker.leftPct"
+      (click)="selectMarker(marker)"
+      (mouseenter)="selectMarker(marker)"
+    >
+      <span class="ts-ev-d"></span>
+      <span class="ts-ev-label">{{ marker.label }}</span>
+    </div>
+  }
+</div>

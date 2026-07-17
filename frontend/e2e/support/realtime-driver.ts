@@ -7,6 +7,8 @@ interface E2eWindow {
     pushObjectUpdate(object: unknown): void;
     pushTelemetry(value: unknown): void;
     setConnectionState(state: string): void;
+    setBounds(bounds: { start: number; end: number }): void;
+    setNow(timestamp: number): void;
   };
 }
 
@@ -24,12 +26,17 @@ export class RealtimeDriver {
     }, object);
   }
 
-  async pushTelemetry(keyString: string, value: number, timestamp?: string): Promise<void> {
+  async pushTelemetry(
+    keyString: string,
+    value: number,
+    timestamp?: string,
+    extra?: Record<string, unknown>,
+  ): Promise<void> {
     await this.page.evaluate(
       (telemetry) => {
         (window as E2eWindow).__cupolaE2E!.pushTelemetry(telemetry);
       },
-      { keyString, value, timestamp: timestamp ?? new Date().toISOString() },
+      { keyString, value, timestamp: timestamp ?? new Date().toISOString(), ...extra },
     );
   }
 
@@ -37,5 +44,19 @@ export class RealtimeDriver {
     await this.page.evaluate((s) => {
       (window as E2eWindow).__cupolaE2E!.setConnectionState(s);
     }, state);
+  }
+
+  /** Drives a user-originated conductor bounds change (OMCT-C08-L2-01.07). */
+  async setBounds(bounds: { start: number; end: number }): Promise<void> {
+    await this.page.evaluate((b) => {
+      (window as E2eWindow).__cupolaE2E!.setBounds(b);
+    }, bounds);
+  }
+
+  /** Pins the controllable "now" for deterministic temporal classes (OMCT-C12-L2-03.04). */
+  async setNow(timestamp: number): Promise<void> {
+    await this.page.evaluate((t) => {
+      (window as E2eWindow).__cupolaE2E!.setNow(t);
+    }, timestamp);
   }
 }

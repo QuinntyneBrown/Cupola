@@ -1,0 +1,33 @@
+<div class="plot" data-testid="plot-view">
+  <div class="plot-toolbar">
+    <span class="plot-toolbar-title">{{ object().name }}</span>
+  </div>
+  <div class="plot-stage">
+    <svg class="plot-svg" data-testid="bar-graph-svg" [attr.viewBox]="viewBox" preserveAspectRatio="none" role="img" [attr.aria-label]="object().name + ' bar chart'">
+      <g stroke="var(--cp-chart-grid)" stroke-width="1">
+        @for (y of model().gridY; track $index) {
+          <line [attr.x1]="area.x" [attr.y1]="y" [attr.x2]="area.x + area.w" [attr.y2]="y" />
+        }
+      </g>
+      <g stroke="var(--cp-chart-axis)" stroke-width="1">
+        <line [attr.x1]="area.x" [attr.y1]="area.y" [attr.x2]="area.x" [attr.y2]="area.y + area.h" />
+        <line [attr.x1]="area.x" [attr.y1]="area.y + area.h" [attr.x2]="area.x + area.w" [attr.y2]="area.y + area.h" />
+      </g>
+      <g text-anchor="end">
+        @for (tick of model().yTicks; track $index) {
+          <text data-testid="bar-y-tick" [attr.x]="area.x - 8" [attr.y]="tick.y + 4">{{ tick.label }}</text>
+        }
+      </g>
+      <g [attr.fill]="barColor()">
+        @for (bar of model().bars; track $index) {
+          <rect data-testid="bar" [attr.data-label]="bar.label" [attr.x]="bar.x" [attr.y]="bar.y" [attr.width]="bar.w" [attr.height]="bar.h" rx="2" />
+        }
+      </g>
+      <g text-anchor="middle">
+        @for (bar of model().bars; track $index) {
+          <text data-testid="bar-label" [attr.x]="bar.x + bar.w / 2" [attr.y]="area.y + area.h + 16">{{ bar.label }}</text>
+        }
+      </g>
+    </svg>
+  </div>
+</div>

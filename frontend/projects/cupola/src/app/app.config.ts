@@ -39,6 +39,7 @@ import { FORMS_CONTROL_SOURCE, FormsService } from '@cupola/components';
 
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
+import { registerConditions } from './conditions/register-conditions';
 import { registerDefaultActions } from './actions/register-default-actions';
 import { registerFaults } from './faults/register-faults';
 import { registerStandardInspectorViews } from './inspector/register-standard-inspector-views';
@@ -49,6 +50,11 @@ import { registerDefaultTime } from './time/register-default-time';
 import { registerTimeViews } from './time/register-time-views';
 import { registerDefaultToolbars } from './toolbars/register-default-toolbars';
 import { registerDefaultViews } from './views/register-default-views';
+import { registerPlotViews } from './views/plot/register-plot-views';
+import { registerTabularViews } from './tabular/register-tabular-views';
+import { registerPlans } from './plans/register-plans';
+import { registerNotebook } from './notebook/register-notebook';
+import { NowProvider } from './plans/plan/now-provider';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -86,6 +92,26 @@ export const appConfig: ApplicationConfig = {
       registerDefaultTelemetry();
       registerDefaultViews();
       registerStandardInspectorViews();
+      // C07 plots: register plot/chart types, composition policies, metadata, and
+      // view providers before create actions are minted from the creatable types.
+      registerPlotViews();
+      // C10 conditions: register condition/widget/derived types and views, the
+      // composition policy, the filter inspector, and derived providers before
+      // create actions are minted from the creatable types.
+      registerConditions();
+      // C08 tabular: register table/LAD/gauge/autoflow types, composition
+      // policies, view providers, and the gauge inspector before create actions
+      // are minted from the creatable types.
+      registerTabularViews();
+      // C12 planning: register plan/gantt/time-strip/time-list/monitoring types,
+      // view and inspector providers, composition policies, event timeline, and
+      // the activity-state / plan-monitoring interceptors and roots before create
+      // actions are minted from the creatable types.
+      registerPlans();
+      // C13 notebooks: register the notebook, restricted-notebook, and annotation
+      // types, the notebook view, the copy/export actions, and the known
+      // annotation types before create actions are minted from the creatable types.
+      registerNotebook();
       registerDefaultActions();
       registerDefaultToolbars();
       // C14 operational awareness: user/status providers, indicators, notifications, faults.
@@ -96,6 +122,21 @@ export const appConfig: ApplicationConfig = {
       registerDefaultTime();
       registerTimeViews();
       inject(UrlTimeSyncService).start();
+      // e2e only: expose a conductor bounds setter on the realtime test hook so
+      // acceptance tests can drive a user-originated bounds change (the conductor
+      // itself has no bounds-editing control). Mirrors the FakeRealtimeGateway
+      // hook; no effect in production builds.
+      if (environment.e2e) {
+        const time = inject(GlobalTimeContext);
+        const hook = (window as unknown as { __cupolaE2E?: Record<string, unknown> }).__cupolaE2E;
+        if (hook) {
+          hook['setBounds'] = (bounds: { start: number; end: number }) => time.setBounds(bounds);
+          // C12 time list / plan temporal classification reads a controllable
+          // "now"; let acceptance tests pin it for deterministic temporal classes.
+          const now = inject(NowProvider);
+          hook['setNow'] = (value: number) => now.set(value);
+        }
+      }
     }),
   ],
 };

@@ -1,10 +1,116 @@
 <div class="inspector-section" data-testid="plot-series-inspector">
   <div class="sh-overline">Plot series</div>
+
   <div class="series-list">
     @for (s of series(); track s.keyString) {
-      <span class="series-row">
-        <span class="sh-series-swatch" [style.background]="s.swatch"></span>{{ s.keyString }}
-      </span>
+      <div class="series-row" data-testid="plot-series-row" [attr.data-key]="s.keyString">
+        <div class="series-head">
+          <span class="sh-series-swatch" [style.background]="s.color"></span>
+          <span class="series-name">{{ s.name }}</span>
+        </div>
+        <div class="palette" role="group" aria-label="Series colour">
+          @for (slot of slots; track slot) {
+            <button
+              type="button"
+              class="swatch"
+              data-testid="plot-series-color"
+              [attr.data-slot]="slot"
+              [class.is-selected]="(s.style.colorSlot ?? 0) === slot"
+              [style.background]="chartColor(slot)"
+              [attr.aria-label]="'Colour slot ' + slot"
+              (click)="setColor(s.keyString, slot)"
+            ></button>
+          }
+        </div>
+        @if (isPlot()) {
+          <div class="series-selects">
+            <label>
+              <span>Interp.</span>
+              <select data-testid="plot-series-interp" [attr.data-key]="s.keyString" [value]="s.style.interpolation ?? 'linear'" (change)="setInterpolation(s.keyString, $event)">
+                <option value="linear">Linear</option>
+                <option value="step">Step</option>
+              </select>
+            </label>
+            <label>
+              <span>Line</span>
+              <select data-testid="plot-series-linestyle" [attr.data-key]="s.keyString" [value]="s.style.lineStyle ?? 'solid'" (change)="setLineStyle(s.keyString, $event)">
+                <option value="solid">Solid</option>
+                <option value="dashed">Dashed</option>
+                <option value="none">None</option>
+              </select>
+            </label>
+            <label>
+              <span>Point</span>
+              <select data-testid="plot-series-point" [attr.data-key]="s.keyString" [value]="s.style.pointStyle ?? 'none'" (change)="setPointStyle(s.keyString, $event)">
+                <option value="none">None</option>
+                <option value="dot">Dot</option>
+              </select>
+            </label>
+          </div>
+        }
+      </div>
     }
   </div>
+
+  @if (isPlot()) {
+    <div class="options">
+      <label class="opt">
+        <input type="checkbox" data-testid="plot-opt-grid" [checked]="config().grid" (change)="setGrid($event)" />
+        <span>Show gridlines</span>
+      </label>
+      <label class="opt">
+        <input type="checkbox" data-testid="plot-opt-limits" [checked]="config().limitLines" (change)="setLimitLines($event)" />
+        <span>Show limit lines</span>
+      </label>
+
+      <div class="radio-group" role="radiogroup" aria-label="Legend mode">
+        <span class="radio-label">Legend</span>
+        @for (mode of ['collapsed', 'expanded']; track mode) {
+          <button
+            type="button"
+            class="radio"
+            data-testid="plot-opt-legend"
+            [attr.data-value]="mode"
+            [class.is-selected]="config().legend === mode"
+            (click)="setLegend($any(mode))"
+          >{{ mode }}</button>
+        }
+      </div>
+
+      <div class="radio-group" role="radiogroup" aria-label="Y-axis mode">
+        <span class="radio-label">Y axes</span>
+        @for (mode of ['single', 'per-series']; track mode) {
+          <button
+            type="button"
+            class="radio"
+            data-testid="plot-opt-yaxis"
+            [attr.data-value]="mode"
+            [class.is-selected]="config().yAxisMode === mode"
+            (click)="setYAxisMode($any(mode))"
+          >{{ mode }}</button>
+        }
+      </div>
+    </div>
+  }
+
+  @if (isScatter()) {
+    <div class="options scatter-axes">
+      <label>
+        <span>X range</span>
+        <select data-testid="scatter-x-key" [value]="scatter().xKey" (change)="setScatterKey('xKey', $event)">
+          @for (key of rangeKeys(); track key) {
+            <option [value]="key">{{ key }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        <span>Y range</span>
+        <select data-testid="scatter-y-key" [value]="scatter().yKey" (change)="setScatterKey('yKey', $event)">
+          @for (key of rangeKeys(); track key) {
+            <option [value]="key">{{ key }}</option>
+          }
+        </select>
+      </label>
+    </div>
+  }
 </div>

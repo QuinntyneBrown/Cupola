@@ -1,0 +1,111 @@
+<div class="time-list-controls">
+  <span class="cp-input-wrap">
+    <input
+      class="cp-input"
+      type="text"
+      placeholder="Filter by name"
+      data-testid="time-list-filter"
+      [value]="filter().name ?? ''"
+      (input)="onNameFilter($any($event.target).value)"
+    />
+  </span>
+  <select
+    class="cp-select"
+    data-testid="time-list-class"
+    [value]="timeClass()"
+    (change)="onTimeClass($any($event.target).value)"
+  >
+    <option value="all">All time classes</option>
+    <option value="past">Past only</option>
+    <option value="current-future">Current &amp; future</option>
+  </select>
+</div>
+
+<div class="cp-table-wrap">
+  <table class="cp-table" data-testid="time-list-table">
+    <thead>
+      <tr>
+        <th>
+          <button
+            class="cp-th-sort"
+            data-testid="time-list-sort-name"
+            [class.is-sorted]="sortIndicator('name')"
+            (click)="sortBy('name')"
+          >
+            Name
+          </button>
+        </th>
+        <th>
+          <button
+            class="cp-th-sort"
+            data-testid="time-list-sort-start"
+            [class.is-sorted]="sortIndicator('start')"
+            [attr.data-direction]="sortIndicator('start')"
+            (click)="sortBy('start')"
+          >
+            Start
+          </button>
+        </th>
+        <th>
+          <button
+            class="cp-th-sort"
+            data-testid="time-list-sort-end"
+            [class.is-sorted]="sortIndicator('end')"
+            (click)="sortBy('end')"
+          >
+            End
+          </button>
+        </th>
+        <th class="num">
+          <button
+            class="cp-th-sort"
+            data-testid="time-list-sort-duration"
+            [class.is-sorted]="sortIndicator('duration')"
+            (click)="sortBy('duration')"
+          >
+            Duration
+          </button>
+        </th>
+        <th>Progress</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.id) {
+        <tr
+          data-testid="time-list-row"
+          [attr.data-id]="row.id"
+          [attr.data-temporal]="row.temporal"
+          [class.is-currentrow]="row.isCurrent"
+          [class.is-pastrow]="row.isPast"
+        >
+          <td data-testid="time-list-name">{{ row.name }}</td>
+          <td class="cp-mono" data-testid="time-list-start">{{ row.startText }}</td>
+          <td class="cp-mono" data-testid="time-list-end">{{ row.endText }}</td>
+          <td class="num cp-mono" data-testid="time-list-duration">{{ row.durationText }}</td>
+          <td data-testid="time-list-progress">
+            @if (row.isCurrent) {
+              <span class="tt-progress">
+                <svg class="tl-arc" viewBox="0 0 16 16" aria-hidden="true">
+                  <circle class="trk" cx="8" cy="8" r="6" />
+                  <circle
+                    class="fil"
+                    cx="8"
+                    cy="8"
+                    r="6"
+                    [attr.stroke-dasharray]="row.arcDash"
+                    transform="rotate(-90 8 8)"
+                  />
+                </svg>
+                {{ row.percent }}%
+              </span>
+            } @else if (row.isPast) {
+              <span class="tt-progress">Complete</span>
+            } @else {
+              <span class="tt-progress tt-progress--future">Not started</span>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

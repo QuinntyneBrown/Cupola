@@ -1,0 +1,14 @@
+:host {
+  display: block;
+  padding: var(--cp-space-4);
+}
+
+.cp-field {
+  margin-bottom: var(--cp-space-3);
+}
+
+.cp-gauge-manual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--cp-space-3);
+}

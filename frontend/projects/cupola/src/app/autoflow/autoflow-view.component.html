@@ -1,0 +1,34 @@
+<div
+  class="tt-autoflow"
+  data-testid="autoflow-view"
+  [attr.data-columns]="columns()"
+  [style.column-count]="columns()"
+>
+  @for (row of rows(); track row.keyString) {
+    <div
+      class="tt-af-row"
+      role="listitem"
+      data-testid="autoflow-row"
+      [class.is-stale]="row.stale"
+      [attr.data-key]="row.keyString"
+      [attr.aria-label]="row.name + ' ' + row.value + ' ' + row.unit"
+      (dblclick)="onDatum(row)"
+    >
+      <span class="tt-af-name" [class.is-stale]="row.stale">
+        {{ row.name }}
+        @if (row.stale) {
+          <svg class="cp-icon cp-af-stale"><use href="#i-history" /></svg>
+        }
+      </span>
+      <span
+        class="tt-af-val"
+        data-testid="autoflow-value"
+        [class.is-stale]="row.stale"
+        [class.is-limit-caution]="row.limitClass === 'is-limit-caution'"
+        [class.is-limit-critical]="row.limitClass === 'is-limit-critical'"
+      >
+        {{ row.value }}<span class="unit">{{ row.unit }}</span>
+      </span>
+    </div>
+  }
+</div>

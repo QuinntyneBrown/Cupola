@@ -1,0 +1,39 @@
+@if (mode() === 'expanded') {
+  <div class="cp-table-wrap" data-testid="plot-legend-table">
+    <table class="cp-table plot-legend-table" aria-label="Plot legend, expanded">
+      <thead>
+        <tr>
+          <th class="sw-col"></th>
+          <th>Name</th>
+          <th>Timestamp</th>
+          <th class="num">Value</th>
+          <th class="num">Min</th>
+          <th class="num">Max</th>
+          <th>Unit</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (s of series(); track s.keyString) {
+          <tr data-testid="plot-legend-row" [attr.data-key]="s.keyString">
+            <td><span class="sw" [style.background]="s.color"></span></td>
+            <td>{{ s.name }}</td>
+            <td>{{ s.timestamp }}</td>
+            <td class="num">{{ s.latest }}</td>
+            <td class="num">{{ s.min }}</td>
+            <td class="num">{{ s.max }}</td>
+            <td>{{ s.unit }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <div class="plot-legend" data-testid="plot-legend" aria-label="Plot legend, collapsed">
+    @for (s of series(); track s.keyString) {
+      <span class="plot-key" data-testid="plot-key" [attr.data-key]="s.keyString">
+        <span class="sw" [style.background]="s.color"></span>{{ s.name }}
+        <span class="v">{{ s.latest }} {{ s.unit }}</span>
+      </span>
+    }
+  </div>
+}

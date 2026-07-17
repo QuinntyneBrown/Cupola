@@ -1,0 +1,271 @@
+<div class="nb-shell">
+  <!-- Sections -->
+  <div class="nb-col nb-col--sections">
+    <div class="cp-pane-head">
+      Sections
+      <button
+        class="cp-icon-btn cp-icon-btn--s"
+        style="margin-left: auto"
+        data-testid="notebook-add-section"
+        aria-label="Add section"
+        (click)="addSection()"
+      >
+        <svg class="cp-icon cp-icon--s"><use href="#i-plus" /></svg>
+      </button>
+    </div>
+    <div class="nb-list cp-scroll">
+      @for (section of sections(); track section.id; let i = $index) {
+        <div
+          class="nb-item"
+          data-testid="notebook-section"
+          [attr.data-section-id]="section.id"
+          [attr.data-name]="section.name"
+          [class.is-selected]="section.id === selectedSection()?.id"
+          (click)="selectSection(section)"
+        >
+          @if (isRenaming('section', section.id)) {
+            <input
+              class="cp-input nb-rename"
+              data-testid="notebook-rename-input"
+              [value]="renameDraft()"
+              (click)="$event.stopPropagation()"
+              (input)="renameDraft.set($any($event.target).value)"
+              (keydown.enter)="commitRename()"
+              (blur)="commitRename()"
+              autofocus
+            />
+          } @else {
+            <span class="nb-item-label">{{ section.name }}</span>
+            <span class="nb-item-actions">
+              <button
+                class="nb-act"
+                data-testid="notebook-move-section-up"
+                aria-label="Move section up"
+                [disabled]="i === 0"
+                (click)="moveSection(i, -1); $event.stopPropagation()"
+              >
+                <svg class="cp-icon"><use href="#i-chevron-up" /></svg>
+              </button>
+              <button
+                class="nb-act"
+                data-testid="notebook-rename-section"
+                aria-label="Rename section"
+                (click)="
+                  startRename('section', section.id, section.id, section.name);
+                  $event.stopPropagation()
+                "
+              >
+                <svg class="cp-icon"><use href="#i-pencil" /></svg>
+              </button>
+              <button
+                class="nb-act"
+                data-testid="notebook-delete-section"
+                aria-label="Delete section"
+                (click)="deleteSection(section); $event.stopPropagation()"
+              >
+                <svg class="cp-icon"><use href="#i-trash" /></svg>
+              </button>
+            </span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Pages -->
+  <div class="nb-col nb-col--pages">
+    <div class="cp-pane-head">
+      Pages
+      <button
+        class="cp-icon-btn cp-icon-btn--s"
+        style="margin-left: auto"
+        data-testid="notebook-add-page"
+        aria-label="Add page"
+        (click)="addPage()"
+      >
+        <svg class="cp-icon cp-icon--s"><use href="#i-plus" /></svg>
+      </button>
+    </div>
+    <div class="nb-list cp-scroll">
+      @for (page of pages(); track page.id; let i = $index) {
+        <div
+          class="nb-item"
+          data-testid="notebook-page"
+          [attr.data-page-id]="page.id"
+          [attr.data-name]="page.name"
+          [class.is-selected]="page.id === selectedPage()?.id"
+          (click)="selectPage(page.id)"
+        >
+          @if (isRenaming('page', page.id)) {
+            <input
+              class="cp-input nb-rename"
+              data-testid="notebook-rename-input"
+              [value]="renameDraft()"
+              (click)="$event.stopPropagation()"
+              (input)="renameDraft.set($any($event.target).value)"
+              (keydown.enter)="commitRename()"
+              (blur)="commitRename()"
+              autofocus
+            />
+          } @else {
+            <span class="nb-item-label">{{ page.name }}</span>
+            @if (isDefaultPage(page.id)) {
+              <svg
+                class="cp-icon"
+                style="color: var(--cp-color-primary)"
+                data-testid="notebook-default-pin"
+                role="img"
+                aria-label="Default destination"
+              >
+                <use href="#i-pin" />
+              </svg>
+            }
+            <span class="nb-item-actions">
+              <button
+                class="nb-act"
+                data-testid="notebook-set-default"
+                aria-label="Set as default destination"
+                (click)="selectPage(page.id); setDefaultDestination(); $event.stopPropagation()"
+              >
+                <svg class="cp-icon"><use href="#i-pin" /></svg>
+              </button>
+              <button
+                class="nb-act"
+                data-testid="notebook-rename-page"
+                aria-label="Rename page"
+                (click)="
+                  startRename('page', selectedSection()!.id, page.id, page.name);
+                  $event.stopPropagation()
+                "
+              >
+                <svg class="cp-icon"><use href="#i-pencil" /></svg>
+              </button>
+              <button
+                class="nb-act"
+                data-testid="notebook-delete-page"
+                aria-label="Delete page"
+                (click)="deletePage(page.id); $event.stopPropagation()"
+              >
+                <svg class="cp-icon"><use href="#i-trash" /></svg>
+              </button>
+            </span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Entries -->
+  <div class="nb-col nb-col--entries">
+    <div class="nb-editor">
+      <textarea
+        class="cp-textarea"
+        data-testid="notebook-editor"
+        placeholder="Add a notebook entry…"
+        style="min-height: 52px"
+        [value]="draftText()"
+        (input)="draftText.set($any($event.target).value)"
+        (keydown)="onEditorKeydown($event)"
+      ></textarea>
+      <div style="display: flex; gap: 10px; align-items: center">
+        <span class="cp-input-wrap nb-search" style="flex: 1">
+          <svg class="cp-icon cp-icon--s cp-icon--lead"><use href="#i-search" /></svg>
+          <input
+            class="cp-input"
+            data-testid="notebook-search-input"
+            placeholder="Search entries"
+            [value]="searchTerm()"
+            (input)="onSearch($any($event.target).value)"
+          />
+        </span>
+        @if (editingEntryId()) {
+          <button
+            class="cp-btn cp-btn--text cp-btn--small"
+            data-testid="notebook-cancel-entry"
+            (click)="cancelEdit()"
+          >
+            Cancel
+          </button>
+        }
+        <button
+          class="cp-btn cp-btn--filled cp-btn--small"
+          data-testid="notebook-save-entry"
+          (click)="saveEntry()"
+        >
+          {{ editingEntryId() ? 'Update entry' : 'Save entry' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="nb-entries cp-scroll" data-testid="notebook-entries">
+      @for (row of entryRows(); track row.entry.id) {
+        <div class="nb-entry" data-testid="notebook-entry" [attr.data-entry-id]="row.entry.id">
+          <div class="nb-entry-head">
+            <span class="nb-ts" data-testid="notebook-entry-timestamp">{{
+              entryTimestamp(row.entry)
+            }}</span>
+            @if (row.entry.createdBy) {
+              <span class="nb-author" data-testid="notebook-entry-author">
+                <svg class="cp-icon"><use href="#i-user" /></svg>{{ row.entry.createdBy }}
+              </span>
+            }
+            @if (searchTerm().trim()) {
+              <span class="nb-committed" data-testid="notebook-entry-path"
+                >{{ row.sectionName }} / {{ row.pageName }}</span
+              >
+            }
+            <span class="nb-item-actions">
+              <button
+                class="nb-act"
+                data-testid="notebook-edit-entry"
+                aria-label="Edit entry"
+                (click)="editEntry(row)"
+              >
+                <svg class="cp-icon"><use href="#i-pencil" /></svg>
+              </button>
+              <button
+                class="nb-act"
+                data-testid="notebook-delete-entry"
+                aria-label="Delete entry"
+                (click)="deleteEntry(row)"
+              >
+                <svg class="cp-icon"><use href="#i-trash" /></svg>
+              </button>
+            </span>
+          </div>
+          <div
+            class="nb-entry-body"
+            data-testid="notebook-entry-body"
+            [innerHTML]="entryBodyHtml(row.entry)"
+          ></div>
+          @if (row.entry.embeds.length > 0) {
+            <div class="nb-embeds">
+              @for (embed of row.entry.embeds; track embed.objectKeyString + embed.capturedAt) {
+                <cp-notebook-embed [embed]="embed" />
+              }
+            </div>
+          }
+          @if (row.entry.tags.length > 0) {
+            <div class="nb-tags">
+              @for (tag of row.entry.tags; track tag) {
+                <span class="cp-chip">{{ tag }}</span>
+              }
+            </div>
+          }
+        </div>
+      } @empty {
+        <div class="cp-empty" data-testid="notebook-empty">
+          <svg class="cp-icon"><use href="#i-notebook" /></svg>
+          <h4>{{ searchTerm().trim() ? 'No matching entries' : 'No entries yet' }}</h4>
+          <p>
+            {{
+              searchTerm().trim()
+                ? 'Nothing in this notebook matches your search.'
+                : 'Add the first entry above.'
+            }}
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+</div>
