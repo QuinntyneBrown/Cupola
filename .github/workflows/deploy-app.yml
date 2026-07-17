@@ -145,3 +145,6 @@ jobs:
 
       - name: Assert camera frames at /imagery (root-absolute telemetry URLs)
         run: curl -fs "${{ needs.deploy.outputs.url }}/imagery/frame-0.svg" | grep -q '<svg'
+
+      - name: Assert AVIF screenshots are served with the right type
+        run: curl -fsI "${{ needs.deploy.outputs.url }}/assets/shots/dashboard.avif" | grep -qi 'content-type: image/avif'

@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Cupola.Api.Hubs;
 using Cupola.Core.Models;
 using Cupola.Core.Services;
+using Microsoft.AspNetCore.StaticFiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,8 +31,14 @@ var app = builder.Build();
 // (assembled at CI time; absent in local dev, where these middlewares no-op).
 // The SPA uses hash routing, so no server-side fallback route is required.
 app.UseDefaultFiles();
+
+// .NET 8's default content-type map predates AVIF; unknown extensions 404.
+var staticContentTypes = new FileExtensionContentTypeProvider();
+staticContentTypes.Mappings[".avif"] = "image/avif";
+
 app.UseStaticFiles(new StaticFileOptions
 {
+    ContentTypeProvider = staticContentTypes,
     OnPrepareResponse = static ctx =>
         ctx.Context.Response.Headers.CacheControl = Program.CacheControlFor(ctx.File.Name),
 });
