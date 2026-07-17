@@ -7,6 +7,7 @@ import { ContextMenuPage } from '../pages/context-menu.page';
 import { FormDialogPage } from '../pages/form-dialog.page';
 import { GrandSearchPage } from '../pages/grand-search.page';
 import { InspectorPage } from '../pages/inspector.page';
+import { LayoutPage } from '../pages/layout.page';
 import { LicensesPage } from '../pages/licenses.page';
 import { NotebookPage } from '../pages/notebook.page';
 import { ObjectViewPage } from '../pages/object-view.page';
@@ -36,6 +37,7 @@ interface CupolaFixtures {
   plan: PlanPage;
   telemetryTable: TelemetryTablePage;
   notebook: NotebookPage;
+  layout: LayoutPage;
 }
 
 /**
@@ -99,6 +101,9 @@ export const test = base.extend<CupolaFixtures>({
   },
   notebook: async ({ page }, use) => {
     await use(new NotebookPage(page));
+  },
+  layout: async ({ page }, use) => {
+    await use(new LayoutPage(page));
   },
 });
 

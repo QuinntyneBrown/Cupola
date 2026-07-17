@@ -1,0 +1,46 @@
+<div
+  class="dl-canvas"
+  [class.cp-editable-canvas]="editing()"
+  [class.dl-canvas--browse]="!editing()"
+  data-testid="dl-canvas"
+  [attr.data-editing]="editing()"
+  (pointerdown)="onCanvasPointerDown($event)"
+>
+  @for (item of renderedItems(); track item.id) {
+    <div
+      class="cp-frame dl-item"
+      [class.is-selected]="isSelected(item.id)"
+      [class.dl-item--line]="item.kind === 'line'"
+      [class.dl-item--frameless]="item.kind !== 'subobject' || item.hideFrame"
+      data-testid="dl-frame"
+      [attr.data-item-id]="item.id"
+      [attr.data-kind]="item.kind"
+      [style.left.px]="item.x * gridPx"
+      [style.top.px]="item.y * gridPx"
+      [style.width.px]="frameWidth(item)"
+      [style.height.px]="frameHeight(item)"
+      [style.transform]="frameTransform(item)"
+      [style.z-index]="item.z"
+      (pointerdown)="onItemPointerDown($event, item)"
+    >
+      <cp-layout-frame [item]="item" [objectPath]="objectPath()" />
+      @if (editing() && isSelected(item.id)) {
+        @if (item.kind !== 'line') {
+          @for (handle of handles; track handle) {
+            <div
+              class="cp-handle cp-handle--{{ handle }}"
+              data-testid="dl-handle"
+              [attr.data-handle]="handle"
+              (pointerdown)="onHandlePointerDown($event, item, handle)"
+            ></div>
+          }
+          <div
+            class="dl-rotate"
+            data-testid="dl-rotate"
+            (pointerdown)="onRotatePointerDown($event, item)"
+          ></div>
+        }
+      }
+    </div>
+  }
+</div>

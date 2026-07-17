@@ -1,0 +1,73 @@
+:host {
+  display: block;
+  height: 100%;
+  min-height: 0;
+}
+
+.fl-canvas {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  min-height: 320px;
+  border: 1px solid transparent;
+}
+
+.fl-canvas--rows {
+  flex-direction: column;
+}
+
+.fl-canvas--edit {
+  outline: 1px dashed var(--cp-color-edit);
+  outline-offset: -1px;
+}
+
+.fl-container {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  gap: 0;
+}
+
+.fl-canvas--rows .fl-container {
+  flex-direction: row;
+}
+
+.fl-canvas:not(.fl-canvas--rows) .fl-container {
+  flex-direction: column;
+}
+
+.fl-chip {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  z-index: 2;
+  padding: 1px 6px;
+  font: var(--cp-type-caption);
+  color: var(--cp-color-ink-3);
+  background: var(--cp-color-surface-1);
+  border: 1px solid var(--cp-color-hairline);
+  border-radius: var(--cp-radius-s);
+  pointer-events: none;
+}
+
+.fl-pane {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--cp-color-hairline);
+}
+
+.fl-pane.is-selected {
+  border-color: var(--cp-color-edit);
+  box-shadow: 0 0 0 1px var(--cp-color-edit) inset;
+}
+
+.fl-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -1,0 +1,23 @@
+<div class="cp-pane-head folder-head">
+  <cp-folder-view-toggle active="list" />
+</div>
+@if (rows().length > 0) {
+  <div class="children-list" data-testid="children-list" role="list">
+    @for (row of rows(); track row.object.keyString) {
+      <div
+        class="child-row"
+        role="listitem"
+        [cpSelectable]="row.context"
+        [attr.data-key]="row.object.keyString"
+        data-testid="child-row"
+      >
+        <svg class="cp-icon"><use [attr.href]="'#' + row.glyph" /></svg>
+        <span class="child-row-name">{{ row.object.name }}</span>
+        <span class="child-row-type">{{ row.typeName }}</span>
+        <span class="child-row-when">{{ row.modified }}</span>
+      </div>
+    }
+  </div>
+} @else {
+  <p class="empty-folder" data-testid="empty-folder">This folder is empty.</p>
+}

@@ -1,3 +1,6 @@
+<div class="cp-pane-head folder-head">
+  <cp-folder-view-toggle active="folder" />
+</div>
 @if (childEntries().length > 0) {
   <div class="children-grid" data-testid="children-grid">
     @for (entry of childEntries(); track entry.object.keyString) {

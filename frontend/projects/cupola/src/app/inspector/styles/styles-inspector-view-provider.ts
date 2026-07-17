@@ -8,6 +8,7 @@ import { StylesInspectorViewComponent } from './styles-inspector-view.component'
 const STYLABLE_TYPES = new Set([
   'overlay-plot',
   'layout',
+  'flexible-layout',
   'condition-set',
   'condition-widget',
   'summary-widget',

@@ -65,7 +65,7 @@
     "name": "My Items",
     "type": "folder",
     "location": "ROOT",
-    "composition": ["station-displays", "ops-notebook", "conditions-lab", "plots-lab", "tables-lab", "notebook-lab", "imagery-lab"],
+    "composition": ["station-displays", "ops-notebook", "conditions-lab", "plots-lab", "tables-lab", "notebook-lab", "imagery-lab", "layouts-lab"],
     "telemetry": null,
     "created": "2026-07-02T14:51:08Z",
     "modified": "2026-07-13T09:12:44Z",
@@ -724,6 +724,167 @@
         "relatedTelemetry": ["pwr.bus_v", "pwr.array_out"]
       }
     },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "layouts-lab" },
+    "keyString": "layouts-lab",
+    "name": "Layouts lab",
+    "type": "folder",
+    "location": "mine",
+    "composition": ["dl.station", "fl.station", "tabs.ops", "tabs.keep", "tabs.empty", "link.rules", "link.console", "web.tdrs", "web.blocked"],
+    "telemetry": null,
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "dl.station" },
+    "keyString": "dl.station",
+    "name": "Station layout",
+    "type": "layout",
+    "location": "layouts-lab",
+    "composition": ["pwr.bus_v", "cam.cupola"],
+    "telemetry": null,
+    "configuration": {
+      "layout": {
+        "items": [
+          { "id": "it-busv", "kind": "subobject", "keyString": "pwr.bus_v", "viewKey": "table", "x": 2, "y": 2, "w": 30, "h": 18, "rotation": 0, "z": 0 },
+          { "id": "it-cam", "kind": "subobject", "keyString": "cam.cupola", "x": 34, "y": 2, "w": 22, "h": 18, "rotation": 0, "z": 1 },
+          { "id": "it-title", "kind": "text", "text": "Station overview", "x": 2, "y": 22, "w": 16, "h": 3, "rotation": 0, "z": 2, "styles": { "color": "rgb(240, 200, 90)" } },
+          { "id": "it-box", "kind": "box", "x": 20, "y": 22, "w": 10, "h": 6, "rotation": 0, "z": 3, "styles": { "backgroundColor": "rgb(20, 40, 60)" } }
+        ]
+      }
+    },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "fl.station" },
+    "keyString": "fl.station",
+    "name": "Station flexible layout",
+    "type": "flexible-layout",
+    "location": "layouts-lab",
+    "composition": ["pwr.bus_v", "pwr.array_out", "cam.cupola"],
+    "telemetry": null,
+    "configuration": {
+      "flexible": {
+        "rowsLayout": true,
+        "containers": [
+          {
+            "id": "fc-top",
+            "size": 60,
+            "frames": [
+              { "id": "ff-busv", "keyString": "pwr.bus_v", "size": 55 },
+              { "id": "ff-array", "keyString": "pwr.array_out", "size": 45, "styles": { "backgroundColor": "rgb(20, 40, 60)" } }
+            ]
+          },
+          {
+            "id": "fc-bottom",
+            "size": 40,
+            "frames": [{ "id": "ff-cam", "keyString": "cam.cupola", "size": 100 }]
+          }
+        ]
+      }
+    },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "tabs.ops" },
+    "keyString": "tabs.ops",
+    "name": "Ops tabs",
+    "type": "tabs",
+    "location": "layouts-lab",
+    "composition": ["pwr.bus_v", "cam.cupola"],
+    "telemetry": null,
+    "configuration": { "tabs": {} },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "tabs.keep" },
+    "keyString": "tabs.keep",
+    "name": "Ops tabs (keep-alive)",
+    "type": "tabs",
+    "location": "layouts-lab",
+    "composition": ["pwr.bus_v", "pwr.array_out"],
+    "telemetry": null,
+    "configuration": { "tabs": { "keepAlive": true } },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "tabs.empty" },
+    "keyString": "tabs.empty",
+    "name": "Empty tabs",
+    "type": "tabs",
+    "location": "layouts-lab",
+    "composition": [],
+    "telemetry": null,
+    "configuration": { "tabs": { "emptyMessage": "No station displays composed yet." } },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "link.rules" },
+    "keyString": "link.rules",
+    "name": "Flight rules",
+    "type": "hyperlink",
+    "location": "layouts-lab",
+    "composition": [],
+    "telemetry": null,
+    "configuration": {
+      "hyperlink": { "url": "https://ops.example.gov/rules", "displayFormat": "link", "target": "current" }
+    },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "link.console" },
+    "keyString": "link.console",
+    "name": "Ops console",
+    "type": "hyperlink",
+    "location": "layouts-lab",
+    "composition": [],
+    "telemetry": null,
+    "configuration": {
+      "hyperlink": { "url": "https://ops.example.gov/console", "displayFormat": "button", "target": "new" }
+    },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "web.tdrs" },
+    "keyString": "web.tdrs",
+    "name": "TDRS status",
+    "type": "web-page",
+    "location": "layouts-lab",
+    "composition": [],
+    "telemetry": null,
+    "configuration": { "webPage": { "url": "https://status.example.gov/tdrs" } },
+    "created": "2026-07-02T14:51:08Z",
+    "modified": "2026-07-13T09:12:44Z",
+    "createdBy": "j.reyes"
+  },
+  {
+    "identifier": { "namespace": "", "key": "web.blocked" },
+    "keyString": "web.blocked",
+    "name": "Blocked page",
+    "type": "web-page",
+    "location": "layouts-lab",
+    "composition": [],
+    "telemetry": null,
+    "configuration": { "webPage": { "url": "javascript:alert(1)" } },
     "created": "2026-07-02T14:51:08Z",
     "modified": "2026-07-13T09:12:44Z",
     "createdBy": "j.reyes"
